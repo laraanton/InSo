@@ -10,10 +10,6 @@ class MiVentana(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
 
-        # Cambiar el color al pasar por arriba
-        self.olvidado_contrasena.setStyleSheet("color: blue; text-decoration: underline;")
-        self.cdRegistro.setStyleSheet("color: blue; text-decoration: underline;")
-
         # Cambiar el cursor al pasar por arriba
         self.olvidado_contrasena.setCursor(Qt.PointingHandCursor)
         self.cdRegistro.setCursor(Qt.PointingHandCursor)
