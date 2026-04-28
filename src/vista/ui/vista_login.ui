@@ -33,6 +33,13 @@
            <height>441</height>
           </rect>
          </property>
+         <property name="styleSheet">
+          <string notr="true">QWidget#widget_2 {
+	background-color: rgba(255, 255, 255, 0.82);
+	border-radius: 16px;
+	border: 1px solid rgba(200, 220, 245, 0.6);
+}</string>
+         </property>
          <widget class="QLabel" name="inicio_sesion">
           <property name="geometry">
            <rect>
@@ -43,7 +50,7 @@
            </rect>
           </property>
           <property name="text">
-           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:14pt;&quot;&gt;Iniciar Sesión&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:300; color:#1a3a5c; letter-spacing:2px;&quot;&gt;Iniciar Sesión&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="textFormat">
            <enum>Qt::RichText</enum>
@@ -63,9 +70,18 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit {
-	font-size: 16px;
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
 }
-</string>
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="text">
            <string>Usuario</string>
@@ -82,9 +98,18 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit {
-	font-size: 16px;
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
 }
-</string>
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="text">
            <string>Contraseña</string>
@@ -101,10 +126,21 @@
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton {
-	background-color: rgb(222, 237, 252);
+	background-color: rgb(29, 147, 197);
+	color: white;
 	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 1px;
+	border: none;
+	border-radius: 8px;
+	padding: 6px;
 }
-</string>
+QPushButton:hover {
+	background-color: rgb(24, 95, 165);
+}
+QPushButton:pressed {
+	background-color: rgb(12, 68, 124);
+}</string>
           </property>
           <property name="text">
            <string>Entrar</string>
@@ -120,7 +156,7 @@
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: blue;</string>
+           <string notr="true">color: rgb(24, 95, 165); font-size: 12px;</string>
           </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;¿Has olvidado tu contraseña?&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
@@ -136,8 +172,7 @@
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">color: blue;
-</string>
+           <string notr="true">color: rgb(24, 95, 165); font-size: 12px;</string>
           </property>
           <property name="text">
            <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; text-decoration: underline;&quot;&gt;¿No tienes cuenta? Regístrate&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
