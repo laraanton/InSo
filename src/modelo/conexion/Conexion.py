@@ -17,9 +17,16 @@ class Conexion:
                 [self._user, self._password],
                 jar_file
             )
+            print("Conexión realizada con éxito")  
             return self.conexion
+          
         except Exception as e:
             print("Error creando conexión:", e)
             return None
+
+
+if__name__ == "__main__":
+print("Comenzando conexión con SoftripBD ->")
+db = Conexion()
 
   
