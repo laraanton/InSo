@@ -1,11 +1,7 @@
 import jaydebeapi
 
 class Conexion:
-  _instancia = None
-  def __new__(cls, *args, **kwargs):
-    pass
-
-  def __init__(self, host='localhost', database='SoftripDB', user= 'userST', password = 'passST'):
+  def __init__(self, host='localhost', database='SoftripDB', user= 'sa', password = 'olacaracola'):
     if self._inicializado:
       return
     self._host = host
