@@ -2,8 +2,6 @@ import jaydebeapi
 
 class Conexion:
   def __init__(self, host='localhost', database='SoftripDB', user= 'sa', password = 'olacaracola'):
-    if self._inicializado:
-      return
     self._host = host
     self._database = database
     self._user = user
@@ -12,11 +10,10 @@ class Conexion:
 
    def createConnection(self):
         try:
-            jdbc_driver = "com.mysql.cj.jdbc.Driver"
-            jar_file = "./lib/mysql-connector-j-9.2.0.jar"
+            jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDrive"
+            jar_file = r".\lib\mssql-jdbc-13.4.0.jre11.jar"
             self.conexion = jaydebeapi.connect(
-                jdbc_driver,
-                f"jdbc:mysql://{self._host}/{self._database}",
+                url,
                 [self._user, self._password],
                 jar_file
             )
