@@ -24,6 +24,18 @@ class Conexion:
             print("Error creando conexión:", e)
             return None
 
+def getCursor(self):
+  if self.conexion is None:
+    self.createConnection()
+  return self.conexion.cursor()
+
+def clonseConnection(self):
+  try:
+    if self.conexion:
+      self.conexion.close()
+      self.conexion = None
+except Exception as e:
+print("Error creando conexión")
 
 if__name__ == "__main__":
 print("Comenzando conexión con SoftripBD ->")
