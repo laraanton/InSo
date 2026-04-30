@@ -35,7 +35,7 @@ def clonseConnection(self):
       self.conexion.close()
       self.conexion = None
 except Exception as e:
-print("Error creando conexión")
+print("Error cerrando conexión ->", e)
 
 if__name__ == "__main__":
 print("Comenzando conexión con SoftripBD ->")
