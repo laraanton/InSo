@@ -1,5 +1,6 @@
 from src.modelo.dao.UserDAO import UserDAO
 from src.modelo.vo.LoginVO import LoginVO
+from src.modelo.vo.RegistroVO import RegistroVO
 
 class BussinessObject():
 
@@ -16,7 +17,7 @@ class BussinessObject():
         if not user.es_activo():
             if user.cuenta_bloqueada:
                 return None, "Cuenta bloqueada. Contacta con el administrador"
-            return None, "Cuenta suspendida"
+            return None, "Cuenta inactiva o suspendida"
 
         return user, "Inicio de sesión exitoso"
 
@@ -41,3 +42,18 @@ class BussinessObject():
         if exito:
             return True, "Contraseña actualizada correctamente"
         return False, "No se pudo actualizar la contraseña"
+    
+
+    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash):
+        if not all([dni_nie, nombre_completo, email, password_hash]):
+            return False, "Todos los campos obligatorios deben estar rellenos"
+        
+        if len(password_hash) < 6:
+            return False, "La contraseña debe tener al menos 6 caracteres"
+
+        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash)
+        exito = UserDAO().insertarUsuario(registroVO)
+
+        if exito:
+            return True, "Usuario registrado correctamente"
+        return False, "No se pudo registrar el usuario. El email o DNI ya existen"
