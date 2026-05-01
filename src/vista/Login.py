@@ -1,7 +1,7 @@
-from PyQt5.QtWidgets import QApplication, QMainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
-from src.modelo.vo.LoginVo import LoginVo
+from src.modelo.logica.BussinessObject import BussinessObject
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaLogin.ui")
 
@@ -9,37 +9,60 @@ class MiVentana(QMainWindow, Form):
     def __init__(self):
         super().__init__()
         self.setupUi(self)
+        self.logica = BussinessObject()
 
-        # Cambiar el cursor al pasar por arriba
-        self.olvidado_contrasena.setCursor(Qt.PointingHandCursor)
+        self.forgetPass.setCursor(Qt.PointingHandCursor)
         self.cdRegistro.setCursor(Qt.PointingHandCursor)
 
         self.botonEntrar.clicked.connect(self.on_button_click)
-        self.olvidado_contrasena.mousePressEvent = lambda event: self.ir_a_recuperar()
+        self.forgetPass.mousePressEvent = lambda event: self.ir_a_recuperar()
         self.cdRegistro.mousePressEvent = lambda event: self.ir_a_registro()
 
     def on_button_click(self):
-        texto_usuario = self.in_usuario.text()
-        texto_contrasena = self.in_contrasena.text()
-        print("Usuario:", texto_usuario)
-        print("Contraseña:", texto_contrasena)
-        login = LoginVo(texto_usuario, texto_contrasena)
-        return login
+        email = self.in_usuario.text().strip()
+        contrasena = self.in_contrasena.text().strip()
+
+        user, mensaje = self.logica.comprobarLogin(email, contrasena)
+        if not user:
+            QMessageBox.warning(self, "Error de acceso", mensaje)
+            return
+
+        QMessageBox.information(self, "Bienvenido", mensaje)
+        self.abrir_ventana_principal(user)
+
+    def abrir_ventana_principal(self, user):
+        # Redirige según el tipo de usuario
+        tipo = user.tipo_usuario
+
+        if tipo == "Administrador":
+            from src.vista.VentanaAdmin import VentanaAdmin
+            self.ventana = VentanaAdmin(user)
+        elif tipo == "Operador":
+            from src.vista.VentanaOperador import VentanaOperador
+            self.ventana = VentanaOperador(user)
+        elif tipo == "Cliente":
+            from src.vista.VentanaCliente import VentanaCliente
+            self.ventana = VentanaCliente(user)
+        else:
+            QMessageBox.critical(self, "Error", "Tipo de usuario no reconocido")
+            return
+
+        self.ventana.show()
+        self.close()
 
     def ir_a_recuperar(self):
-        print("Ir a recuperar contraseña")
+        pass
         # from src.vista.VentanaRecuperar import VentanaRecuperar
         # self.ventana = VentanaRecuperar()
         # self.ventana.show()
         # self.close()
 
     def ir_a_registro(self):
-        print("Ir a registro")
+        pass
         # from src.vista.VentanaRegistro import VentanaRegistro
         # self.ventana = VentanaRegistro()
         # self.ventana.show()
         # self.close()
-
 
 if __name__ == "__main__":
     app = QApplication([])
