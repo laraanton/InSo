@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
-from src.modelo.logica.BussinessObject import BussinessObject
+from src.modelo.Logica_login import BussinessObject
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaLogin.ui")
 
@@ -33,7 +33,8 @@ class MiVentana(QMainWindow, Form):
     def abrir_ventana_principal(self, user):
         # Redirige según el tipo de usuario
         tipo = user.tipo_usuario
-
+        
+        #FALTA IMPLEMENTAR
         if tipo == "Administrador":
             from src.vista.VentanaAdmin import VentanaAdmin
             self.ventana = VentanaAdmin(user)
