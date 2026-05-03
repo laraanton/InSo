@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1115</width>
+    <height>844</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Recuperar contraseña</string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <property name="styleSheet">
+    <string notr="true">#centralwidget{
+	border-image: url(:/imagenes/fondo.jpg);
+}</string>
+   </property>
+   <layout class="QHBoxLayout" name="horizontalLayout">
+    <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QWidget" name="widget" native="true">
+        <widget class="QWidget" name="widget_2" native="true">
+         <property name="geometry">
+          <rect>
+           <x>9</x>
+           <y>270</y>
+           <width>531</width>
+           <height>380</height>
+          </rect>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QWidget#widget_2 {
+	background-color: rgba(255, 255, 255, 0.82);
+	border-radius: 16px;
+	border: 1px solid rgba(200, 220, 245, 0.6);
+}</string>
+         </property>
+
+         <!-- Título -->
+         <widget class="QLabel" name="lbl_titulo">
+          <property name="geometry">
+           <rect>
+            <x>14</x>
+            <y>30</y>
+            <width>501</width>
+            <height>51</height>
+           </rect>
+          </property>
+          <property name="text">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:16pt; font-weight:300; color:#1a3a5c; letter-spacing:2px;&quot;&gt;Recuperar Contraseña&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
+          <property name="textFormat">
+           <enum>Qt::RichText</enum>
+          </property>
+          <property name="alignment">
+           <set>Qt::AlignCenter</set>
+          </property>
+         </widget>
+
+         <!-- Input Email -->
+         <widget class="QLineEdit" name="in_email">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>100</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
+          </property>
+          <property name="placeholderText">
+           <string>Email</string>
+          </property>
+         </widget>
+
+         <!-- Input Nueva Contraseña -->
+         <widget class="QLineEdit" name="in_nueva_contrasena">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>160</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
+          </property>
+          <property name="placeholderText">
+           <string>Nueva contraseña</string>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+
+         <!-- Input Confirmar Nueva Contraseña -->
+         <widget class="QLineEdit" name="in_confirmar">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>220</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
+          </property>
+          <property name="placeholderText">
+           <string>Confirmar nueva contraseña</string>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+         </widget>
+
+         <!-- Botón Actualizar -->
+         <widget class="QPushButton" name="botonRecuperar">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>310</y>
+            <width>371</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+	background-color: rgb(29, 147, 197);
+	color: white;
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 1px;
+	border: none;
+	border-radius: 8px;
+	padding: 6px;
+}
+QPushButton:hover {
+	background-color: rgb(24, 95, 165);
+}
+QPushButton:pressed {
+	background-color: rgb(12, 68, 124);
+}</string>
+          </property>
+          <property name="text">
+           <string>Actualizar contraseña</string>
+          </property>
+         </widget>
+
+        </widget>
+       </widget>
+      </item>
+      <item>
+       <widget class="QWidget" name="widget_3" native="true"/>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources>
+  <include location="../imagenes/recursos.qrc"/>
+ </resources>
+ <connections/>
+</ui>
