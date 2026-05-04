@@ -12,3 +12,27 @@ class VentanaRecuperar(QMainWindow, Form):
     self.logica = BusinessObject()
 
     self.botonRecuperar.clicked.connect(self.on_actualizar)
+
+  def on_actualizar(self):
+    email = self.in_email.text().strip()
+    n_contrasena = self.in_nueva_contrasena.text().strip()
+    confirmar = self.in_confirmar.text().strip()
+
+    if n_contrasena != confirmar:
+      QMessageBox.warning(self, "Error", "Las contraseñas no coinciden")
+      return
+
+    exito, mensaje = self.logica.actualizarContrasena(email, n_contrasena)
+    
+    if not exito:
+      QMessageBox.warning(self, "Error de registro", mensaje)
+      return
+
+    QMessageBox.information(self, "Registro exitoso", mensaje)
+    self.volver_al_login()
+
+  def volver_al_login(self):
+    from src.vista.Login import MiVentana
+    self.ventana_login = MiVentana()
+    self.ventana_login.show()
+    self.close()
