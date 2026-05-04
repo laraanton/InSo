@@ -52,18 +52,16 @@ class MiVentana(QMainWindow, Form):
         self.close()
 
     def ir_a_recuperar(self):
-        pass
-        # from src.vista.VentanaRecuperar import VentanaRecuperar
-        # self.ventana = VentanaRecuperar()
-        # self.ventana.show()
-        # self.close()
+        from src.vista.VentanaRecuperar import VentanaRecuperar
+        self.ventana = VentanaRecuperar()
+        self.ventana.show()
+        self.close()
 
     def ir_a_registro(self):
-        pass
-        # from src.vista.VentanaRegistro import VentanaRegistro
-        # self.ventana = VentanaRegistro()
-        # self.ventana.show()
-        # self.close()
+        from src.vista.VentanaRegistro import VentanaRegistro
+        self.ventana = VentanaRegistro()
+        self.ventana.show()
+        self.close()
 
 if __name__ == "__main__":
     app = QApplication([])
