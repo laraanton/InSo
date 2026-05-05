@@ -15,6 +15,8 @@ class MiVentana(QMainWindow, Form):
         self.cdRegistro.setCursor(Qt.PointingHandCursor)
 
         self.botonEntrar.clicked.connect(self.on_button_click)
+        self.in_usuario.returnPressed.connect(lambda: self.in_contrasena.setFocus())
+        self.in_contrasena.returnPressed.connect(lambda: self.botonEntrar.setFocus())
         self.forgetPass.mousePressEvent = lambda event: self.ir_a_recuperar()
         self.cdRegistro.mousePressEvent = lambda event: self.ir_a_registro()
 
