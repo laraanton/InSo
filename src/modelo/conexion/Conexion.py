@@ -39,7 +39,7 @@ def closeConnection(self):
   except Exception as e:
     print("Error cerrando conexión ->", e)
 
-if__name__ == "__main__":
+if __name__ == "__main__":
   print("Comenzando conexión con SoftripBD ->")
   db = Conexion()
 
