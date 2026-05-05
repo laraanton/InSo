@@ -17,7 +17,7 @@ class VentanaRegistro(QMainWindow, Form):
     self.in_email.returnPressed.connect(lambda: self.in_telefono.setFocus())
     self.in_telefono.returnPressed.connect(lambda: self.in_contrasena.setFocus())
     self.in_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
-    self.in_confirmar.returnPressed.connect(lambda: self.botonRegistrar.setFocus())
+    self.in_confirmar.returnPressed.connect(self.on_registrar)
     
 
   def on_registrar(self):
