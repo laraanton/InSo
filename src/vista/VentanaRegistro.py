@@ -12,6 +12,13 @@ class VentanaRegistro(QMainWindow, Form):
     self.logica = BusinessObject()
 
     self.botonRegistrar.clicked.connect(self.on_registrar)
+    self.in_dni.returnPressed.connect(lambda: self.in_nombre.setFocus())
+    self.in_nombre.returnPressed.connect(lambda: self.in_email.setFocus())
+    self.in_email.returnPressed.connect(lambda: self.in_telefono.setFocus())
+    self.in_telefono.returnPressed.connect(lambda: self.in_contrasena.setFocus())
+    self.in_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
+    self.in_confirmar.returnPressed.connect(lambda: self.botonRegistrar.setFocus())
+    
 
   def on_registrar(self):
     dni_nie = self.in_dni.text().strip()
