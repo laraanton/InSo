@@ -83,7 +83,7 @@ QLineEdit:focus {
 	border-bottom: 2px solid rgb(55, 138, 221);
 }</string>
           </property>
-          <property name="text">
+          <property name="placeholderText">
            <string>Usuario</string>
           </property>
          </widget>
@@ -111,8 +111,11 @@ QLineEdit:focus {
 	border-bottom: 2px solid rgb(55, 138, 221);
 }</string>
           </property>
-          <property name="text">
+          <property name="placeholderText">
            <string>Contraseña</string>
+          </property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
           </property>
          </widget>
          <widget class="QPushButton" name="botonEntrar">
