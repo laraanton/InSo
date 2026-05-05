@@ -13,6 +13,6 @@ if __name__ == "__main__":
     controlador= ControladorPrincipal(ventana, modelo)
 
     ventana.controlador=controlador 
-    controlador.ventanaIniciarSesion()
+    controlador.abrirIniciarSesion()
 
     app.exec_()
