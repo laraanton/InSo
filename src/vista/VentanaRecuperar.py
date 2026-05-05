@@ -9,7 +9,7 @@ class VentanaRecuperar(QMainWindow, Form):
   def __init__(self):
     super().__init__()
     self.setupUi(self)
-    self.logica = BusinessObject()
+    self.logica = BussinessObject()
 
     self.botonRecuperar.clicked.connect(self.on_actualizar)
     self.in_email.returnPressed.connect(lambda: self.in_nueva_contrasena.setFocus())
