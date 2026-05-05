@@ -9,7 +9,7 @@ class VentanaRegistro(QMainWindow, Form):
   def __init__(self):
     super().__init__()
     self.setupUi(self)
-    self.logica = BusinessObject()
+    self.logica = BussinessObject()
 
     self.botonRegistrar.clicked.connect(self.on_registrar)
     self.in_dni.returnPressed.connect(lambda: self.in_nombre.setFocus())
