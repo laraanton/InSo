@@ -1,0 +1,587 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>860</width>
+    <height>408</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Softrip - Dashboard</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QMainWindow {
+        background-color: #f9f7f2;
+    }
+    QWidget#centralwidget {
+        background-color: #f9f7f2;
+    }
+    /* --- NAVBAR --- */
+    QWidget#navbar {
+        background-color: #ffffff;
+        border-bottom: 1px solid #eeeeee;
+    }
+    QLabel#logoLabel {
+        font-size: 22px;
+        font-weight: bold;
+        color: #5e8d8d;
+        letter-spacing: 1px;
+    }
+    QPushButton#navBtn1, QPushButton#navBtn2, QPushButton#navBtn3 {
+        background: transparent;
+        border: none;
+        font-size: 11px;
+        font-weight: 500;
+        color: #666666;
+        padding: 5px 2px;
+    }
+    QPushButton#navBtn1 {
+        color: #333333;
+        border-bottom: 2px solid #5e8d8d;
+    }
+    QPushButton#navBtn1:hover, QPushButton#navBtn2:hover, QPushButton#navBtn3:hover {
+        color: #5e8d8d;
+    }
+    QLabel#avatarLabel {
+        background-color: #5e8d8d;
+        color: white;
+        font-weight: bold;
+        font-size: 13px;
+        border-radius: 17px;
+        min-width: 34px;
+        max-width: 34px;
+        min-height: 34px;
+        max-height: 34px;
+    }
+    QLabel#userNameLabel {
+        font-size: 11px;
+        color: #333333;
+    }
+    /* --- HERO --- */
+    QLabel#heroTitle {
+        font-size: 24px;
+        font-weight: bold;
+        color: #333333;
+        letter-spacing: 2px;
+    }
+    QLabel#heroSubtitle {
+        font-size: 13px;
+        color: #666666;
+    }
+    /* --- CARDS --- */
+    QFrame#card1, QFrame#card2, QFrame#card3 {
+        background-color: #ffffff;
+        border-radius: 15px;
+        border: 1px solid #eeeeee;
+    }
+    QLabel#iconLabel1, QLabel#iconLabel2, QLabel#iconLabel3 {
+        font-size: 32px;
+    }
+    QLabel#cardTitle1, QLabel#cardTitle2, QLabel#cardTitle3 {
+        font-size: 11px;
+        font-weight: bold;
+        color: #333333;
+        letter-spacing: 1px;
+    }
+    QLabel#cardDesc1, QLabel#cardDesc2, QLabel#cardDesc3 {
+        font-size: 9px;
+        color: #666666;
+    }
+    QPushButton#moreBtn1, QPushButton#moreBtn2, QPushButton#moreBtn3 {
+        background-color: #f0f0f0;
+        border: none;
+        border-radius: 12px;
+        padding: 6px 22px;
+        font-size: 9px;
+        color: #333333;
+    }
+    QPushButton#moreBtn1:hover, QPushButton#moreBtn2:hover, QPushButton#moreBtn3:hover {
+        background-color: #e0e0e0;
+    }
+    /* --- CTA --- */
+    QPushButton#ctaButton {
+        background-color: #5e8d8d;
+        color: white;
+        border: none;
+        border-radius: 25px;
+        font-size: 12px;
+        font-weight: bold;
+        padding: 14px 40px;
+        letter-spacing: 1px;
+    }
+    QPushButton#ctaButton:hover {
+        background-color: #4a7474;
+    }
+    QLabel#ctaFooterText {
+        font-size: 9px;
+        color: #666666;
+    }
+    /* --- FOOTER --- */
+    QLabel#footerLinks, QLabel#footerCopy {
+        font-size: 9px;
+        color: #666666;
+    }
+   </string>
+  </property>
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="mainLayout">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <item>
+     <layout class="QHBoxLayout" name="navLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="logoLabel">
+        <property name="text">
+         <string>Softrip</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="navSpacer1">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QPushButton" name="navBtn1">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>1. Diseño de Paquetes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="navBtn2">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>2. Gestión de Compra</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="navBtn3">
+        <property name="cursor">
+         <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        <property name="text">
+         <string>3. Edición de Paquetes</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="navSpacer2">
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="avatarLabel">
+        <property name="text">
+         <string>M</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="userNameLabel">
+        <property name="text">
+         <string>Miguel</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="heroLayout">
+      <property name="spacing">
+       <number>8</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="heroTitle">
+        <property name="text">
+         <string>CENTRO DEL OPERADOR</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QHBoxLayout" name="cardsLayout">
+      <property name="spacing">
+       <number>30</number>
+      </property>
+      <item>
+       <widget class="QFrame" name="card1">
+        <layout class="QVBoxLayout" name="card1Layout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="iconLabel1">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Ignored" vsizetype="Ignored">
+             <horstretch>0</horstretch>
+             <verstretch>3</verstretch>
+            </sizepolicy>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>16777215</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">color: #333333;</string>
+           </property>
+           <property name="text">
+            <string>✎</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardTitle1">
+           <property name="text">
+            <string>1. DISEÑO DE PAQUETES</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardDesc1">
+           <property name="text">
+            <string>Crea experiencias de viaje perfectas con herramientas intuitivas y claras.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout">
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="moreBtn1">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Más</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="card2">
+        <layout class="QVBoxLayout" name="card2Layout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="iconLabel2">
+           <property name="text">
+            <string>📊</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardTitle2">
+           <property name="text">
+            <string>2. GESTIÓN DE COMPRA</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardDesc2">
+           <property name="text">
+            <string>Simplifica el proceso de reservas y pagos de forma segura y eficiente.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout">
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="moreBtn2">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Más</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+      <item>
+       <widget class="QFrame" name="card3">
+        <layout class="QVBoxLayout" name="card3Layout">
+         <property name="spacing">
+          <number>10</number>
+         </property>
+         <item>
+          <widget class="QLabel" name="iconLabel3">
+           <property name="text">
+            <string>⚙</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardTitle3">
+           <property name="text">
+            <string>3. EDICIÓN DE PAQUETES</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="cardDesc3">
+           <property name="text">
+            <string>Actualiza y personaliza tus ofertas rápidamente en una plataforma centralizada.</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignmentFlag::AlignCenter</set>
+           </property>
+           <property name="wordWrap">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <layout class="QHBoxLayout">
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item>
+            <widget class="QPushButton" name="moreBtn3">
+             <property name="cursor">
+              <cursorShape>PointingHandCursor</cursorShape>
+             </property>
+             <property name="text">
+              <string>Más</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Orientation::Horizontal</enum>
+             </property>
+             <property name="sizeHint" stdset="0">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+        </layout>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="ctaLayout">
+      <property name="spacing">
+       <number>10</number>
+      </property>
+      <item>
+       <layout class="QHBoxLayout">
+        <item>
+         <spacer>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation">
+           <enum>Qt::Orientation::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item>
+       <widget class="QLabel" name="ctaFooterText">
+        <property name="text">
+         <string>Haz las maletas. Nosotros el resto.</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
+     <layout class="QVBoxLayout" name="footerLayout">
+      <property name="spacing">
+       <number>4</number>
+      </property>
+      <item>
+       <widget class="QLabel" name="footerLinks">
+        <property name="text">
+         <string>Términos     Privacidad</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="footerCopy">
+        <property name="text">
+         <string>Copyright © 2026 Softrip</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignCenter</set>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
