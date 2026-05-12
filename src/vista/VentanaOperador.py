@@ -19,7 +19,7 @@ class SoftripApp(QMainWindow):
         # CTA
         self.ctaButton.clicked.connect(self.prueba_gratis)
 
-    def abrir_diseno_paquetes(self): pass   # ← tu lógica aquí
-    def abrir_gestion_compra(self):  pass   # ← tu lógica aquí
-    def abrir_edicion_paquetes(self): pass  # ← tu lógica aquí
-    def prueba_gratis(self):          pass  # ← tu lógica aquí
+    def abrir_diseno_paquetes(self): pass  
+    def abrir_gestion_compra(self):  pass  
+    def abrir_edicion_paquetes(self): pass  
+    def prueba_gratis(self):          pass 
