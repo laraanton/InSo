@@ -22,4 +22,4 @@ class SoftripApp(QMainWindow):
     def abrir_diseno_paquetes(self): pass  
     def abrir_gestion_compra(self):  pass  
     def abrir_edicion_paquetes(self): pass  
-    def prueba_gratis(self):          pass 
+    def prueba_gratis(self): pass 
