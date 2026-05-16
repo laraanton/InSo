@@ -30,33 +30,31 @@ class BussinessObject():
             return usuario.email, "Correo verificado"
         return None, "El correo no está registrado"
 
-    def actualizarContrasena(self, email, nueva_contrasena, dni):
+    def actualizarContrasena(self, email, nueva_contrasena):
         if not nueva_contrasena or len(nueva_contrasena) < 6:
             return False, "La contraseña debe tener al menos 6 caracteres"
-        if not dni:
-            return False, "El DNI es obligatorio"
+
         usuario = UserDAO().obtenerUsuarioPorEmail(email)
         if not usuario:
             return False, "No existe ninguna cuenta con ese email"
 
-        if usuario.dni_nie.upper() != dni.upper():
-            return False, "El DNI no corresponde con el email introducido"
         exito = UserDAO().actualizarContrasena(usuario.usuario_id, nueva_contrasena)
         if exito:
             return True, "Contraseña actualizada correctamente"
         return False, "No se pudo actualizar la contraseña"
     
 
-    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash):
+    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash, preferencia):
         if not all([dni_nie, nombre_completo, email, password_hash]):
             return False, "Todos los campos obligatorios deben estar rellenos"
         
         if len(password_hash) < 6:
             return False, "La contraseña debe tener al menos 6 caracteres"
 
-        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash)
+        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash, preferencia = preferencia)
         exito = UserDAO().insertarUsuario(registroVO)
 
         if exito:
             return True, "Usuario registrado correctamente"
         return False, "No se pudo registrar el usuario. El email o DNI ya existen"
+
