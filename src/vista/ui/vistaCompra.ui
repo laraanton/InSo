@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaCompra</class>
+ <widget class="QWidget" name="VentanaCompra">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget {
+    background-color: #f9f7f2;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+QLabel#lblSeccionTitulo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333333;
+    letter-spacing: 1px;
+}
+QLabel#lblSeccionSub {
+    font-size: 11px;
+    color: #999999;
+}
+QFrame#tablaCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLabel {
+    font-size: 11px;
+    color: #555555;
+}
+QLineEdit {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #333333;
+}
+QLineEdit:focus {
+    border: 1px solid #5e8d8d;
+    background-color: #ffffff;
+}
+QComboBox {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: #333333;
+}
+QComboBox:focus {
+    border: 1px solid #5e8d8d;
+}
+QTableWidget {
+    background-color: #ffffff;
+    border: none;
+    gridline-color: #f0ede6;
+    font-size: 11px;
+    color: #333333;
+}
+QTableWidget::item {
+    padding: 8px 10px;
+}
+QTableWidget::item:selected {
+    background-color: #e8f2f2;
+    color: #333333;
+}
+QHeaderView::section {
+    background-color: #f9f7f2;
+    border: none;
+    border-bottom: 2px solid #eeeeee;
+    padding: 8px 10px;
+    font-size: 10px;
+    font-weight: bold;
+    color: #999999;
+    letter-spacing: 0.5px;
+}
+QPushButton#btnNuevaReserva {
+    background-color: #5e8d8d;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+}
+QPushButton#btnNuevaReserva:hover {
+    background-color: #4a7474;
+}
+QPushButton#btnExportar {
+    background-color: transparent;
+    border: 1px solid #5e8d8d;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #5e8d8d;
+}
+QPushButton#btnExportar:hover {
+    background-color: #5e8d8d;
+    color: white;
+}
+QLabel#lblEstado {
+    font-size: 11px;
+    font-weight: bold;
+}
+QScrollBar:vertical {
+    background: #f9f7f2;
+    width: 6px;
+}
+QScrollBar::handle:vertical {
+    background: #d0d0d0;
+    border-radius: 3px;
+    min-height: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>32</number></property>
+   <property name="topMargin"><number>24</number></property>
+   <property name="rightMargin"><number>32</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+
+   <!-- Cabecera -->
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <property name="spacing"><number>12</number></property>
+     <item>
+      <layout class="QVBoxLayout">
+       <property name="spacing"><number>2</number></property>
+       <item>
+        <widget class="QLabel" name="lblSeccionTitulo">
+         <property name="text"><string>Gestion de Compra</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSeccionSub">
+         <property name="text"><string>Reservas y estados de pedidos de clientes</string></property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnExportar">
+       <property name="text"><string>Exportar CSV</string></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNuevaReserva">
+       <property name="text"><string>+ Nueva Reserva</string></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Filtros -->
+   <item>
+    <layout class="QHBoxLayout" name="filtrosLayout">
+     <property name="spacing"><number>10</number></property>
+     <item>
+      <widget class="QLineEdit" name="inputBuscar">
+       <property name="placeholderText"><string>Buscar por cliente, ID o paquete...</string></property>
+       <property name="minimumWidth"><number>220</number></property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QComboBox" name="comboEstado">
+       <item><property name="text"><string>Todos los estados</string></property></item>
+       <item><property name="text"><string>Pendiente confirmacion</string></property></item>
+       <item><property name="text"><string>Confirmado</string></property></item>
+       <item><property name="text"><string>Pagado</string></property></item>
+       <item><property name="text"><string>En curso</string></property></item>
+       <item><property name="text"><string>Finalizado</string></property></item>
+       <item><property name="text"><string>Cancelado</string></property></item>
+       <item><property name="text"><string>Reembolsado</string></property></item>
+      </widget>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblEstado">
+       <property name="text"><string></string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Tabla de reservas -->
+   <item>
+    <widget class="QFrame" name="tablaCard">
+     <layout class="QVBoxLayout" name="tablaLayout">
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+      <item>
+       <widget class="QTableWidget" name="tablaReservas">
+        <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+        <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+        <property name="showGrid"><bool>false</bool></property>
+        <property name="alternatingRowColors"><bool>true</bool></property>
+        <property name="columnCount"><number>7</number></property>
+        <column><property name="text"><string>ID PEDIDO</string></property></column>
+        <column><property name="text"><string>CLIENTE</string></property></column>
+        <column><property name="text"><string>PAQUETE</string></property></column>
+        <column><property name="text"><string>FECHA RESERVA</string></property></column>
+        <column><property name="text"><string>PRECIO</string></property></column>
+        <column><property name="text"><string>ESTADO</string></property></column>
+        <column><property name="text"><string>ACCIONES</string></property></column>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+  </layout>
+ </widget>
+</ui>
