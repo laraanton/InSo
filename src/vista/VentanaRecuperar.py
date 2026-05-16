@@ -25,7 +25,7 @@ class VentanaRecuperar(QMainWindow, Form):
     confirmar = self.in_confirmar.text().strip()
 
     if not dni:
-      MessageBox.warning(self, "Error", "Debe introducir el DNI para poder actualizar la contraseña.")
+      QMessageBox.warning(self, "Error", "Debe introducir el DNI para poder actualizar la contraseña.")
       self.in_dni.setFocus()
       return
     if n_contrasena != confirmar:
