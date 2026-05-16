@@ -33,3 +33,7 @@ class RegistroVO:
     def tipo_usuario(self):
         return self.__tipo_usuario
 
+    @property
+    def preferencia(self):
+        return self.__preferencia
+
