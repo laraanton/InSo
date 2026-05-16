@@ -10,11 +10,12 @@ class Conexion:
 
   def createConnection(self):
     try:
-      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDrive"
+      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
       jar_file = r".\lib\mssql-jdbc-13.4.0.jre11.jar"
       url = f"jdbc:sqlserver://{self._host}:1433;databaseName=SoftripDB;encrypt=true;trustServerCertificate=true;" 
       
       self.conexion = jaydebeapi.connect(
+        jdbc_driver,
         url,
         [self._user, self._password],
         jar_file
