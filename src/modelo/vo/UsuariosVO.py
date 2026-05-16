@@ -54,3 +54,4 @@ class UsuarioVO:
 
     def __repr__(self):
         return f"UsuarioVO({self._usuario_id}, {self._nombre_completo}, {self._tipo_usuario})"
+
