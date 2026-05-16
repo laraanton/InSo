@@ -13,26 +13,19 @@ class VentanaRecuperar(QMainWindow, Form):
 
     self.botonRecuperar.clicked.connect(self.on_actualizar)
     self.in_email.returnPressed.connect(lambda: self.in_nueva_contrasena.setFocus())
-
-    self.in_dni.returnPressed.connect(lambda: self.in_dni.setFocus())
     self.in_nueva_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
     self.in_confirmar.returnPressed.connect(lambda: self.botonRecuperar.setFocus())
 
   def on_actualizar(self):
     email = self.in_email.text().strip()
-    dni = self.in_dni.text().strip()   
     n_contrasena = self.in_nueva_contrasena.text().strip()
     confirmar = self.in_confirmar.text().strip()
 
-    if not dni:
-      QMessageBox.warning(self, "Error", "Debe introducir el DNI para poder actualizar la contraseña.")
-      self.in_dni.setFocus()
-      return
     if n_contrasena != confirmar:
       QMessageBox.warning(self, "Error", "Las contraseñas no coinciden")
       return
 
-    exito, mensaje = self.logica.actualizarContrasena(email, n_contrasena, dni)
+    exito, mensaje = self.logica.actualizarContrasena(email, n_contrasena)
     
     if not exito:
       QMessageBox.warning(self, "Error de registro", mensaje)
