@@ -1,7 +1,7 @@
 
 class RegistroVO:
     def __init__(self, dni_nie, nombre_completo, email, 
-                 telefono, password_hash, tipo_usuario='Cliente'):
+                 telefono, password_hash, tipo_usuario='Cliente', preferencia = 'General'):
         self.__dni_nie         = dni_nie
         self.__nombre_completo = nombre_completo
         self.__email           = email
