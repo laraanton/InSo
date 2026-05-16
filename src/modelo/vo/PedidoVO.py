@@ -1,4 +1,3 @@
-
 class PedidoVO:
     def __init__(self, cliente_id, paquete_id, monto_total,
                  metodo_pago='PayPal', fecha_inicio=None, fecha_fin=None):
@@ -32,3 +31,4 @@ class PedidoVO:
     @property
     def fecha_fin(self):
         return self.__fecha_fin
+
