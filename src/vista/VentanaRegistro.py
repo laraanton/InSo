@@ -16,7 +16,6 @@ class VentanaRegistro(QMainWindow, Form):
     self.in_nombre.returnPressed.connect(lambda: self.in_email.setFocus())
     self.in_email.returnPressed.connect(lambda: self.in_telefono.setFocus())
     self.in_telefono.returnPressed.connect(lambda: self.in_contrasena.setFocus())
-    self.in_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
     self.in_confirmar.returnPressed.connect(self.on_registrar)
     
 
@@ -27,12 +26,13 @@ class VentanaRegistro(QMainWindow, Form):
     telefono = self.in_telefono.text().strip()
     contrasena = self.in_contrasena.text().strip()
     confirmar = self.in_confirmar.text().strip()
+    preferencia = self.in_preferencia.currentText()
 
     if contrasena != confirmar:
       QMessageBox.warning(self, "Error", "Las contraseñas no coinciden")
       return
 
-    exito, mensaje = self.logica.registrarUsuario(dni_nie, nombre, email, telefono, contrasena)
+    exito, mensaje = self.logica.registrarUsuario(dni_nie, nombre, email, telefono, contrasena, preferencia)
 
     if not exito:
       QMessageBox.warning(self, "Error de registro", mensaje)
