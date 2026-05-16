@@ -3,20 +3,24 @@
  <class>VentanaOperador</class>
  <widget class="QMainWindow" name="VentanaOperador">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>1100</width><height>680</height></rect>
+   <rect><x>0</x><y>0</y><width>1280</width><height>720</height></rect>
   </property>
   <property name="windowTitle">
-   <string>SoftTrip — Centro del Operador</string>
+   <string>SoftTrip - Centro del Operador</string>
   </property>
   <property name="styleSheet">
    <string notr="true">
-/* ── Base ── */
-QMainWindow, QWidget {
-    background-color: #f9f7f2;
+QMainWindow {
+    background-color: #1e2533;
     font-family: "Segoe UI", Arial, sans-serif;
 }
-
-/* ── Sidebar (estética oscura) ── */
+QWidget {
+    font-family: "Segoe UI", Arial, sans-serif;
+    background-color: #f9f7f2;
+}
+QWidget#centralwidget {
+    background-color: #1e2533;
+}
 QFrame#sidebarFrame {
     background-color: #1e2533;
     border-right: none;
@@ -25,14 +29,18 @@ QFrame#logoFrame {
     background-color: #161c28;
     border-bottom: 1px solid #2d3548;
 }
-QLabel#logoLabel {
+QPushButton#logoBtn {
     font-size: 20px;
     font-weight: bold;
     color: #7eb8b8;
     letter-spacing: 1px;
+    background-color: transparent;
+    border: none;
+    padding: 0px;
 }
-
-/* Nav buttons */
+QPushButton#logoBtn:hover {
+    color: #a0d4d4;
+}
 QPushButton#btnNav1,
 QPushButton#btnNav2,
 QPushButton#btnNav3 {
@@ -60,30 +68,31 @@ QPushButton#btnNav3:checked {
     border-left: 3px solid #7eb8b8;
     font-weight: bold;
 }
-
 QPushButton#btnLogout {
     background: transparent;
     border: none;
-    border-top: 1px solid #2d3548;
+    border-top: 1px solid #444444;
+    border-left: 3px solid transparent;
     text-align: left;
     padding: 12px 20px;
     font-size: 11px;
-    color: #718096;
+    color: #e05252;
+    margin-top: 4px;
 }
 QPushButton#btnLogout:hover {
-    color: #fc8181;
-    background-color: #2a3347;
+    background-color: #3a2020;
+    color: #ff7070;
+    border-left: 3px solid #ff7070;
 }
 QLabel#sidebarFooter {
     font-size: 9px;
     color: #4a5568;
     padding: 6px 10px;
+    background-color: transparent;
 }
-
-/* ── Topbar ── */
 QFrame#topbarFrame {
-    background-color: #ffffff;
-    border-bottom: 1px solid #eeeeee;
+    background-color: #f9f7f2;
+    border-bottom: 1px solid #e8e5de;
 }
 QLabel#pageTitle {
     font-size: 18px;
@@ -110,15 +119,6 @@ QLabel#userNameLabel {
     font-size: 11px;
     color: #333333;
 }
-
-/* ── Stacked pages bg ── */
-QWidget#pageDiseño,
-QWidget#pageCompra,
-QWidget#pageEdicion {
-    background-color: #f9f7f2;
-}
-
-/* ── Hero ── */
 QLabel#heroTitle {
     font-size: 26px;
     font-weight: bold;
@@ -129,8 +129,6 @@ QLabel#heroSubtitle {
     font-size: 13px;
     color: #666666;
 }
-
-/* ── Cards ── */
 QFrame#card1, QFrame#card2, QFrame#card3 {
     background-color: #ffffff;
     border-radius: 15px;
@@ -163,14 +161,10 @@ QPushButton#moreBtn1, QPushButton#moreBtn2, QPushButton#moreBtn3 {
 QPushButton#moreBtn1:hover, QPushButton#moreBtn2:hover, QPushButton#moreBtn3:hover {
     background-color: #4a7474;
 }
-
-/* ── Footer ── */
 QLabel#footerLinks, QLabel#footerCopy {
     font-size: 9px;
     color: #bbbbbb;
 }
-
-/* ── Scrollbar ── */
 QScrollBar:vertical {
     background: #f9f7f2;
     width: 6px;
@@ -211,9 +205,9 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
          <property name="maximumHeight"><number>72</number></property>
          <layout class="QHBoxLayout" name="logoLayout">
           <item>
-           <widget class="QLabel" name="logoLabel">
-            <property name="text"><string>✈  SOFTRIP</string></property>
-            <property name="alignment"><set>Qt::AlignCenter</set></property>
+           <widget class="QPushButton" name="logoBtn">
+            <property name="text"><string>&#x2708;  SOFTRIP</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
            </widget>
           </item>
          </layout>
@@ -222,21 +216,21 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
 
        <item>
         <widget class="QPushButton" name="btnNav1">
-         <property name="text"><string>   1. Diseño de Paquetes</string></property>
+         <property name="text"><string>   1. Diseno de Paquetes</string></property>
          <property name="checkable"><bool>true</bool></property>
          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNav2">
-         <property name="text"><string>   2. Gestión de Compra</string></property>
+         <property name="text"><string>   2. Gestion de Compra</string></property>
          <property name="checkable"><bool>true</bool></property>
          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="btnNav3">
-         <property name="text"><string>   3. Edición de Paquetes</string></property>
+         <property name="text"><string>   3. Edicion de Paquetes</string></property>
          <property name="checkable"><bool>true</bool></property>
          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
         </widget>
@@ -251,7 +245,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
 
        <item>
         <widget class="QPushButton" name="btnLogout">
-         <property name="text"><string>   Cerrar sesión</string></property>
+         <property name="text"><string>   Cerrar sesion</string></property>
          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
         </widget>
        </item>
@@ -325,7 +319,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
        <item>
         <widget class="QStackedWidget" name="stackedWidget">
 
-         <!-- PAGE 0: HUB PRINCIPAL (las 3 cards) -->
+         <!-- PAGE 0: HUB -->
          <widget class="QWidget" name="pageHub">
           <layout class="QVBoxLayout" name="hubLayout">
            <property name="leftMargin"><number>48</number></property>
@@ -334,7 +328,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <property name="bottomMargin"><number>32</number></property>
            <property name="spacing"><number>0</number></property>
 
-           <!-- Hero -->
            <item>
             <layout class="QVBoxLayout" name="heroLayout">
              <property name="spacing"><number>6</number></property>
@@ -346,7 +339,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
              </item>
              <item>
               <widget class="QLabel" name="heroSubtitle">
-               <property name="text"><string>Selecciona una sección para comenzar a trabajar</string></property>
+               <property name="text"><string>Selecciona una seccion para comenzar a trabajar</string></property>
                <property name="alignment"><set>Qt::AlignCenter</set></property>
               </widget>
              </item>
@@ -377,13 +370,13 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
                 <property name="bottomMargin"><number>24</number></property>
                 <item>
                  <widget class="QLabel" name="iconLabel1">
-                  <property name="text"><string>✎</string></property>
+                  <property name="text"><string>&#x270E;</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="cardTitle1">
-                  <property name="text"><string>1. DISEÑO DE PAQUETES</string></property>
+                  <property name="text"><string>1. DISENO DE PAQUETES</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
@@ -428,13 +421,13 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
                 <property name="bottomMargin"><number>24</number></property>
                 <item>
                  <widget class="QLabel" name="iconLabel2">
-                  <property name="text"><string>📊</string></property>
+                  <property name="text"><string>&#x1F4CA;</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="cardTitle2">
-                  <property name="text"><string>2. GESTIÓN DE COMPRA</string></property>
+                  <property name="text"><string>2. GESTION DE COMPRA</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
@@ -479,19 +472,19 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
                 <property name="bottomMargin"><number>24</number></property>
                 <item>
                  <widget class="QLabel" name="iconLabel3">
-                  <property name="text"><string>⚙</string></property>
+                  <property name="text"><string>&#x2699;</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="cardTitle3">
-                  <property name="text"><string>3. EDICIÓN DE PAQUETES</string></property>
+                  <property name="text"><string>3. EDICION DE PAQUETES</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                  </widget>
                 </item>
                 <item>
                  <widget class="QLabel" name="cardDesc3">
-                  <property name="text"><string>Actualiza y personaliza tus ofertas rápidamente en una plataforma centralizada.</string></property>
+                  <property name="text"><string>Actualiza y personaliza tus ofertas rapidamente en una plataforma centralizada.</string></property>
                   <property name="alignment"><set>Qt::AlignCenter</set></property>
                   <property name="wordWrap"><bool>true</bool></property>
                  </widget>
@@ -534,13 +527,13 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
              <property name="spacing"><number>4</number></property>
              <item>
               <widget class="QLabel" name="footerLinks">
-               <property name="text"><string>Términos     Privacidad</string></property>
+               <property name="text"><string>Terminos     Privacidad</string></property>
                <property name="alignment"><set>Qt::AlignCenter</set></property>
               </widget>
              </item>
              <item>
               <widget class="QLabel" name="footerCopy">
-               <property name="text"><string>Copyright © 2026 Softrip</string></property>
+               <property name="text"><string>Copyright 2026 Softrip</string></property>
                <property name="alignment"><set>Qt::AlignCenter</set></property>
               </widget>
              </item>
@@ -550,8 +543,8 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
           </layout>
          </widget>
 
-         <!-- PAGE 1: DISEÑO DE PAQUETES (placeholder) -->
-         <widget class="QWidget" name="pageDiseño">
+         <!-- PAGE 1: DISENO DE PAQUETES -->
+         <widget class="QWidget" name="pageDiseno">
           <layout class="QVBoxLayout" name="disenioLayout">
            <property name="leftMargin"><number>48</number></property>
            <property name="topMargin"><number>40</number></property>
@@ -560,14 +553,14 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <property name="spacing"><number>16</number></property>
            <item>
             <widget class="QLabel" name="lblDisenioPlaceholder">
-             <property name="text"><string>Contenido de Diseño de Paquetes</string></property>
+             <property name="text"><string>Contenido de Diseno de Paquetes</string></property>
              <property name="alignment"><set>Qt::AlignCenter</set></property>
             </widget>
            </item>
           </layout>
          </widget>
 
-         <!-- PAGE 2: GESTIÓN DE COMPRA (placeholder) -->
+         <!-- PAGE 2: GESTION DE COMPRA -->
          <widget class="QWidget" name="pageCompra">
           <layout class="QVBoxLayout" name="compraLayout">
            <property name="leftMargin"><number>48</number></property>
@@ -577,14 +570,14 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <property name="spacing"><number>16</number></property>
            <item>
             <widget class="QLabel" name="lblCompraPlaceholder">
-             <property name="text"><string>Contenido de Gestión de Compra</string></property>
+             <property name="text"><string>Contenido de Gestion de Compra</string></property>
              <property name="alignment"><set>Qt::AlignCenter</set></property>
             </widget>
            </item>
           </layout>
          </widget>
 
-         <!-- PAGE 3: EDICIÓN DE PAQUETES (placeholder) -->
+         <!-- PAGE 3: EDICION DE PAQUETES -->
          <widget class="QWidget" name="pageEdicion">
           <layout class="QVBoxLayout" name="edicionLayout">
            <property name="leftMargin"><number>48</number></property>
@@ -594,7 +587,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <property name="spacing"><number>16</number></property>
            <item>
             <widget class="QLabel" name="lblEdicionPlaceholder">
-             <property name="text"><string>Contenido de Edición de Paquetes</string></property>
+             <property name="text"><string>Contenido de Edicion de Paquetes</string></property>
              <property name="alignment"><set>Qt::AlignCenter</set></property>
             </widget>
            </item>
