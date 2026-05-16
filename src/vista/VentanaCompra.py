@@ -1,5 +1,16 @@
+"""
+VentanaCompra.py  Vista de Gestión de Compra / Reservas (Req_25, Req_26)
+============================================================================
+Responsabilidad: mostrar reservas, filtrarlas, cambiar su estado y exportar.
+Toda la lógica de datos pasa por ControladorOperador.
+
+Widgets del .ui que usa esta vista:
+    tablaReservas (QTableWidget, 7 columnas),
+    inputBuscar, comboEstado, lblEstado,
+    btnNuevaReserva, btnExportar
+"""
+
 import os
-import csv
 from PyQt5 import uic
 from PyQt5.QtWidgets import (
     QWidget, QTableWidgetItem, QComboBox, QHBoxLayout, QFileDialog
@@ -7,13 +18,15 @@ from PyQt5.QtWidgets import (
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
+from src.controlador.ControladorOperador import ControladorOperador
+
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "ui",
     "vistaCompra.ui"
 )
 
-# Req_26: estados posibles del pedido
+# Estados válidos según Req_26 / sección 2.2.3 ERS
 ESTADOS = [
     "Pendiente confirmacion",
     "Confirmado",
@@ -24,6 +37,7 @@ ESTADOS = [
     "Reembolsado",
 ]
 
+# Colores de badge por estado (Req_6)
 _COLOR_ESTADO = {
     "Pendiente confirmacion": ("#fff3cd", "#856404"),
     "Confirmado":             ("#d4edda", "#155724"),
@@ -34,13 +48,7 @@ _COLOR_ESTADO = {
     "Reembolsado":            ("#e2e3e5", "#383d41"),
 }
 
-COL_ID       = 0
-COL_CLIENTE  = 1
-COL_PAQUETE  = 2
-COL_FECHA    = 3
-COL_PRECIO   = 4
-COL_ESTADO   = 5
-COL_ACCIONES = 6
+COL_ID, COL_CLIENTE, COL_PAQUETE, COL_FECHA, COL_PRECIO, COL_ESTADO, COL_ACCIONES = range(7)
 
 
 class VentanaCompra(QWidget):
@@ -49,11 +57,13 @@ class VentanaCompra(QWidget):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        self._datos_completos = []
+        self._ctrl = ControladorOperador()
 
         self._configurar_tabla()
         self._conectar_senales()
-        self.cargar_reservas()
+        self.refrescar()          # carga inicial
+
+    # ── Configuración ──────────────────────────────────────────────────────
 
     def _configurar_tabla(self):
         t = self.tablaReservas
@@ -72,106 +82,110 @@ class VentanaCompra(QWidget):
         self.inputBuscar.textChanged.connect(self._filtrar)
         self.comboEstado.currentIndexChanged.connect(self._filtrar)
 
-    # ── Datos ──────────────────────────────────────────────────────────────
+    # ── Carga / filtrado ───────────────────────────────────────────────────
 
-    def cargar_reservas(self):
-        """Sustituir por: ControladorCompra().obtener_todas()"""
-        self._datos_completos = [
-            ("PED-0001", "Ana Garcia",   "Escapada Paris",  "2026-03-10", "1.200 EUR", "Confirmado"),
-            ("PED-0002", "Luis Perez",   "Caribe Relax",    "2026-03-11", "2.450 EUR", "Pagado"),
-            ("PED-0003", "Marta Lopez",  "Ruta por Italia", "2026-03-12", "980 EUR",   "Pendiente confirmacion"),
-            ("PED-0004", "Carlos Ruiz",  "Cancun All Inc.", "2026-03-15", "3.100 EUR", "En curso"),
-            ("PED-0005", "Sofia Blanco", "Escapada Paris",  "2026-03-18", "1.200 EUR", "Finalizado"),
-            ("PED-0006", "Jorge Martin", "Safari Kenia",    "2026-03-20", "4.800 EUR", "Cancelado"),
-            ("PED-0007", "Elena Torres", "Ruta por Italia", "2026-03-22", "980 EUR",   "Reembolsado"),
-        ]
-        self._poblar_tabla(self._datos_completos)
+    def refrescar(self):
+        """Recarga la tabla completa desde el controlador."""
+        self._filtrar()
 
-    def _poblar_tabla(self, datos):
-        tabla = self.tablaReservas
-        tabla.setRowCount(0)
+    def _filtrar(self):
+        """Filtra reservas según búsqueda y estado, y repinta la tabla."""
+        texto  = self.inputBuscar.text().strip()
+        estado = self.comboEstado.currentText()
+        reservas = self._ctrl.buscar_reservas(texto=texto, estado=estado)
+        self._poblar_tabla(reservas)
 
-        for fila, (id_p, cliente, paquete, fecha, precio, estado) in enumerate(datos):
-            tabla.insertRow(fila)
+    # ── Tabla ──────────────────────────────────────────────────────────────
 
-            for col, valor in enumerate([id_p, cliente, paquete, fecha, precio]):
-                item = QTableWidgetItem(valor)
+    def _poblar_tabla(self, reservas: list[dict]):
+        t = self.tablaReservas
+        t.setRowCount(0)
+
+        for fila, r in enumerate(reservas):
+            t.insertRow(fila)
+
+            for col, clave in enumerate(["id", "cliente", "paquete", "fecha", "precio"]):
+                item = QTableWidgetItem(str(r.get(clave, "")))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
-                tabla.setItem(fila, col, item)
+                t.setItem(fila, col, item)
 
-            # Badge estado con color (Req_6)
+            # Badge de estado con color (Req_6)
+            estado = r.get("estado", "")
             item_e = QTableWidgetItem(estado)
             item_e.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item_e.setTextAlignment(Qt.AlignCenter)
             bg, fg = _COLOR_ESTADO.get(estado, ("#ffffff", "#333333"))
             item_e.setBackground(QColor(bg))
             item_e.setForeground(QColor(fg))
-            tabla.setItem(fila, COL_ESTADO, item_e)
+            t.setItem(fila, COL_ESTADO, item_e)
 
-            self._insertar_acciones(tabla, fila, id_p, estado)
+            self._insertar_combo_estado(t, fila, r["id"], estado)
 
-        tabla.resizeRowsToContents()
+        t.resizeRowsToContents()
 
-    def _insertar_acciones(self, tabla, fila, id_pedido, estado_actual):
+    def _insertar_combo_estado(self, tabla, fila: int, id_pedido: str, estado_actual: str):
+        """Inserta el combo desplegable de cambio de estado en la columna Acciones."""
         w = QWidget()
         lay = QHBoxLayout(w)
         lay.setContentsMargins(4, 2, 4, 2)
+
         combo = QComboBox()
         combo.addItems(ESTADOS)
         if estado_actual in ESTADOS:
             combo.setCurrentIndex(ESTADOS.index(estado_actual))
-        combo.setFixedWidth(160)
+        combo.setFixedWidth(170)
+
         combo.currentTextChanged.connect(
-            lambda nuevo, r=fila, pid=id_pedido: self._cambiar_estado(r, pid, nuevo)
+            lambda nuevo, pid=id_pedido, f=fila: self._cambiar_estado(pid, nuevo, f)
         )
+
         lay.addWidget(combo)
         tabla.setCellWidget(fila, COL_ACCIONES, w)
 
     # ── Acciones ───────────────────────────────────────────────────────────
 
-    def _filtrar(self):
-        texto  = self.inputBuscar.text().strip().lower()
-        estado = self.comboEstado.currentText()
-        filtrados = [
-            r for r in self._datos_completos
-            if (not texto or any(texto in c.lower() for c in r))
-            and (estado == "Todos los estados" or r[5] == estado)
-        ]
-        self._poblar_tabla(filtrados)
-
-    def _cambiar_estado(self, fila, id_pedido, nuevo_estado):
-        """Req_26: actualizar estado. Conectar con ControladorCompra().actualizar_estado()"""
-        for i, r in enumerate(self._datos_completos):
-            if r[0] == id_pedido:
-                self._datos_completos[i] = r[:5] + (nuevo_estado,)
-                break
-        item = self.tablaReservas.item(fila, COL_ESTADO)
-        if item:
-            item.setText(nuevo_estado)
-            bg, fg = _COLOR_ESTADO.get(nuevo_estado, ("#ffffff", "#333333"))
-            item.setBackground(QColor(bg))
-            item.setForeground(QColor(fg))
-        self.lblEstado.setText(f"Pedido {id_pedido} -> '{nuevo_estado}'")
-        self.lblEstado.setStyleSheet("color: #5e8d8d; font-weight: bold;")
+    def _cambiar_estado(self, id_pedido: str, nuevo_estado: str, fila: int):
+        """Delega el cambio de estado en el controlador (Req_26) y actualiza el badge."""
+        ok, msg = self._ctrl.cambiar_estado_reserva(id_pedido, nuevo_estado)
+        self._set_estado(msg, error=not ok)
+        if ok:
+            # Actualizar el badge sin repintar toda la tabla
+            item = self.tablaReservas.item(fila, COL_ESTADO)
+            if item:
+                item.setText(nuevo_estado)
+                bg, fg = _COLOR_ESTADO.get(nuevo_estado, ("#ffffff", "#333333"))
+                item.setBackground(QColor(bg))
+                item.setForeground(QColor(fg))
 
     def _nueva_reserva(self):
-        """Abrir dialogo de nueva reserva — conectar con dialogo real."""
-        self.lblEstado.setText("Conectar con dialogo NuevaReserva.")
-        self.lblEstado.setStyleSheet("color: #999999;")
+        """
+        Punto de entrada para crear una reserva nueva (Req_25).
+        Aquí se abriría un diálogo; por ahora inserta un ejemplo.
+        Sustituir por: dialogo = DialogoNuevaReserva(self); dialogo.exec_()
+        """
+        datos = {
+            "cliente": "Cliente Ejemplo",
+            "paquete": "Escapada Paris",
+            "precio":  "1.200 EUR",
+        }
+        ok, msg = self._ctrl.registrar_reserva(datos)
+        self._set_estado(msg, error=not ok)
+        if ok:
+            self.refrescar()
 
     def _exportar_csv(self):
-        """Req_19: exportar ventas a CSV."""
-        ruta, _ = QFileDialog.getSaveFileName(self, "Exportar", "reservas.csv", "CSV (*.csv)")
+        """Exporta las reservas a CSV (Req_19)."""
+        ruta, _ = QFileDialog.getSaveFileName(
+            self, "Exportar reservas", "reservas.csv", "CSV (*.csv)"
+        )
         if not ruta:
             return
-        try:
-            with open(ruta, "w", newline="", encoding="utf-8") as f:
-                csv.writer(f).writerows(
-                    [["ID Pedido", "Cliente", "Paquete", "Fecha", "Precio", "Estado"]]
-                    + list(self._datos_completos)
-                )
-            self.lblEstado.setText(f"Exportado: {ruta}")
-            self.lblEstado.setStyleSheet("color: #5e8d8d; font-weight: bold;")
-        except Exception as e:
-            self.lblEstado.setText(f"Error: {e}")
-            self.lblEstado.setStyleSheet("color: #e05252; font-weight: bold;")
+        ok, msg = self._ctrl.exportar_csv(ruta)
+        self._set_estado(msg, error=not ok)
+
+    # ── Helpers ────────────────────────────────────────────────────────────
+
+    def _set_estado(self, msg: str, error: bool = False):
+        self.lblEstado.setText(msg)
+        color = "#e05252" if error else "#5e8d8d"
+        self.lblEstado.setStyleSheet(f"color: {color}; font-weight: bold;")
