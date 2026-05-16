@@ -47,3 +47,4 @@ class VentanaRegistro(QMainWindow, Form):
     self.ventana_login.show()
     self.close()
     
+
