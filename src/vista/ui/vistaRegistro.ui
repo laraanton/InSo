@@ -28,9 +28,9 @@
          <property name="geometry">
           <rect>
            <x>9</x>
-           <y>150</y>
+           <y>100</y>
            <width>531</width>
-           <height>641</height>
+           <height>700</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -40,6 +40,7 @@
 	border: 1px solid rgba(200, 220, 245, 0.6);
 }</string>
          </property>
+
          <widget class="QLabel" name="lbl_titulo">
           <property name="geometry">
            <rect>
@@ -59,6 +60,7 @@
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_dni">
           <property name="geometry">
            <rect>
@@ -87,6 +89,7 @@ QLineEdit:focus {
            <string>DNI / NIE</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_nombre">
           <property name="geometry">
            <rect>
@@ -115,6 +118,7 @@ QLineEdit:focus {
            <string>Nombre completo</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_email">
           <property name="geometry">
            <rect>
@@ -143,6 +147,7 @@ QLineEdit:focus {
            <string>Email</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_telefono">
           <property name="geometry">
            <rect>
@@ -171,6 +176,7 @@ QLineEdit:focus {
            <string>Teléfono (opcional)</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_contrasena">
           <property name="geometry">
            <rect>
@@ -202,6 +208,7 @@ QLineEdit:focus {
            <string>Contraseña</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_confirmar">
           <property name="geometry">
            <rect>
@@ -233,11 +240,77 @@ QLineEdit:focus {
            <string>Confirmar contraseña</string>
           </property>
          </widget>
+
+         <!-- Preferencia -->
+         <widget class="QComboBox" name="in_preferencia">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>460</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QComboBox {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QComboBox:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}
+QComboBox::drop-down {
+	border: none;
+	padding-right: 10px;
+}
+QComboBox QAbstractItemView {
+	background-color: #ffffff;
+	color: #2c4a6e;
+	selection-background-color: rgba(55, 138, 221, 0.15);
+	border: 1px solid rgba(55, 138, 221, 0.3);
+	border-radius: 8px;
+	padding: 4px;
+}</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>General</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Familiar</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Jubilado</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Movilidad reducida</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Escolar</string>
+           </property>
+          </item>
+         </widget>
+
+         <!-- Botón -->
          <widget class="QPushButton" name="botonRegistrar">
           <property name="geometry">
            <rect>
             <x>70</x>
-            <y>590</y>
+            <y>620</y>
             <width>371</width>
             <height>28</height>
            </rect>
@@ -264,6 +337,7 @@ QPushButton:pressed {
            <string>Registrarse</string>
           </property>
          </widget>
+
         </widget>
        </widget>
       </item>
