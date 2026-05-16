@@ -18,3 +18,4 @@ class ControladorPrincipal:
 
       else:
         self.__vista.close()
+
