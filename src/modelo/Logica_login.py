@@ -30,7 +30,7 @@ class BussinessObject():
             return usuario.email, "Correo verificado"
         return None, "El correo no está registrado"
 
-    def actualizarContrasena(self, email, nueva_contrasena):
+    def actualizarContrasena(self, email, nueva_contrasena, dni):
         if not nueva_contrasena or len(nueva_contrasena) < 6:
             return False, "La contraseña debe tener al menos 6 caracteres"
         if not dni:
