@@ -58,13 +58,3 @@ class VentanaCliente(QMainWindow, Form):
             "Ver paquete",
             f"Abriendo detalle del paquete {numero}…"
         )
-
-
-# ------------------------------------------------------------------ #
-#  Punto de entrada (prueba rápida)                                   #
-# ------------------------------------------------------------------ #
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     ventana = PrincipalCliente()
-#     ventana.show()
-#     sys.exit(app.exec_())
