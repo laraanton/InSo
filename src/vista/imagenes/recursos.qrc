@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="imagenes">
+    <file>fondo.jpg</file>
+    <file>pagPrincipalCliente.jpg</file>
+    <file>fondo_registro.jpg</file>
+  </qresource>
+</RCC>
