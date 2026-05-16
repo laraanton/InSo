@@ -1,4 +1,3 @@
-
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.UsuariosVO import UsuarioVO
 
@@ -17,6 +16,7 @@ class UserDAO(Conexion):
             row = cursor.fetchone()
             if not row:
                 return None
+            
             return UsuarioVO(*row)
         except Exception as e:
             print(f"Error en consultaLogin: {e}")
@@ -77,7 +77,17 @@ class UserDAO(Conexion):
         except Exception as e:
             print(f"Error en actualizarContrasena: {e}")
             return False
-
+    def bloquearCuenta(self, usuario_id):
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?",
+                [usuario_id]
+            )
+            return True
+        except Exception as e:
+            print(f"Error en bloquearCuenta: {e}")
+            return False
     def desbloquearCuenta(self, usuario_id):
         try:
             cursor = self.getCursor()
@@ -108,3 +118,4 @@ class UserDAO(Conexion):
         except Exception as e:
             print(f"Error en insertarUsuario: {e}")
             return False
+
