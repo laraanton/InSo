@@ -34,8 +34,7 @@ class MiVentana(QMainWindow, Form):
 
     def abrir_ventana_principal(self, user):
         # Redirige según el tipo de usuario
-        tipo = user.tipo_usuario
-        
+        tipo = user.tipo_usuario 
         #FALTA IMPLEMENTAR
         if tipo == "Administrador":
             from src.vista.VentanaAdmin import VentanaAdmin
@@ -70,3 +69,4 @@ if __name__ == "__main__":
     ventana = MiVentana()
     ventana.show()
     app.exec_()
+
