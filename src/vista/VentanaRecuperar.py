@@ -20,6 +20,7 @@ class VentanaRecuperar(QMainWindow, Form):
 
   def on_actualizar(self):
     email = self.in_email.text().strip()
+    dni = self.in_dni.text().strip()   
     n_contrasena = self.in_nueva_contrasena.text().strip()
     confirmar = self.in_confirmar.text().strip()
 
