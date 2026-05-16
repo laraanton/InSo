@@ -1,5 +1,3 @@
-
-
 class LoginVO:
     def __init__(self, email, password_hash):
         self.__email = email
