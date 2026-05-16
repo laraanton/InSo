@@ -9,21 +9,21 @@ UI_FILE = os.path.join(
 )
 
 PAG_HUB     = 0
-PAG_DISEÑO  = 1
+PAG_DISENO  = 1
 PAG_COMPRA  = 2
 PAG_EDICION = 3
 
 _TITULOS = [
     "Centro del Operador",
-    "Diseño de Paquetes",
-    "Gestión de Compra",
-    "Edición de Paquetes",
+    "Diseno de Paquetes",
+    "Gestion de Compra",
+    "Edicion de Paquetes",
 ]
 _BREADCRUMBS = [
     "Softrip › Operador",
-    "Softrip › Operador › Diseño de Paquetes",
-    "Softrip › Operador › Gestión de Compra",
-    "Softrip › Operador › Edición de Paquetes",
+    "Softrip › Operador › Diseno de Paquetes",
+    "Softrip › Operador › Gestion de Compra",
+    "Softrip › Operador › Edicion de Paquetes",
 ]
 _NAV_BOTONES = ["btnNav1", "btnNav2", "btnNav3"]
 
@@ -34,22 +34,28 @@ class VentanaOperador(QMainWindow):
         super().__init__()
         uic.loadUi(UI_FILE, self)
 
-        self.user = user  # UsuarioVO
+        self.user = user
 
-        # nombre_completo es el atributo real de UsuarioVO
         nombre = user.nombre_completo if user else "Operador"
         self.userNameLabel.setText(nombre)
         self.avatarLabel.setText(nombre[0].upper() if nombre else "O")
 
-        self._conectar_señales()
+        # Referencias a widgets de sección, se crean solo una vez (lazy)
+        self._widget_diseno  = None
+        self._widget_compra  = None
+        self._widget_edicion = None
+
+        self._conectar_senales()
         self._navegar(PAG_HUB)
 
-    def _conectar_señales(self):
-        self.moreBtn1.clicked.connect(lambda: self._navegar(PAG_DISEÑO))
+    def _conectar_senales(self):
+        self.logoBtn.clicked.connect(lambda: self._navegar(PAG_HUB))
+
+        self.moreBtn1.clicked.connect(lambda: self._navegar(PAG_DISENO))
         self.moreBtn2.clicked.connect(lambda: self._navegar(PAG_COMPRA))
         self.moreBtn3.clicked.connect(lambda: self._navegar(PAG_EDICION))
 
-        self.btnNav1.clicked.connect(lambda: self._navegar(PAG_DISEÑO))
+        self.btnNav1.clicked.connect(lambda: self._navegar(PAG_DISENO))
         self.btnNav2.clicked.connect(lambda: self._navegar(PAG_COMPRA))
         self.btnNav3.clicked.connect(lambda: self._navegar(PAG_EDICION))
 
@@ -63,44 +69,44 @@ class VentanaOperador(QMainWindow):
         for i, nombre in enumerate(_NAV_BOTONES):
             getattr(self, nombre).setChecked(indice == i + 1)
 
-        if indice == PAG_DISEÑO:
-            self.cargar_diseño()
+        if indice == PAG_DISENO:
+            self._cargar_diseno()
         elif indice == PAG_COMPRA:
-            self.cargar_compra()
+            self._cargar_compra()
         elif indice == PAG_EDICION:
-            self.cargar_edicion()
+            self._cargar_edicion()
 
-    def cargar_diseño(self):
-        self.lblDisenioPlaceholder.setText(
-            "📦  Diseño de Paquetes\n\n"
-            "Aquí irá el formulario/lista de paquetes turísticos."
-        )
-        self.lblDisenioPlaceholder.setStyleSheet(
-            "font-size: 14px; color: #5e8d8d; font-weight: bold;"
-        )
+    def _cargar_diseno(self):
+        if self._widget_diseno is None:
+            from src.vista.VentanaDiseno import VentanaDiseno
+            self._widget_diseno = VentanaDiseno(self.user)
+            layout = self.pageDiseno.layout()
+            layout.removeWidget(self.lblDisenioPlaceholder)
+            self.lblDisenioPlaceholder.hide()
+            layout.addWidget(self._widget_diseno)
 
-    def cargar_compra(self):
-        self.lblCompraPlaceholder.setText(
-            "🛒  Gestión de Compra\n\n"
-            "Aquí irá la tabla de reservas y estados de pago."
-        )
-        self.lblCompraPlaceholder.setStyleSheet(
-            "font-size: 14px; color: #5e8d8d; font-weight: bold;"
-        )
+    def _cargar_compra(self):
+        if self._widget_compra is None:
+            from src.vista.VentanaCompra import VentanaCompra
+            self._widget_compra = VentanaCompra(self.user)
+            layout = self.pageCompra.layout()
+            layout.removeWidget(self.lblCompraPlaceholder)
+            self.lblCompraPlaceholder.hide()
+            layout.addWidget(self._widget_compra)
 
-    def cargar_edicion(self):
-        self.lblEdicionPlaceholder.setText(
-            "✏️  Edición de Paquetes\n\n"
-            "Aquí irá el editor de paquetes existentes."
-        )
-        self.lblEdicionPlaceholder.setStyleSheet(
-            "font-size: 14px; color: #5e8d8d; font-weight: bold;"
-        )
+    def _cargar_edicion(self):
+        if self._widget_edicion is None:
+            from src.vista.VentanaEditar import VentanaEditar
+            self._widget_edicion = VentanaEditar(self.user)
+            layout = self.pageEdicion.layout()
+            layout.removeWidget(self.lblEdicionPlaceholder)
+            self.lblEdicionPlaceholder.hide()
+            layout.addWidget(self._widget_edicion)
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
-            self, "Cerrar sesión",
-            "¿Deseas cerrar la sesión actual?",
+            self, "Cerrar sesion",
+            "Deseas cerrar la sesion actual?",
             QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )
