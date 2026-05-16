@@ -8,6 +8,7 @@ class RegistroVO:
         self.__telefono        = telefono
         self.__password_hash   = password_hash
         self.__tipo_usuario    = tipo_usuario  # por defecto Cliente
+        self.__preferencia = preferencia
 
     @property
     def dni_nie(self):
