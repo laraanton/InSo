@@ -12,9 +12,8 @@ class VentanaRecuperar(QMainWindow, Form):
     self.logica = BussinessObject()
 
     self.botonRecuperar.clicked.connect(self.on_actualizar)
-    self.in_email.returnPressed.connect(lambda: self.in_nueva_contrasena.setFocus())
-
-    self.in_dni.returnPressed.connect(lambda: self.in_dni.setFocus())
+    self.in_email.returnPressed.connect(lambda: self.in_dni.setFocus())              
+    self.in_dni.returnPressed.connect(lambda: self.in_nueva_contrasena.setFocus())  
     self.in_nueva_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
     self.in_confirmar.returnPressed.connect(lambda: self.botonRecuperar.setFocus())
 
