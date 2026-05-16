@@ -1,0 +1,275 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaDiseno</class>
+ <widget class="QWidget" name="VentanaDiseno">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget {
+    background-color: #f9f7f2;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+QLabel#lblSeccionTitulo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333333;
+    letter-spacing: 1px;
+}
+QLabel#lblSeccionSub {
+    font-size: 11px;
+    color: #999999;
+}
+QFrame#formCard {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLabel {
+    font-size: 11px;
+    color: #555555;
+}
+QLineEdit, QTextEdit {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #333333;
+}
+QLineEdit:focus, QTextEdit:focus {
+    border: 1px solid #5e8d8d;
+    background-color: #ffffff;
+}
+QPushButton#btnNuevoPaquete {
+    background-color: transparent;
+    border: 1px solid #5e8d8d;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #5e8d8d;
+}
+QPushButton#btnNuevoPaquete:hover {
+    background-color: #5e8d8d;
+    color: white;
+}
+QPushButton#btnGuardar {
+    background-color: #5e8d8d;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 28px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+}
+QPushButton#btnGuardar:hover {
+    background-color: #4a7474;
+}
+QPushButton#btnLimpiar {
+    background-color: transparent;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    color: #999999;
+}
+QPushButton#btnLimpiar:hover {
+    border-color: #e05252;
+    color: #e05252;
+}
+QLabel#lblEstado {
+    font-size: 11px;
+    font-weight: bold;
+}
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>32</number></property>
+   <property name="topMargin"><number>24</number></property>
+   <property name="rightMargin"><number>32</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+
+   <!-- Cabecera -->
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <property name="spacing"><number>12</number></property>
+     <item>
+      <layout class="QVBoxLayout">
+       <property name="spacing"><number>2</number></property>
+       <item>
+        <widget class="QLabel" name="lblSeccionTitulo">
+         <property name="text"><string>Diseno de Paquetes</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSeccionSub">
+         <property name="text"><string>Crea y configura nuevos paquetes turisticos</string></property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="btnNuevoPaquete">
+       <property name="text"><string>+ Nuevo Paquete</string></property>
+       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Formulario -->
+   <item>
+    <widget class="QFrame" name="formCard">
+     <layout class="QVBoxLayout" name="formLayout">
+      <property name="leftMargin"><number>28</number></property>
+      <property name="topMargin"><number>24</number></property>
+      <property name="rightMargin"><number>28</number></property>
+      <property name="bottomMargin"><number>24</number></property>
+      <property name="spacing"><number>14</number></property>
+
+      <!-- Fila 1: Nombre + Destino -->
+      <item>
+       <layout class="QHBoxLayout" name="fila1">
+        <property name="spacing"><number>20</number></property>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblNombre">
+            <property name="text"><string>Nombre del paquete</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputNombre">
+            <property name="placeholderText"><string>Ej: Escapada a Paris</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblDestino">
+            <property name="text"><string>Destino</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputDestino">
+            <property name="placeholderText"><string>Ej: Paris, Francia</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+
+      <!-- Fila 2: Duracion + Precio -->
+      <item>
+       <layout class="QHBoxLayout" name="fila2">
+        <property name="spacing"><number>20</number></property>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblDuracion">
+            <property name="text"><string>Duracion (dias)</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputDuracion">
+            <property name="placeholderText"><string>Ej: 7</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblPrecio">
+            <property name="text"><string>Precio (EUR)</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="inputPrecio">
+            <property name="placeholderText"><string>Ej: 1200.00</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+
+      <!-- Descripcion -->
+      <item>
+       <layout class="QVBoxLayout">
+        <property name="spacing"><number>4</number></property>
+        <item>
+         <widget class="QLabel" name="lblDescripcion">
+          <property name="text"><string>Descripcion</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QTextEdit" name="textDescripcion">
+          <property name="placeholderText"><string>Describe el paquete: actividades, alojamiento, incluidos...</string></property>
+          <property name="minimumHeight"><number>90</number></property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+
+      <!-- Botones + estado -->
+      <item>
+       <layout class="QHBoxLayout" name="botonesLayout">
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="lblEstado">
+          <property name="text"><string></string></property>
+         </widget>
+        </item>
+        <item>
+         <spacer>
+          <property name="orientation"><enum>Qt::Horizontal</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnLimpiar">
+          <property name="text"><string>Limpiar</string></property>
+          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnGuardar">
+          <property name="text"><string>Guardar Paquete</string></property>
+          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+
+     </layout>
+    </widget>
+   </item>
+
+   <item>
+    <spacer>
+     <property name="orientation"><enum>Qt::Vertical</enum></property>
+     <property name="sizeHint" stdset="0"><size><width>20</width><height>20</height></size></property>
+    </spacer>
+   </item>
+
+  </layout>
+ </widget>
+</ui>
