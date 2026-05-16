@@ -1,7 +1,7 @@
 import jaydebeapi
 
 class Conexion:
-  def __init__(self, host='PORTATILMARTA\\SQLEXPRESS', database='SoftripDB', user= 'sa', password = 'olacaracola'):
+  def __init__(self, host='localhost', database='SoftripDB', user= 'sa', password = 'olacaracola'):
     self._host = host
     self._database = database
     self._user = user
@@ -10,13 +10,13 @@ class Conexion:
 
   def createConnection(self):
     try:
-      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"
-      jar_file = r"C:\Users\marta\InSo\lib\mssql-jdbc-13.4.0.jre11.jar"
+      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"  # fix: faltaba 'r'
+      jar_file = r".\lib\mssql-jdbc-13.4.0.jre11.jar"
       url = f"jdbc:sqlserver://{self._host}:1433;databaseName=SoftripDB;encrypt=true;trustServerCertificate=true;" 
       
       self.conexion = jaydebeapi.connect(
-        jdbc_driver, 
-        url,
+        jdbc_driver,  # fix: driver como 1er argumento
+        url,          # fix: url como 2º argumento
         [self._user, self._password],
         jar_file
       )
@@ -43,9 +43,6 @@ def closeConnection(self):
 if __name__ == "__main__":
   print("Comenzando conexión con SoftripBD ->")
   db = Conexion()
-
-
-
 
 
 
