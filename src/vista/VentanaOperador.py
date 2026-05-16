@@ -1,14 +1,13 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-#ruta
+
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "ui",
     "vistaOperador.ui"
 )
 
-#variables globales
 PAG_HUB     = 0
 PAG_DISEÑO  = 1
 PAG_COMPRA  = 2
