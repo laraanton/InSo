@@ -1,0 +1,370 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaEditar</class>
+ <widget class="QWidget" name="VentanaEditar">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget {
+    background-color: #f9f7f2;
+    font-family: "Segoe UI", Arial, sans-serif;
+}
+QLabel#lblSeccionTitulo {
+    font-size: 20px;
+    font-weight: bold;
+    color: #333333;
+    letter-spacing: 1px;
+}
+QLabel#lblSeccionSub {
+    font-size: 11px;
+    color: #999999;
+}
+QFrame#panelIzq {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QFrame#panelDer {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLabel {
+    font-size: 11px;
+    color: #555555;
+}
+QLineEdit, QTextEdit, QDateEdit {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: #333333;
+}
+QLineEdit:focus, QTextEdit:focus, QDateEdit:focus {
+    border: 1px solid #5e8d8d;
+    background-color: #ffffff;
+}
+QComboBox {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 11px;
+    color: #333333;
+}
+QComboBox:focus {
+    border: 1px solid #5e8d8d;
+}
+QListWidget {
+    background-color: #f9f7f2;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    font-size: 11px;
+    color: #333333;
+}
+QListWidget::item {
+    padding: 8px 10px;
+}
+QListWidget::item:selected {
+    background-color: #e8f2f2;
+    color: #2d6b6b;
+}
+QListWidget::item:hover {
+    background-color: #f0f5f5;
+}
+QPushButton#btnGuardarCambios {
+    background-color: #5e8d8d;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 24px;
+    font-size: 11px;
+    font-weight: bold;
+    color: white;
+}
+QPushButton#btnGuardarCambios:hover {
+    background-color: #4a7474;
+}
+QPushButton#btnEliminar {
+    background-color: transparent;
+    border: 1px solid #e05252;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #e05252;
+}
+QPushButton#btnEliminar:hover {
+    background-color: #e05252;
+    color: white;
+}
+QPushButton#btnLimpiar {
+    background-color: transparent;
+    border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-size: 11px;
+    color: #999999;
+}
+QPushButton#btnLimpiar:hover {
+    border-color: #999999;
+    color: #555555;
+}
+QLabel#lblEstado {
+    font-size: 11px;
+    font-weight: bold;
+}
+QScrollBar:vertical {
+    background: #f9f7f2;
+    width: 6px;
+}
+QScrollBar::handle:vertical {
+    background: #d0d0d0;
+    border-radius: 3px;
+    min-height: 20px;
+}
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="mainLayout">
+   <property name="leftMargin"><number>32</number></property>
+   <property name="topMargin"><number>24</number></property>
+   <property name="rightMargin"><number>32</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+
+   <!-- Cabecera -->
+   <item>
+    <layout class="QHBoxLayout" name="headerLayout">
+     <property name="spacing"><number>12</number></property>
+     <item>
+      <layout class="QVBoxLayout">
+       <property name="spacing"><number>2</number></property>
+       <item>
+        <widget class="QLabel" name="lblSeccionTitulo">
+         <property name="text"><string>Edicion de Paquetes</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSeccionSub">
+         <property name="text"><string>Selecciona un paquete de la lista para editarlo o eliminarlo</string></property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblEstado">
+       <property name="text"><string></string></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Cuerpo: lista izquierda + formulario derecha -->
+   <item>
+    <layout class="QHBoxLayout" name="cuerpoLayout">
+     <property name="spacing"><number>16</number></property>
+
+     <!-- Panel izquierdo: lista de paquetes -->
+     <item>
+      <widget class="QFrame" name="panelIzq">
+       <property name="minimumWidth"><number>220</number></property>
+       <property name="maximumWidth"><number>260</number></property>
+       <layout class="QVBoxLayout" name="izqLayout">
+        <property name="leftMargin"><number>12</number></property>
+        <property name="topMargin"><number>16</number></property>
+        <property name="rightMargin"><number>12</number></property>
+        <property name="bottomMargin"><number>16</number></property>
+        <property name="spacing"><number>10</number></property>
+        <item>
+         <widget class="QLabel" name="lblListaTitulo">
+          <property name="text"><string>Paquetes disponibles</string></property>
+          <property name="styleSheet"><string>font-weight: bold; color: #333333;</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLineEdit" name="inputFiltroLista">
+          <property name="placeholderText"><string>Buscar paquete...</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QListWidget" name="listaPaquetes">
+          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+     </item>
+
+     <!-- Panel derecho: formulario de edicion -->
+     <item>
+      <widget class="QFrame" name="panelDer">
+       <layout class="QVBoxLayout" name="derLayout">
+        <property name="leftMargin"><number>24</number></property>
+        <property name="topMargin"><number>20</number></property>
+        <property name="rightMargin"><number>24</number></property>
+        <property name="bottomMargin"><number>20</number></property>
+        <property name="spacing"><number>12</number></property>
+
+        <!-- Fila 1: Nombre + Destino -->
+        <item>
+         <layout class="QHBoxLayout">
+          <property name="spacing"><number>16</number></property>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblNombre"><property name="text"><string>Nombre del paquete</string></property></widget></item>
+            <item><widget class="QLineEdit" name="inputNombre"><property name="placeholderText"><string>Nombre</string></property></widget></item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblDestino"><property name="text"><string>Destino(s)</string></property></widget></item>
+            <item><widget class="QLineEdit" name="inputDestino"><property name="placeholderText"><string>Ej: Paris, Roma</string></property></widget></item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+
+        <!-- Fila 2: Duracion + Precio -->
+        <item>
+         <layout class="QHBoxLayout">
+          <property name="spacing"><number>16</number></property>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblDuracion"><property name="text"><string>Duracion (dias)</string></property></widget></item>
+            <item><widget class="QLineEdit" name="inputDuracion"><property name="placeholderText"><string>Ej: 7</string></property></widget></item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblPrecio"><property name="text"><string>Precio TPV (EUR)</string></property></widget></item>
+            <item><widget class="QLineEdit" name="inputPrecio"><property name="placeholderText"><string>Ej: 1200.00</string></property></widget></item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+
+        <!-- Fila 3: Fecha inicio + Fecha fin -->
+        <item>
+         <layout class="QHBoxLayout">
+          <property name="spacing"><number>16</number></property>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblFechaInicio"><property name="text"><string>Fecha de inicio</string></property></widget></item>
+            <item><widget class="QDateEdit" name="inputFechaInicio"><property name="calendarPopup"><bool>true</bool></property><property name="displayFormat"><string>dd/MM/yyyy</string></property></widget></item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblFechaFin"><property name="text"><string>Fecha de fin</string></property></widget></item>
+            <item><widget class="QDateEdit" name="inputFechaFin"><property name="calendarPopup"><bool>true</bool></property><property name="displayFormat"><string>dd/MM/yyyy</string></property></widget></item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+
+        <!-- Perfil objetivo (Req_2, Req_27) -->
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item><widget class="QLabel" name="lblPerfil"><property name="text"><string>Perfil objetivo</string></property></widget></item>
+          <item>
+           <widget class="QComboBox" name="comboPerfil">
+            <item><property name="text"><string>General</string></property></item>
+            <item><property name="text"><string>Familias</string></property></item>
+            <item><property name="text"><string>Jovenes</string></property></item>
+            <item><property name="text"><string>Jubilados</string></property></item>
+            <item><property name="text"><string>Parejas</string></property></item>
+            <item><property name="text"><string>Grupos escolares</string></property></item>
+            <item><property name="text"><string>Movilidad reducida</string></property></item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
+        <!-- Servicios incluidos -->
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item><widget class="QLabel" name="lblServicios"><property name="text"><string>Servicios incluidos</string></property></widget></item>
+          <item><widget class="QLineEdit" name="inputServicios"><property name="placeholderText"><string>Ej: Vuelo, Hotel, Traslados, Seguro</string></property></widget></item>
+         </layout>
+        </item>
+
+        <!-- Descripcion -->
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item><widget class="QLabel" name="lblDescripcion"><property name="text"><string>Descripcion</string></property></widget></item>
+          <item>
+           <widget class="QTextEdit" name="textDescripcion">
+            <property name="placeholderText"><string>Descripcion detallada del paquete...</string></property>
+            <property name="maximumHeight"><number>70</number></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
+        <item>
+         <spacer>
+          <property name="orientation"><enum>Qt::Vertical</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>20</width><height>8</height></size></property>
+         </spacer>
+        </item>
+
+        <!-- Botones -->
+        <item>
+         <layout class="QHBoxLayout" name="botonesLayout">
+          <property name="spacing"><number>10</number></property>
+          <item>
+           <widget class="QPushButton" name="btnEliminar">
+            <property name="text"><string>Eliminar paquete</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+           </widget>
+          </item>
+          <item>
+           <spacer>
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnLimpiar">
+            <property name="text"><string>Cancelar</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="btnGuardarCambios">
+            <property name="text"><string>Guardar cambios</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
+       </layout>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+  </layout>
+ </widget>
+</ui>
