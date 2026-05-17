@@ -1,6 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 import sys
+from datetime import date
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaCliente.ui")
 
@@ -39,13 +40,13 @@ class VentanaCliente(QMainWindow, Form):
     def _ir_mis_viajes(self):
         self.menuCuenta.hide()
         QMessageBox.information(self, "Mis viajes", "Aquí irán tus viajes.")
-    
+
     def _buscar_paquetes(self):
         """Recoge los filtros del buscador y lanza la búsqueda."""
-        destino      = self.in_destino.text().strip()
-        fecha_ida    = self.in_fecha_ida.date()
+        destino = self.in_destino.text().strip()
+        fecha_ida = self.in_fecha_ida.date()
         fecha_vuelta = self.in_fecha_vuelta.date()
-        personas     = self.in_personas.value()
+        personas = self.in_personas.value()
 
         if not destino:
             QMessageBox.warning(self, "Campo requerido", "Por favor, escribe un destino.")
@@ -57,6 +58,13 @@ class VentanaCliente(QMainWindow, Form):
                 self,
                 "Fechas incorrectas",
                 "La fecha de vuelta no puede ser anterior a la de ida."
+            )
+            return
+        elif fecha_ida < date.today():
+            QMessageBox.warning(
+                self,
+                "Fechas incorrectas",
+                "La fecha no puede ser anterior a la fecha de hoy"
             )
             return
 
