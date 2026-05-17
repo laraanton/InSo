@@ -3,7 +3,7 @@
  <class>VentanaEditar</class>
  <widget class="QWidget" name="VentanaEditar">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
+   <rect><x>0</x><y>0</y><width>900</width><height>640</height></rect>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -55,8 +55,20 @@ QComboBox {
     font-size: 11px;
     color: #333333;
 }
+QComboBox#comboEmoji {
+    font-size: 13px;
+}
 QComboBox:focus {
     border: 1px solid #5e8d8d;
+}
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #dddddd;
+    border-radius: 6px;
+    selection-background-color: #5e8d8d;
+    selection-color: white;
+    font-size: 13px;
+    padding: 4px;
 }
 QListWidget {
     background-color: #f9f7f2;
@@ -116,6 +128,10 @@ QLabel#lblEstado {
     font-size: 11px;
     font-weight: bold;
 }
+QLabel#lblAviso {
+    font-size: 11px;
+    font-weight: bold;
+}
 QScrollBar:vertical {
     background: #f9f7f2;
     width: 6px;
@@ -145,7 +161,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
        <property name="spacing"><number>2</number></property>
        <item>
         <widget class="QLabel" name="lblSeccionTitulo">
-         <property name="text"><string>Edicion de Paquetes</string></property>
+         <property name="text"><string>Edición de Paquetes</string></property>
         </widget>
        </item>
        <item>
@@ -205,7 +221,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
       </widget>
      </item>
 
-     <!-- Panel derecho: formulario de edicion -->
+     <!-- Panel derecho: formulario de edición -->
      <item>
       <widget class="QFrame" name="panelDer">
        <layout class="QVBoxLayout" name="derLayout">
@@ -213,7 +229,16 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
         <property name="topMargin"><number>20</number></property>
         <property name="rightMargin"><number>24</number></property>
         <property name="bottomMargin"><number>20</number></property>
-        <property name="spacing"><number>12</number></property>
+        <property name="spacing"><number>11</number></property>
+
+        <!-- Banner de aviso: paquete caducado (oculto por defecto) -->
+        <item>
+         <widget class="QLabel" name="lblAviso">
+          <property name="text"><string></string></property>
+          <property name="visible"><bool>false</bool></property>
+          <property name="wordWrap"><bool>true</bool></property>
+         </widget>
+        </item>
 
         <!-- Fila 1: Nombre + Destino -->
         <item>
@@ -230,20 +255,20 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <layout class="QVBoxLayout">
             <property name="spacing"><number>4</number></property>
             <item><widget class="QLabel" name="lblDestino"><property name="text"><string>Destino(s)</string></property></widget></item>
-            <item><widget class="QLineEdit" name="inputDestino"><property name="placeholderText"><string>Ej: Paris, Roma</string></property></widget></item>
+            <item><widget class="QLineEdit" name="inputDestino"><property name="placeholderText"><string>Ej: París, Roma</string></property></widget></item>
            </layout>
           </item>
          </layout>
         </item>
 
-        <!-- Fila 2: Duracion + Precio -->
+        <!-- Fila 2: Duración + Precio -->
         <item>
          <layout class="QHBoxLayout">
           <property name="spacing"><number>16</number></property>
           <item>
            <layout class="QVBoxLayout">
             <property name="spacing"><number>4</number></property>
-            <item><widget class="QLabel" name="lblDuracion"><property name="text"><string>Duracion (dias)</string></property></widget></item>
+            <item><widget class="QLabel" name="lblDuracion"><property name="text"><string>Duración (días)</string></property></widget></item>
             <item><widget class="QLineEdit" name="inputDuracion"><property name="placeholderText"><string>Ej: 7</string></property></widget></item>
            </layout>
           </item>
@@ -278,21 +303,36 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
          </layout>
         </item>
 
-        <!-- Perfil objetivo (Req_2, Req_27) -->
+        <!-- Fila 4: Perfil + Emoji -->
         <item>
-         <layout class="QVBoxLayout">
-          <property name="spacing"><number>4</number></property>
-          <item><widget class="QLabel" name="lblPerfil"><property name="text"><string>Perfil objetivo</string></property></widget></item>
+         <layout class="QHBoxLayout">
+          <property name="spacing"><number>16</number></property>
           <item>
-           <widget class="QComboBox" name="comboPerfil">
-            <item><property name="text"><string>General</string></property></item>
-            <item><property name="text"><string>Familias</string></property></item>
-            <item><property name="text"><string>Jovenes</string></property></item>
-            <item><property name="text"><string>Jubilados</string></property></item>
-            <item><property name="text"><string>Parejas</string></property></item>
-            <item><property name="text"><string>Grupos escolares</string></property></item>
-            <item><property name="text"><string>Movilidad reducida</string></property></item>
-           </widget>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblPerfil"><property name="text"><string>Perfil objetivo</string></property></widget></item>
+            <item>
+             <widget class="QComboBox" name="comboPerfil">
+              <item><property name="text"><string>General</string></property></item>
+              <item><property name="text"><string>Familias</string></property></item>
+              <item><property name="text"><string>Jovenes</string></property></item>
+              <item><property name="text"><string>Jubilados</string></property></item>
+              <item><property name="text"><string>Parejas</string></property></item>
+              <item><property name="text"><string>Grupos escolares</string></property></item>
+              <item><property name="text"><string>Movilidad reducida</string></property></item>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QVBoxLayout">
+            <property name="spacing"><number>4</number></property>
+            <item><widget class="QLabel" name="lblEmoji"><property name="text"><string>Icono del paquete</string></property></widget></item>
+            <item>
+             <!-- Las opciones se rellenan desde el código Python -->
+             <widget class="QComboBox" name="comboEmoji"/>
+            </item>
+           </layout>
           </item>
          </layout>
         </item>
@@ -306,15 +346,15 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
          </layout>
         </item>
 
-        <!-- Descripcion -->
+        <!-- Descripción -->
         <item>
          <layout class="QVBoxLayout">
           <property name="spacing"><number>4</number></property>
-          <item><widget class="QLabel" name="lblDescripcion"><property name="text"><string>Descripcion</string></property></widget></item>
+          <item><widget class="QLabel" name="lblDescripcion"><property name="text"><string>Descripción</string></property></widget></item>
           <item>
            <widget class="QTextEdit" name="textDescripcion">
-            <property name="placeholderText"><string>Descripcion detallada del paquete...</string></property>
-            <property name="maximumHeight"><number>70</number></property>
+            <property name="placeholderText"><string>Descripción detallada del paquete...</string></property>
+            <property name="maximumHeight"><number>65</number></property>
            </widget>
           </item>
          </layout>
