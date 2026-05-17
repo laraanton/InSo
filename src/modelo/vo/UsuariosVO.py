@@ -1,17 +1,22 @@
 
 class UsuarioVO:
     def __init__(self, usuario_id, dni_nie, nombre_completo, email,
-                 telefono, tipo_usuario, estado, cuenta_bloqueada,
+                 telefono, tipo_usuario, estado, preferencia, cuenta_bloqueada,
                  fecha_registro=None, password_hash=None):
-        self._usuario_id      = usuario_id
-        self._dni_nie         = dni_nie
-        self._nombre_completo = nombre_completo
-        self._email           = email
-        self._telefono        = telefono
-        self._tipo_usuario    = tipo_usuario   # : Administrador, Operador, CLiente
-        self._estado          = estado   # :Activo, Inactivo, Suspendido
-        self._cuenta_bloqueada = cuenta_bloqueada  # True / False
-        self._fecha_registro  = fecha_registro
+        self._usuario_id       = usuario_id
+        self._dni_nie          = dni_nie
+        self._nombre_completo  = nombre_completo
+        self._email            = email
+        self._telefono         = telefono
+        self._tipo_usuario     = tipo_usuario
+        self._estado           = estado
+        self._preferencia      = preferencia
+        self._cuenta_bloqueada = cuenta_bloqueada
+        self._fecha_registro   = fecha_registro
+
+    @property
+    def preferencia(self):
+        return self._preferencia
 
     @property
     def usuario_id(self):
