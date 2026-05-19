@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaMisViajes</class>
+ <widget class="QMainWindow" name="VentanaMisViajes">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1280</width><height>720</height></rect>
+  </property>
+  <property name="windowTitle">
+   <string>SoftTrip - Mis Viajes</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QMainWindow { background-color: #1e2533; font-family: "Segoe UI", Arial, sans-serif; }
+QWidget { font-family: "Segoe UI", Arial, sans-serif; background-color: #f9f7f2; }
+QWidget#centralwidget { background-color: #1e2533; }
+QFrame#sidebarFrame { background-color: #1e2533; border-right: none; }
+QFrame#logoFrame { background-color: #161c28; border-bottom: 1px solid #2d3548; }
+QPushButton#logoBtn {
+    font-size: 20px; font-weight: bold; color: #7eb8b8;
+    letter-spacing: 1px; background-color: transparent; border: none; padding: 0px;
+}
+QPushButton#logoBtn:hover { color: #a0d4d4; }
+QPushButton#btnNavAjustes, QPushButton#btnNavViajes {
+    background: transparent; border: none; border-left: 3px solid transparent;
+    text-align: left; padding: 13px 20px; font-size: 11px; font-weight: 500; color: #a0aec0;
+}
+QPushButton#btnNavAjustes:hover, QPushButton#btnNavViajes:hover {
+    background-color: #2a3347; color: #7eb8b8; border-left: 3px solid #7eb8b8;
+}
+QPushButton#btnNavAjustes:checked, QPushButton#btnNavViajes:checked {
+    background-color: #2a3347; color: #7eb8b8; border-left: 3px solid #7eb8b8; font-weight: bold;
+}
+QPushButton#btnLogout {
+    background: transparent; border: none; border-top: 1px solid #444444;
+    border-left: 3px solid transparent; text-align: left; padding: 12px 20px;
+    font-size: 11px; color: #e05252; margin-top: 4px;
+}
+QPushButton#btnLogout:hover { background-color: #3a2020; color: #ff7070; border-left: 3px solid #ff7070; }
+QLabel#sidebarFooter { font-size: 9px; color: #4a5568; padding: 6px 10px; background-color: transparent; }
+QFrame#topbarFrame { background-color: #f9f7f2; border-bottom: 1px solid #e8e5de; }
+QLabel#pageTitle { font-size: 18px; font-weight: bold; color: #333333; letter-spacing: 1px; }
+QLabel#pageBreadcrumb { font-size: 10px; color: #999999; }
+QLabel#avatarLabel {
+    background-color: #5e8d8d; color: white; font-weight: bold; font-size: 13px;
+    border-radius: 17px; min-width: 34px; max-width: 34px; min-height: 34px; max-height: 34px;
+}
+QLabel#userNameLabel { font-size: 11px; color: #333333; }
+QLabel#placeholderLabel { font-size: 16px; color: #aaaaaa; }
+QLabel#placeholderSub { font-size: 11px; color: #cccccc; }
+QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
+   </string>
+  </property>
+
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="rootLayout">
+    <property name="spacing"><number>0</number></property>
+    <property name="leftMargin"><number>0</number></property>
+    <property name="topMargin"><number>0</number></property>
+    <property name="rightMargin"><number>0</number></property>
+    <property name="bottomMargin"><number>0</number></property>
+
+    <!-- SIDEBAR -->
+    <item>
+     <widget class="QFrame" name="sidebarFrame">
+      <property name="minimumWidth"><number>220</number></property>
+      <property name="maximumWidth"><number>220</number></property>
+      <layout class="QVBoxLayout" name="sidebarLayout">
+       <property name="spacing"><number>0</number></property>
+       <property name="leftMargin"><number>0</number></property>
+       <property name="topMargin"><number>0</number></property>
+       <property name="rightMargin"><number>0</number></property>
+       <property name="bottomMargin"><number>0</number></property>
+
+       <item>
+        <widget class="QFrame" name="logoFrame">
+         <property name="minimumHeight"><number>72</number></property>
+         <property name="maximumHeight"><number>72</number></property>
+         <layout class="QHBoxLayout" name="logoLayout">
+          <item>
+           <widget class="QPushButton" name="logoBtn">
+            <property name="text"><string>&#x2708;  SOFTRIP</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+
+       <item>
+        <widget class="QPushButton" name="btnNavAjustes">
+         <property name="text"><string>   Ajustes de cuenta</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="btnNavViajes">
+         <property name="text"><string>   Mis viajes</string></property>
+         <property name="checkable"><bool>true</bool></property>
+         <property name="checked"><bool>true</bool></property>
+         <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+        </widget>
+       </item>
+
+       <item>
+        <spacer name="sidebarSpacer">
+         <property name="orientation"><enum>Qt::Vertical</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+        </spacer>
+       </item>
+
+       <item>
+        <widget class="QPushButton" name="btnLogout">
+         <property name="text"><string>   Cerrar sesion</string></property>
+         <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="sidebarFooter">
+         <property name="text"><string>Haz las maletas. Nosotros el resto.</string></property>
+         <property name="alignment"><set>Qt::AlignCenter</set></property>
+        </widget>
+       </item>
+
+      </layout>
+     </widget>
+    </item>
+
+    <!-- CONTENT -->
+    <item>
+     <widget class="QFrame" name="contentFrame">
+      <layout class="QVBoxLayout" name="contentLayout">
+       <property name="spacing"><number>0</number></property>
+       <property name="leftMargin"><number>0</number></property>
+       <property name="topMargin"><number>0</number></property>
+       <property name="rightMargin"><number>0</number></property>
+       <property name="bottomMargin"><number>0</number></property>
+
+       <!-- TOPBAR -->
+       <item>
+        <widget class="QFrame" name="topbarFrame">
+         <property name="minimumHeight"><number>64</number></property>
+         <property name="maximumHeight"><number>64</number></property>
+         <layout class="QHBoxLayout" name="topbarLayout">
+          <property name="leftMargin"><number>28</number></property>
+          <property name="rightMargin"><number>24</number></property>
+          <property name="spacing"><number>8</number></property>
+          <item>
+           <layout class="QVBoxLayout" name="titleStack">
+            <property name="spacing"><number>2</number></property>
+            <item>
+             <widget class="QLabel" name="pageTitle">
+              <property name="text"><string>Mis Viajes</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="pageBreadcrumb">
+              <property name="text"><string>Softrip › Mi cuenta › Mis viajes</string></property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <spacer name="topSpacer">
+            <property name="orientation"><enum>Qt::Horizontal</enum></property>
+            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QLabel" name="avatarLabel">
+            <property name="text"><string>U</string></property>
+            <property name="alignment"><set>Qt::AlignCenter</set></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="userNameLabel">
+            <property name="text"><string>Usuario</string></property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+
+       <!-- PLACEHOLDER CONTENT -->
+       <item>
+        <layout class="QVBoxLayout" name="placeholderLayout">
+         <property name="leftMargin"><number>48</number></property>
+         <property name="topMargin"><number>0</number></property>
+         <property name="rightMargin"><number>48</number></property>
+         <property name="bottomMargin"><number>32</number></property>
+         <property name="spacing"><number>0</number></property>
+
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Vertical</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>20</width><height>80</height></size></property>
+          </spacer>
+         </item>
+
+         <item>
+          <widget class="QLabel" name="placeholderIcon">
+           <property name="text"><string>&#x1F9F3;</string></property>
+           <property name="styleSheet"><string>font-size: 52px;</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+          </widget>
+         </item>
+
+         <item>
+          <widget class="QLabel" name="placeholderLabel">
+           <property name="text"><string>Aquí se verán tus próximos viajes</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+          </widget>
+         </item>
+
+         <item>
+          <widget class="QLabel" name="placeholderSub">
+           <property name="text"><string>Cuando realices una reserva aparecerá aquí</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+          </widget>
+         </item>
+
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Vertical</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>20</width><height>80</height></size></property>
+          </spacer>
+         </item>
+
+         <!-- Footer -->
+         <item>
+          <layout class="QVBoxLayout" name="footerLayout">
+           <property name="spacing"><number>4</number></property>
+           <item>
+            <widget class="QLabel" name="footerLinks">
+             <property name="text"><string>Terminos     Privacidad</string></property>
+             <property name="alignment"><set>Qt::AlignCenter</set></property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="footerCopy">
+             <property name="text"><string>Copyright 2026 Softrip</string></property>
+             <property name="alignment"><set>Qt::AlignCenter</set></property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+
+        </layout>
+       </item>
+
+      </layout>
+     </widget>
+    </item>
+
+   </layout>
+  </widget>
+ </widget>
+</ui>
