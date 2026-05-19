@@ -122,3 +122,28 @@ class UserDAO(Conexion):
             print(f"Error en insertarUsuario: {e}")
             return False
 
+    def actualizarTelefono(self, usuario_id, telefono):
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                "UPDATE Usuarios SET telefono = ? WHERE usuario_id = ?",
+                [telefono, usuario_id]
+            )
+            return True
+        except Exception as e:
+            print(f"Error en actualizarTelefono: {e}")
+            return False
+    
+    def actualizarPreferencia(self, usuario_id, preferencia):
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                "UPDATE Usuarios SET preferencia = ? WHERE usuario_id = ?",
+                [preferencia, usuario_id]
+            )
+            return True
+        except Exception as e:
+            print(f"Error en actualizarPreferencia: {e}")
+            return False
+
+
