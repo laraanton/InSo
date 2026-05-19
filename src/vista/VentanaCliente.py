@@ -41,6 +41,20 @@ class VentanaCliente(QMainWindow, Form):
         self.menuCuenta.hide()
         QMessageBox.information(self, "Mis viajes", "Aquí irán tus viajes.")
 
+    def _ir_ajustes(self):
+        self.menuCuenta.hide()
+        from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
+        self.ventana_ajustes = VentanaAjustesCuenta(self.user)
+        self.ventana_ajustes.show()
+        self.close()
+
+    def _ir_mis_viajes(self):
+        self.menuCuenta.hide()
+        from src.vista.VentanaMisViajes import VentanaMisViajes
+        self.ventana_viajes = VentanaMisViajes(self.user)
+        self.ventana_viajes.show()
+        self.close()
+
     def _buscar_paquetes(self):
         """Recoge los filtros del buscador y lanza la búsqueda."""
         destino = self.in_destino.text().strip()
