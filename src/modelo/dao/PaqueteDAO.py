@@ -1,9 +1,7 @@
 """
 PaqueteDAO.py  –  Acceso a datos de Paquetes_Turisticos
-========================================================
-Hereda de Conexion y expone CRUD completo sobre la tabla.
-
-Mapeo entre columnas BD  ↔  claves de dict que usa el Controlador:
+Hereda de Conexion 
+Claves de dict que usa el Controlador:
     paquete_id              → id
     nombre_paquete          → nombre
     descripcion_detallada   → descripcion
@@ -25,8 +23,6 @@ from src.modelo.conexion.Conexion import Conexion
 
 
 class PaqueteDAO(Conexion):
-
-    # ── Query base reutilizable ────────────────────────────────────────────
     _SELECT = """
         SELECT paquete_id, nombre_paquete, descripcion_detallada, destino,
                duracion_dias, precio_tpv, servicios_incluidos, perfil_objetivo,
@@ -35,9 +31,6 @@ class PaqueteDAO(Conexion):
                estado_paquete
         FROM   Paquetes_Turisticos
     """
-
-    # ── Helpers privados ──────────────────────────────────────────────────
-
     @staticmethod
     def _row_a_dict(row) -> dict:
         """Convierte una fila de cursor al dict que espera ControladorOperador."""
@@ -59,13 +52,8 @@ class PaqueteDAO(Conexion):
             "fecha_fin":       "",
         }
 
-    # ── Lecturas ──────────────────────────────────────────────────────────
-
     def obtener_todos(self) -> list[dict]:
-        """
-        Devuelve todos los paquetes que NO están en estado 'Inactivo'.
-        Usado por VentanaEditar (lista) y VentanaCompra (catálogo).
-        """
+        # Devuelve los paquetes no 'Inactivos'. Lo usan VentanaEditar y VentanaCompra
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -79,7 +67,7 @@ class PaqueteDAO(Conexion):
             return []
 
     def obtener_por_id(self, paquete_id: int) -> dict | None:
-        """Devuelve un paquete concreto o None si no existe."""
+        #Devuelve un paquete concreto o None si no existe.
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -93,11 +81,7 @@ class PaqueteDAO(Conexion):
             return None
 
     def tiene_reservas_activas(self, paquete_id: int) -> bool:
-        """
-        Devuelve True si el paquete tiene pedidos en estados que impiden
-        su eliminación (Req_27 – integridad referencial).
-        En caso de error devuelve True como medida de precaución.
-        """
+        #True si el paquete tiene pedidos en estados que impiden su eliminación (Req_27 – integridad referencial).
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -112,19 +96,12 @@ class PaqueteDAO(Conexion):
             return bool(row and row[0] > 0)
         except Exception as e:
             print(f"[PaqueteDAO] Error en tiene_reservas_activas: {e}")
+            #En caso de error devuelve True como medida de precaución.
             return True
 
-    # ── Escrituras ─────────────────────────────────────────────────────────
-
     def insertar(self, datos: dict, operador_id: int | None = None) -> int | None:
-        """
-        Inserta un paquete nuevo.
-        Devuelve el paquete_id generado por IDENTITY, o None si falla.
-
-        datos esperados (mismas claves que _row_a_dict devuelve):
-            nombre*, destino*, duracion, precio*, descripcion,
-            servicios, perfil, accesibilidad
-        """
+        #Devuelve el paquete_id generado por IDENTITY, o None si falla.
+        #Se esperan las mismas claves que _row_a_dict devuelve
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -146,7 +123,7 @@ class PaqueteDAO(Conexion):
                     operador_id,
                 ]
             )
-            # @@IDENTITY devuelve el último IDENTITY generado en la sesión
+            #@@IDENTITY devuelve el último IDENTITY generado en la sesión
             cursor.execute("SELECT @@IDENTITY")
             row = cursor.fetchone()
             nuevo_id = int(row[0]) if row and row[0] is not None else None
@@ -157,10 +134,7 @@ class PaqueteDAO(Conexion):
             return None
 
     def actualizar(self, paquete_id: int, datos: dict) -> bool:
-        """
-        Actualiza los campos editables de un paquete (Req_27).
-        No modifica creado_por_operador ni fecha_creacion.
-        """
+        #Actualiza los campos editables de un paquete (Req_27). No modifica creado_por_operador ni fecha_creacion.
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -193,17 +167,13 @@ class PaqueteDAO(Conexion):
             return False
 
     def eliminar(self, paquete_id: int) -> bool:
-        """
-        Borrado lógico: cambia estado_paquete → 'Inactivo'.
-        Preserva la integridad referencial con Pedidos_Viajes.
-        Verificar antes con tiene_reservas_activas().
-        """
+        #Cambia estado_paquete → 'Inactivo'. Preserva la integridad referencial con Pedidos_Viajes.
         try:
             cursor = self.getCursor()
             cursor.execute(
                 "UPDATE Paquetes_Turisticos "
-                "SET    estado_paquete = 'Inactivo' "
-                "WHERE  paquete_id    = ?",
+                "SET estado_paquete = 'Inactivo' "
+                "WHERE  paquete_id = ?",
                 [paquete_id]
             )
             self.conexion.commit()
@@ -212,9 +182,8 @@ class PaqueteDAO(Conexion):
             print(f"[PaqueteDAO] Error en eliminar: {e}")
             return False
 
-    def registrar_historial(self, paquete_id: int, usuario_id: int | None,
-                            descripcion: str) -> bool:
-        """Guarda un registro en Historial_Cambios_Paquetes."""
+    def registrar_historial(self, paquete_id: int, usuario_id: int | None, descripcion: str) -> bool:
+        #Guarda registro en Historial_Cambios_Paquetes.
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -230,8 +199,7 @@ class PaqueteDAO(Conexion):
             return False
 
 
-# ── Funciones auxiliares de conversión ────────────────────────────────────
-
+#Funciones auxiliares de conversión 
 def _to_int(valor, defecto: int = 1) -> int:
     try:
         return int(str(valor).strip())
