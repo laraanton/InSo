@@ -6,7 +6,7 @@ from src.vista.VentanaCliente import VentanaCliente
 from src.vista.VentanaMisViajes import VentanaMisViajes
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAjustesCuenta.ui")
-
+ 
 class VentanaAjustesCuenta(QMainWindow, Form):
     def __init__(self, user):
         super().__init__()
@@ -104,12 +104,12 @@ class VentanaAjustesCuenta(QMainWindow, Form):
     def _volver_principal(self):
         self.ventana_princial = VentanaCliente(self.user)
         self.ventana_princial.show()
-        self.close()
+        self.hide()
 
     def _ir_mis_viajes(self):
         self.ventana_princial = VentanaMisViajes(self.user)
         self.ventana_princial.show()
-        self.close()
+        self.hide()
     
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
