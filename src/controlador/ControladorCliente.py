@@ -23,15 +23,15 @@ class ControladorCliente:
         self.ventana_ajustes = VentanaAjustesCuenta(self.user, self)
         self.ventana_ajustes.show()
         if self.ventana_principal:
-            self.ventana_principal.close()
+            self.ventana_principal.hide()
     
     def ir_a_mis_viajes(self):
         self.ventana_viajes = VentanaMisViajes(self.user, self)
         self.ventana_ajustes.show()
         if self.ventana_ajustes:
-            self.ventana_ajustes.close()
+            self.ventana_ajustes.hide()
         if self.ventana_principal:
-            self.ventana_principal.close()
+            self.ventana_principal.hide()
 
     def cerrar_sesion(self):
         self.ventana_login = MiVentana()
@@ -46,9 +46,9 @@ class ControladorCliente:
     def volver_a_principal(self):
         self.abrir_principal()
         if self.ventana_ajustes:
-            self.ventana_ajustes.close()
+            self.ventana_ajustes.hide()
         if self.ventana_viajes:
-            self.ventana_viajes.close()
+            self.ventana_viajes.hide()
     
     def guardar_perfil(self, telefono, preferencia):
         from src.modelo.dao.UserDAO import UserDAO
