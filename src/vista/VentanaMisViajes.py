@@ -25,13 +25,13 @@ class VentanaMisViajes(QMainWindow, Form):
         from src.vista.VentanaCliente import VentanaCliente
         self.ventana_principal = VentanaCliente(self.user)
         self.ventana_principal.show()
-        self.close()
+        self.hide()
 
     def _ir_ajustes(self):
         from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
         self.ventana_ajustes = VentanaAjustesCuenta(self.user)
         self.ventana_ajustes.show()
-        self.close()
+        self.hide()
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
