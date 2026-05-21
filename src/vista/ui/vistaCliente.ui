@@ -6,14 +6,20 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1280</width>
-    <height>720</height>
+    <width>1270</width>
+    <height>780</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Softrip</string>
   </property>
   <widget class="QWidget" name="centralwidget">
+   <property name="maximumSize">
+    <size>
+     <width>1270</width>
+     <height>780</height>
+    </size>
+   </property>
    <property name="styleSheet">
     <string notr="true">#centralwidget {
 	background-color: #eef5fc;
@@ -103,7 +109,7 @@ QPushButton:hover {
      <string/>
     </property>
     <property name="pixmap">
-     <pixmap resource="../../../../Trabajo final/src/vista/imagenes/recursos.qrc">:/imagenes/pagPrincipalCliente.jpg</pixmap>
+     <pixmap resource="../imagenes/recursos.qrc">:/imagenes/pagPrincipalCliente.jpg</pixmap>
     </property>
     <property name="scaledContents">
      <bool>false</bool>
@@ -336,8 +342,8 @@ letter-spacing: 1px;</string>
      <rect>
       <x>140</x>
       <y>345</y>
-      <width>300</width>
-      <height>280</height>
+      <width>290</width>
+      <height>160</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -347,104 +353,99 @@ letter-spacing: 1px;</string>
 	border: 1px solid rgba(29, 147, 197, 0.15);
 }</string>
     </property>
-    <widget class="QLabel" name="card1_img">
+    <widget class="QLabel" name="card1_icono">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>300</width>
-       <height>150</height>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #9f8969;
-border-radius: 12px 12px 0 0;
-color: rgba(255,255,255,0.5);
-font-size: 12px;
-qproperty-alignment: AlignCenter;</string>
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
      </property>
      <property name="text">
-      <string>[ imagen destino ]</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <string>✈️</string>
      </property>
     </widget>
     <widget class="QLabel" name="card1_titulo">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>158</y>
-       <width>270</width>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
        <height>22</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 14px;
-font-weight: 600;
-color: #1a3a5c;</string>
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
      </property>
      <property name="text">
-      <string>París · 7 noches</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="card1_desc">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>182</y>
-       <width>270</width>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
        <height>18</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 12px;
-color: #6b8aaa;</string>
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
      </property>
      <property name="text">
-      <string>Vuelo + Hotel + Traslados incluidos</string>
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card1_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
      </property>
     </widget>
     <widget class="QLabel" name="card1_precio">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>208</y>
-       <width>140</width>
+       <y>78</y>
+       <width>160</width>
        <height>24</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 16px;
-font-weight: 700;
-color: #1d93c5;</string>
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
      </property>
      <property name="text">
-      <string>Desde 899 €</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="card1_btn">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>242</y>
-       <width>270</width>
+       <y>118</y>
+       <width>260</width>
        <height>28</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">QPushButton {
-	background-color: #eef5fc;
-	color: #1d93c5;
-	font-size: 13px;
-	font-weight: 500;
-	border: 1px solid rgba(29,147,197,0.3);
-	border-radius: 8px;
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
 }
-QPushButton:hover {
-	background-color: #1d93c5;
-	color: white;
-}</string>
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
      </property>
      <property name="text">
       <string>Ver paquete</string>
@@ -454,10 +455,10 @@ QPushButton:hover {
    <widget class="QWidget" name="card2" native="true">
     <property name="geometry">
      <rect>
-      <x>490</x>
+      <x>475</x>
       <y>345</y>
-      <width>300</width>
-      <height>280</height>
+      <width>290</width>
+      <height>160</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -467,104 +468,99 @@ QPushButton:hover {
 	border: 1px solid rgba(29, 147, 197, 0.15);
 }</string>
     </property>
-    <widget class="QLabel" name="card2_img">
+    <widget class="QLabel" name="card2_icono">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>300</width>
-       <height>150</height>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #9f8969;
-border-radius: 12px 12px 0 0;
-color: rgba(255,255,255,0.5);
-font-size: 12px;
-qproperty-alignment: AlignCenter;</string>
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
      </property>
      <property name="text">
-      <string>[ imagen destino ]</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <string>✈️</string>
      </property>
     </widget>
     <widget class="QLabel" name="card2_titulo">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>158</y>
-       <width>270</width>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
        <height>22</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 14px;
-font-weight: 600;
-color: #1a3a5c;</string>
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
      </property>
      <property name="text">
-      <string>Roma · 5 noches</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="card2_desc">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>182</y>
-       <width>270</width>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
        <height>18</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 12px;
-color: #6b8aaa;</string>
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
      </property>
      <property name="text">
-      <string>Vuelo + Hotel + Visitas guiadas</string>
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card2_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
      </property>
     </widget>
     <widget class="QLabel" name="card2_precio">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>208</y>
-       <width>140</width>
+       <y>78</y>
+       <width>160</width>
        <height>24</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 16px;
-font-weight: 700;
-color: #1d93c5;</string>
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
      </property>
      <property name="text">
-      <string>Desde 749 €</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="card2_btn">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>242</y>
-       <width>270</width>
+       <y>118</y>
+       <width>260</width>
        <height>28</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">QPushButton {
-	background-color: #eef5fc;
-	color: #1d93c5;
-	font-size: 13px;
-	font-weight: 500;
-	border: 1px solid rgba(29,147,197,0.3);
-	border-radius: 8px;
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
 }
-QPushButton:hover {
-	background-color: #1d93c5;
-	color: white;
-}</string>
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
      </property>
      <property name="text">
       <string>Ver paquete</string>
@@ -574,10 +570,10 @@ QPushButton:hover {
    <widget class="QWidget" name="card3" native="true">
     <property name="geometry">
      <rect>
-      <x>840</x>
+      <x>810</x>
       <y>345</y>
-      <width>300</width>
-      <height>280</height>
+      <width>290</width>
+      <height>160</height>
      </rect>
     </property>
     <property name="styleSheet">
@@ -587,111 +583,450 @@ QPushButton:hover {
 	border: 1px solid rgba(29, 147, 197, 0.15);
 }</string>
     </property>
-    <widget class="QLabel" name="card3_img">
+    <widget class="QLabel" name="card3_icono">
      <property name="geometry">
       <rect>
-       <x>0</x>
-       <y>0</y>
-       <width>300</width>
-       <height>150</height>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: #9f8969;
-border-radius: 12px 12px 0 0;
-color: rgba(255,255,255,0.5);
-font-size: 12px;
-qproperty-alignment: AlignCenter;</string>
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
      </property>
      <property name="text">
-      <string>[ imagen destino ]</string>
-     </property>
-     <property name="alignment">
-      <set>Qt::AlignCenter</set>
+      <string>✈️</string>
      </property>
     </widget>
     <widget class="QLabel" name="card3_titulo">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>158</y>
-       <width>270</width>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
        <height>22</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 14px;
-font-weight: 600;
-color: #1a3a5c;</string>
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
      </property>
      <property name="text">
-      <string>Lisboa · 4 noches</string>
+      <string/>
      </property>
     </widget>
     <widget class="QLabel" name="card3_desc">
      <property name="geometry">
       <rect>
-       <x>15</x>
-       <y>182</y>
-       <width>270</width>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
        <height>18</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 12px;
-color: #6b8aaa;</string>
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
      </property>
      <property name="text">
-      <string>Vuelo + Hotel + Desayuno incluido</string>
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card3_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
      </property>
     </widget>
     <widget class="QLabel" name="card3_precio">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>208</y>
-       <width>140</width>
+       <y>78</y>
+       <width>160</width>
        <height>24</height>
       </rect>
      </property>
      <property name="styleSheet">
-      <string notr="true">font-size: 16px;
-font-weight: 700;
-color: #1d93c5;</string>
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
      </property>
      <property name="text">
-      <string>Desde 599 €</string>
+      <string/>
      </property>
     </widget>
     <widget class="QPushButton" name="card3_btn">
      <property name="geometry">
       <rect>
        <x>15</x>
-       <y>242</y>
-       <width>270</width>
+       <y>118</y>
+       <width>260</width>
        <height>28</height>
       </rect>
      </property>
      <property name="styleSheet">
       <string notr="true">QPushButton {
-	background-color: #eef5fc;
-	color: #1d93c5;
-	font-size: 13px;
-	font-weight: 500;
-	border: 1px solid rgba(29,147,197,0.3);
-	border-radius: 8px;
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
 }
-QPushButton:hover {
-	background-color: #1d93c5;
-	color: white;
-}</string>
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
      </property>
      <property name="text">
       <string>Ver paquete</string>
      </property>
     </widget>
    </widget>
-   <!-- ===== MENÚ DESPLEGABLE CUENTA ===== -->
+   <widget class="QWidget" name="card4" native="true">
+    <property name="geometry">
+     <rect>
+      <x>140</x>
+      <y>525</y>
+      <width>290</width>
+      <height>160</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget#card4 {
+	background-color: #ffffff;
+	border-radius: 12px;
+	border: 1px solid rgba(29, 147, 197, 0.15);
+}</string>
+    </property>
+    <widget class="QLabel" name="card4_icono">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
+     </property>
+     <property name="text">
+      <string>✈️</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card4_titulo">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card4_desc">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card4_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card4_precio">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>78</y>
+       <width>160</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="card4_btn">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>118</y>
+       <width>260</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
+}
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
+     </property>
+     <property name="text">
+      <string>Ver paquete</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="card5" native="true">
+    <property name="geometry">
+     <rect>
+      <x>475</x>
+      <y>525</y>
+      <width>290</width>
+      <height>160</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget#card5 {
+	background-color: #ffffff;
+	border-radius: 12px;
+	border: 1px solid rgba(29, 147, 197, 0.15);
+}</string>
+    </property>
+    <widget class="QLabel" name="card5_icono">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
+     </property>
+     <property name="text">
+      <string>✈️</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card5_titulo">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card5_desc">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card5_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card5_precio">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>78</y>
+       <width>160</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="card5_btn">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>118</y>
+       <width>260</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
+}
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
+     </property>
+     <property name="text">
+      <string>Ver paquete</string>
+     </property>
+    </widget>
+   </widget>
+   <widget class="QWidget" name="card6" native="true">
+    <property name="geometry">
+     <rect>
+      <x>810</x>
+      <y>525</y>
+      <width>290</width>
+      <height>160</height>
+     </rect>
+    </property>
+    <property name="styleSheet">
+     <string notr="true">QWidget#card6 {
+	background-color: #ffffff;
+	border-radius: 12px;
+	border: 1px solid rgba(29, 147, 197, 0.15);
+}</string>
+    </property>
+    <widget class="QLabel" name="card6_icono">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>14</y>
+       <width>36</width>
+       <height>36</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 26px; qproperty-alignment: AlignCenter;</string>
+     </property>
+     <property name="text">
+      <string>✈️</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card6_titulo">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>14</y>
+       <width>220</width>
+       <height>22</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card6_desc">
+     <property name="geometry">
+      <rect>
+       <x>58</x>
+       <y>38</y>
+       <width>220</width>
+       <height>18</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 12px; color: #6b8aaa;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QFrame" name="card6_sep">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>68</y>
+       <width>260</width>
+       <height>1</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgba(29,147,197,0.12);</string>
+     </property>
+    </widget>
+    <widget class="QLabel" name="card6_precio">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>78</y>
+       <width>160</width>
+       <height>24</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">font-size: 16px; font-weight: 700; color: #1d93c5;</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="card6_btn">
+     <property name="geometry">
+      <rect>
+       <x>15</x>
+       <y>118</y>
+       <width>260</width>
+       <height>28</height>
+      </rect>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">QPushButton {
+	background-color: #eef5fc; color: #1d93c5;
+	font-size: 13px; font-weight: 500;
+	border: 1px solid rgba(29,147,197,0.3); border-radius: 8px;
+}
+QPushButton:hover { background-color: #1d93c5; color: white; }</string>
+     </property>
+     <property name="text">
+      <string>Ver paquete</string>
+     </property>
+    </widget>
+   </widget>
    <widget class="QWidget" name="menuCuenta" native="true">
     <property name="geometry">
      <rect>
@@ -700,6 +1035,9 @@ QPushButton:hover {
       <width>160</width>
       <height>114</height>
      </rect>
+    </property>
+    <property name="visible">
+     <bool>false</bool>
     </property>
     <property name="styleSheet">
      <string notr="true">QWidget#menuCuenta {
@@ -721,10 +1059,6 @@ QPushButton:hover {
 	color: #1d93c5;
 }</string>
     </property>
-    <property name="visible">
-     <bool>false</bool>
-    </property>
-
     <widget class="QPushButton" name="btnAjustes">
      <property name="geometry">
       <rect>
@@ -738,7 +1072,6 @@ QPushButton:hover {
       <string>Ajustes de cuenta</string>
      </property>
     </widget>
-
     <widget class="QFrame" name="sepMenu1">
      <property name="geometry">
       <rect>
@@ -752,7 +1085,6 @@ QPushButton:hover {
       <string notr="true">background-color: rgba(29, 147, 197, 0.15);</string>
      </property>
     </widget>
-
     <widget class="QPushButton" name="btnMisViajes">
      <property name="geometry">
       <rect>
@@ -766,7 +1098,6 @@ QPushButton:hover {
       <string>Mis viajes</string>
      </property>
     </widget>
-
     <widget class="QFrame" name="sepMenu2">
      <property name="geometry">
       <rect>
@@ -780,7 +1111,6 @@ QPushButton:hover {
       <string notr="true">background-color: rgba(29, 147, 197, 0.15);</string>
      </property>
     </widget>
-
     <widget class="QPushButton" name="btnCerrarSesion">
      <property name="geometry">
       <rect>
@@ -808,14 +1138,12 @@ QPushButton:hover {
       <string>Cerrar sesión</string>
      </property>
     </widget>
-
    </widget>
-
    <widget class="QWidget" name="footer" native="true">
     <property name="geometry">
      <rect>
       <x>0</x>
-      <y>660</y>
+      <y>720</y>
       <width>1280</width>
       <height>60</height>
      </rect>
@@ -892,7 +1220,8 @@ color: rgba(100, 130, 160, 0.4);</string>
   </widget>
  </widget>
  <resources>
-  <include location="../../../../Trabajo final/src/vista/imagenes/recursos.qrc"/>
+  <include location="../imagenes/recursos.qrc"/>
+  <include location="../imagenes/recursos.qrc"/>
  </resources>
  <connections/>
 </ui>
