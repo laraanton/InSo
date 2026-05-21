@@ -1,10 +1,8 @@
 """
 ReservaDAO.py  –  Acceso a datos de Pedidos_Viajes (Reservas)
-=============================================================
-Hereda de Conexion.  Cada operación de escritura actualiza también
-Historial_Estados_Pedidos para mantener trazabilidad (Req_26).
+Hereda de Conexion.  Cada operación de escritura actualiza también Historial_Estados_Pedidos -> trazabilidad (Req_26).
 
-Mapeo columnas BD  ↔  claves de dict que usa ControladorOperador:
+Claves de dict que usa ControladorOperador:
     identificador_unico  (computed: 'ORD-N')  → id
     u.nombre_completo                         → cliente
     pt.nombre_paquete                         → paquete
@@ -17,10 +15,7 @@ Mapeo columnas BD  ↔  claves de dict que usa ControladorOperador:
 from __future__ import annotations
 from src.modelo.conexion.Conexion import Conexion
 
-
 class ReservaDAO(Conexion):
-
-    # ── Query base ────────────────────────────────────────────────────────
     _SELECT = """
         SELECT pv.pedido_id,
                pv.identificador_unico,
@@ -36,8 +31,6 @@ class ReservaDAO(Conexion):
         JOIN   Usuarios              u  ON pv.cliente_id  = u.usuario_id
         JOIN   Paquetes_Turisticos   pt ON pv.paquete_id  = pt.paquete_id
     """
-
-    # ── Helpers privados ──────────────────────────────────────────────────
 
     @staticmethod
     def _row_a_dict(row) -> dict:
@@ -58,13 +51,8 @@ class ReservaDAO(Conexion):
             "_paquete_id": row[9],
         }
 
-    # ── Lecturas ──────────────────────────────────────────────────────────
-
     def obtener_todas(self) -> list[dict]:
-        """
-        Devuelve todas las reservas ordenadas por fecha descendente.
-        Incluye nombre de cliente y paquete mediante JOIN (Req_25).
-        """
+        #Devuelve todas las reservas en fecha descendente. Con nombre de cliente y paquete mediante JOIN (Req_25)
         try:
             cursor = self.getCursor()
             cursor.execute(self._SELECT + "ORDER BY pv.fecha_pedido DESC")
@@ -74,10 +62,7 @@ class ReservaDAO(Conexion):
             return []
 
     def buscar(self, texto: str = "", estado: str = "") -> list[dict]:
-        """
-        Filtra reservas por texto libre (cliente, paquete, id)
-        y/o por estado exacto (Req_23, Req_26).
-        """
+        #Filtra reservas por texto libre (cliente, paquete, id) o estado (Req_23, Req_26)
         try:
             cursor   = self.getCursor()
             conds    = []
@@ -105,7 +90,7 @@ class ReservaDAO(Conexion):
             return []
 
     def obtener_por_identificador(self, identificador: str) -> dict | None:
-        """Devuelve una reserva por su identificador_unico (ORD-N)."""
+        #Devuelve una reserva por su identificador_unico 
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -118,27 +103,23 @@ class ReservaDAO(Conexion):
             print(f"[ReservaDAO] Error en obtener_por_identificador: {e}")
             return None
 
-    # ── Escrituras ────────────────────────────────────────────────────────
-
     def insertar(self, datos: dict) -> str | None:
-        """
-        Crea un nuevo pedido.  Devuelve el identificador_unico ('ORD-N')
-        o None si falla.
-
-        datos esperados:
-            cliente_id*  (int),  paquete_id*  (int),
-            monto_total* (float o str),
-            metodo_pago  (str, default 'PayPal'),
-            fecha_inicio (str YYYY-MM-DD, opcional),
-            fecha_fin    (str YYYY-MM-DD, opcional)
-        """
+            #ids -> int
+            #monto_total* -> float o str
+            #metodo_pago -> [str, default 'PayPal']
+            #fechas -> str YYYY-MM-DD
+        #Crea un nuevo pedido.  Devuelve el identificador_unico ('ORD-N')
         try:
             cursor = self.getCursor()
             cursor.execute(
                 """INSERT INTO Pedidos_Viajes
-                       (cliente_id, paquete_id, monto_total,
-                        metodo_pago, estado_pedido,
-                        fecha_inicio, fecha_fin)
+                       (cliente_id, 
+                       paquete_id,
+                       monto_total,
+                       metodo_pago, 
+                       estado_pedido,
+                       fecha_inicio, 
+                       fecha_fin) 
                    VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)""",
                 [
                     int(datos["cliente_id"]),
@@ -166,16 +147,12 @@ class ReservaDAO(Conexion):
             return f"ORD-{pedido_id}"
         except Exception as e:
             print(f"[ReservaDAO] Error en insertar: {e}")
+            #Devuelve None si falla
             return None
 
     def actualizar_estado(self, identificador: str, nuevo_estado: str,
                           usuario_id: int | None = None) -> bool:
-        """
-        Cambia el estado de un pedido y deja huella en
-        Historial_Estados_Pedidos (Req_26).
-
-        identificador: valor de identificador_unico ('ORD-N') o pedido_id numérico.
-        """
+        #Cambia el estado de un pedido y actualiza Historial_Estados_Pedidos (Req_26).
         try:
             cursor = self.getCursor()
 
@@ -184,7 +161,7 @@ class ReservaDAO(Conexion):
                 """SELECT pedido_id, estado_pedido
                    FROM   Pedidos_Viajes
                    WHERE  identificador_unico = ?""",
-                [identificador]
+                [identificador] #identificador_unico ('ORD-N')/ pedido_id numérico.
             )
             row = cursor.fetchone()
             if not row:
@@ -216,18 +193,14 @@ class ReservaDAO(Conexion):
             return False
 
     def exportar_todas(self) -> list[dict]:
-        """
-        Devuelve todas las reservas sin claves internas (_*),
-        listas para volcar a CSV (Req_19).
-        """
+        #Devuelve todas las reservas sin claves internas (_*)
         return [
             {k: v for k, v in r.items() if not k.startswith("_")}
             for r in self.obtener_todas()
         ]
 
 
-# ── Función auxiliar ──────────────────────────────────────────────────────
-
+#Función auxiliar
 def _to_float(valor, defecto: float = 0.0) -> float:
     try:
         return float(str(valor).strip().replace(",", "."))
