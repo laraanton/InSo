@@ -8,7 +8,7 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia_accesibilidad, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
                    FROM Usuarios
                    WHERE email = ? AND password_hash = ?""",
                 [loginVO.email, loginVO.password_hash]
@@ -16,7 +16,6 @@ class UserDAO(Conexion):
             row = cursor.fetchone()
             if not row:
                 return None
-            
             return UsuarioVO(*row)
         except Exception as e:
             print(f"Error en consultaLogin: {e}")
@@ -27,7 +26,7 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia_accesibilidad, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
                    FROM Usuarios WHERE usuario_id = ?""",
                 [usuario_id]
             )
@@ -42,7 +41,7 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia_accesibilidad, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
                    FROM Usuarios WHERE email = ?""",
                 [email]
             )
@@ -57,7 +56,7 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia_accesibilidad, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
                    FROM Usuarios"""
             )
             rows = cursor.fetchall()
@@ -106,16 +105,16 @@ class UserDAO(Conexion):
         try:
             cursor = self.getCursor()
             print(f"Insertando: {registroVO.dni_nie}, {registroVO.nombre_completo}, "
-              f"{registroVO.email}, {registroVO.telefono}, "
-              f"{registroVO.password_hash}, {registroVO.tipo_usuario}, {registroVO.preferencia_accesibilidad}")
+                  f"{registroVO.email}, {registroVO.telefono}, "
+                  f"{registroVO.password_hash}, {registroVO.tipo_usuario}, {registroVO.preferencia}")
             cursor.execute(
                 """INSERT INTO Usuarios 
-                (dni_nie, nombre_completo, email, telefono, password_hash, tipo_usuario, preferencia_accesibilidad)
+                (dni_nie, nombre_completo, email, telefono, password_hash, tipo_usuario, preferencia)
                 VALUES (?, ?, ?, ?, ?, ?, ?)""",
                 [
                     registroVO.dni_nie, registroVO.nombre_completo,
                     registroVO.email, registroVO.telefono,
-                    registroVO.password_hash, registroVO.tipo_usuario, registroVO.preferencia_accesibilidad
+                    registroVO.password_hash, registroVO.tipo_usuario, registroVO.preferencia
                 ]
             )
             return True
@@ -135,12 +134,12 @@ class UserDAO(Conexion):
             print(f"Error en actualizarTelefono: {e}")
             return False
 
-    def actualizarPreferencia(self, usuario_id, preferencia_accesibilidad):
+    def actualizarPreferencia(self, usuario_id, preferencia):
         try:
             cursor = self.getCursor()
             cursor.execute(
-                "UPDATE Usuarios SET preferencia_accesibilidad = ? WHERE usuario_id = ?",
-                [preferencia_accesibilidad, usuario_id]
+                "UPDATE Usuarios SET preferencia = ? WHERE usuario_id = ?",
+                [preferencia, usuario_id]
             )
             return True
         except Exception as e:
