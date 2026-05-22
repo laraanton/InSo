@@ -94,7 +94,7 @@ CREATE TABLE Historial_Estados_Pedidos (
     estado_nuevo        NVARCHAR(30) NOT NULL,
     fecha_cambio        DATETIME DEFAULT GETDATE(),
     motivo              NVARCHAR(MAX) NULL,
-    usuario_responsable INT NULL   -- NULL = cambio autom·tico del sistema
+    usuario_responsable INT NULL   -- NULL = cambio autom√°tico del sistema
         CONSTRAINT FK_histestado_usuario FOREIGN KEY REFERENCES Usuarios(usuario_id)
 );
 
@@ -118,7 +118,7 @@ CREATE TABLE Reclamaciones (
     fecha_incidente DATE NOT NULL,
     fecha_registro DATETIME DEFAULT GETDATE(),
     estado_reclamacion NVARCHAR(20) DEFAULT 'Registrada' CONSTRAINT CK_estado_reclamacion 
-        CHECK (estado_reclamacion IN ('Registrada', 'En revisiÛn', 'En gestiÛn', 'Resuelta', 'Rechazada', 'Cerrada'))
+        CHECK (estado_reclamacion IN ('Registrada', 'En revisi√≥n', 'En gesti√≥n', 'Resuelta', 'Rechazada', 'Cerrada'))
 );
 GO
 
@@ -144,11 +144,22 @@ GO
  
 INSERT INTO Usuarios (dni_nie, nombre_completo, email, telefono, tipo_usuario, estado)
 VALUES 
-('11111111A', 'Lara AntÛn (Admin)', 'lara.admin@softrip.com', '600111222', 'Administrador', 'Activo'),
+('11111111A', 'Lara Ant√≥n (Admin)', 'lara.admin@softrip.com', '600111222', 'Administrador', 'Activo'),
 ('22222222B', 'Daniela Pino (Operador)', 'daniela.ops@softrip.com', '600222333', 'Operador', 'Activo'),
-('33333333C', 'Nuria GarcÌa (Cliente)', 'nuria.garcia@email.com', '600333444', 'Cliente', 'Activo'),
+('33333333C', 'Nuria Garc√≠a (Cliente)', 'nuria.garcia@email.com', '600333444', 'Cliente', 'Activo'),
 ('44444444D', 'Marta Royo (Cliente)', 'marta.royo@email.com', '600444555', 'Cliente', 'Activo'),
-('55555555E', 'Juan PÈrez (Cliente)', 'juan.perez@email.com', '600555666', 'Cliente', 'Activo');
+('55555555E', 'Juan P√©rez (Cliente)', 'juan.perez@email.com', '600555666', 'Cliente', 'Activo');
+('10000001A', 'Carlos Medina', 'carlos.medina@email.com', '611001001', 'Cliente', 'Activo', 'General'),
+('10000002B', 'Sofia Herrera', 'sofia.herrera@email.com', '611002002', 'Cliente', 'Activo', 'Familiar'),
+('10000003C', 'Andres Torres', 'andres.torres@email.com', '611003003', 'Cliente', 'Activo', 'General'),
+('10000004D', 'Elena Vidal', 'elena.vidal@email.com', '611004004', 'Cliente', 'Activo', 'Jubilado'),
+('10000005E', 'Pablo Ruiz', 'pablo.ruiz@email.com', '611005005', 'Cliente', 'Activo', 'General'),
+('10000006F', 'Laura Campos', 'laura.campos@email.com', '611006006', 'Cliente', 'Activo', 'Familiar'),
+('10000007G', 'Miguel Serrano', 'miguel.serrano@email.com', '611007007', 'Cliente', 'Activo', 'General'),
+('10000008H', 'Ana Blanco', 'ana.blanco@email.com', '611008008', 'Cliente', 'Activo', 'Jubilado'),
+('10000009I', 'Roberto Iglesias', 'roberto.iglesias@email.com', '611009009', 'Cliente', 'Activo', 'General'),
+('10000010J', 'Carmen Navarro', 'carmen.navarro@email.com', '611010010', 'Cliente', 'Activo', 'Familiar'),
+('20000001K', 'Pedro Sainz (Op)', 'pedro.ops@softrip.com', '622000001', 'Operador', 'Activo', 'General');
  
  
 INSERT INTO Clientes_Perfiles (usuario_id, perfil_viajero, preferencia_accesibilidad, presupuesto_promedio)
@@ -156,15 +167,25 @@ VALUES
 (3, 'Joven', 'Ninguna', 1200.00),
 (4, 'Familia', 'Dificultad Lectura', 2500.00),
 (5, 'Jubilado', 'Movilidad Reducida', 1800.00);
+(6,  'Joven', 'Ninguna', 900.00),
+(7,  'Familia', 'Dificultad Lectura', 2200.00),
+(8,  'Joven', 'Ninguna',  750.00),
+(9,  'Jubilado', 'Movilidad Reducida', 1600.00),
+(10, 'Joven', 'Ninguna', 500.00),
+(11, 'Familia', 'Ninguna', 3000.00),
+(12, 'Joven', 'Ninguna', 850.00),
+(13, 'Jubilado', 'Movilidad Reducida', 2000.00),
+(14, 'Joven', 'Ninguna', 650.00),
+(15, 'Familia', 'Dificultad Lectura', 2800.00);
  
  
  
 INSERT INTO Paquetes_Turisticos 
 (nombre_paquete, descripcion_detallada, destino, duracion_dias, precio_tpv, servicios_incluidos, perfil_objetivo, accesibilidad_certificada, creado_por_operador)
 VALUES 
-('Escapada Relax Canarias', 'Vuelo y hotel 5 estrellas en Tenerife.', 'Tenerife, EspaÒa', 7, 850.00, 'Vuelo, Hotel, Traslados', 'Jubilado', 1, 2),
-('Aventura en los Pirineos', 'Rutas de senderismo y alojamiento en cabaÒas.', 'Huesca, EspaÒa', 5, 450.00, 'Alojamiento, GuÌa, Seguro', 'Joven', 0, 2),
-('Magia en Disneyland', 'Paquete completo para familias con niÒos.', 'ParÌs, Francia', 4, 1200.00, 'Vuelo, Hotel, Entradas Parque', 'Familia', 1, 2);
+('Escapada Relax Canarias', 'Vuelo y hotel 5 estrellas en Tenerife.', 'Tenerife, Espa√±a', 7, 850.00, 'Vuelo, Hotel, Traslados', 'Jubilado', 1, 2),
+('Aventura en los Pirineos', 'Rutas de senderismo y alojamiento en caba√±as.', 'Huesca, Espa√±a', 5, 450.00, 'Alojamiento, Gu√≠a, Seguro', 'Joven', 0, 2),
+('Magia en Disneyland', 'Paquete completo para familias con ni√±os.', 'Par√≠s, Francia', 4, 1200.00, 'Vuelo, Hotel, Entradas Parque', 'Familia', 1, 2);
  
  
 INSERT INTO Pedidos_Viajes (cliente_id, paquete_id, monto_total, estado_pedido, metodo_pago)
@@ -177,12 +198,12 @@ VALUES
  
 INSERT INTO Feedback_Clientes (pedido_id, val_trato_operador, val_calidad_transporte, val_satisfaccion_alojamiento, val_general, comentarios)
 VALUES 
-(1, 5, 4, 5, 5, 'Una experiencia increÌble, el guÌa fue muy amable.');
+(1, 5, 4, 5, 5, 'Una experiencia incre√≠ble, el gu√≠a fue muy amable.');
  
  
 INSERT INTO Reclamaciones (pedido_id, categoria, descripcion_incidente, fecha_incidente, estado_reclamacion)
 VALUES 
-(2, 'Transporte', 'El vuelo de ida sufriÛ un retraso de 4 horas sin previo aviso.', '2024-03-10', 'En revisiÛn');
+(2, 'Transporte', 'El vuelo de ida sufri√≥ un retraso de 4 horas sin previo aviso.', '2024-03-10', 'En revisi√≥n');
  
  
 UPDATE Usuarios 
