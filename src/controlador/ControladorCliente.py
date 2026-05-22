@@ -3,9 +3,11 @@ from src.vista.VentanaCliente import VentanaCliente
 from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
 from src.vista.VentanaMisViajes import VentanaMisViajes
 from src.vista.Login import MiVentana
+
 from src.modelo.dao.UserDAO import UserDAO
 from src.modelo.vo.LoginVO import LoginVO
-from src.modelo.dao.UserDAO import UserDAO
+from src.modelo.vo.PedidoVO import PedidoVO
+from src.modelo.dao.PedidoDAO import PedidoDAO
 
 class ControladorCliente:
     def __init__(self, user):
@@ -16,17 +18,17 @@ class ControladorCliente:
         self.ventana_viajes = None
 
     def abrir_principal(self):
-        self.ventana_principal = VentanaCliente(self.user, self)
+        self.ventana_principal = VentanaCliente(self.user)
         self.ventana_principal.show()
     
     def ir_a_ajustes(self):
-        self.ventana_ajustes = VentanaAjustesCuenta(self.user, self)
+        self.ventana_ajustes = VentanaAjustesCuenta(self.user)
         self.ventana_ajustes.show()
         if self.ventana_principal:
             self.ventana_principal.hide()
     
     def ir_a_mis_viajes(self):
-        self.ventana_viajes = VentanaMisViajes(self.user, self)
+        self.ventana_viajes = VentanaMisViajes(self.user)
         self.ventana_ajustes.show()
         if self.ventana_ajustes:
             self.ventana_ajustes.hide()
@@ -50,6 +52,64 @@ class ControladorCliente:
         if self.ventana_viajes:
             self.ventana_viajes.hide()
     
+    def ver_paquete(self, paquete_id: int):
+        from src.modelo.dao.PaqueteDAO import PaqueteDAO
+        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
+        paquete = PaqueteDAO().obtener_por_id(paquete_id)
+        if not paquete:
+            return
+        self.ventana_detalle = VentanaDetallePaquete(paquete, self)
+        self.ventana_detalle.show()
+
+    def abrir_ventana_compra(self, paquete: dict):
+        from src.vista.VentanaCompra import VentanaCompra
+        self.ventana_compra = VentanaCompra(paquete, self.user, self)
+        self.ventana_compra.show()
+
+    def comprar_paquete(self, paquete: dict,
+                        fecha_inicio, fecha_fin,
+                        personas: int, metodo_pago: str) -> tuple[bool, str]:
+        """
+        Lógica de negocio de la compra.
+        1. Valida datos.
+        2. Calcula monto.
+        3. Persiste el pedido.
+        4. Emite la señal → el suscriptor (ControladorOperador) notifica.
+        """
+        # Validaciones básicas
+        if fecha_fin <= fecha_inicio:
+            return False, "La fecha de fin debe ser posterior a la de inicio."
+        if personas < 1:
+            return False, "Debe haber al menos 1 persona."
+        if not metodo_pago:
+            return False, "Selecciona un método de pago."
+
+        try:
+            precio_unitario = float(paquete.get("precio", 0))
+        except ValueError:
+            return False, "El paquete no tiene un precio válido."
+
+        monto_total = precio_unitario * personas
+
+        vo = PedidoVO(
+            cliente_id=self.user.usuario_id,
+            paquete_id=paquete["id"],
+            monto_total=monto_total,
+            metodo_pago=metodo_pago,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin,
+        )
+
+        pedido_id = PedidoDAO().insertar_pedido(vo)
+        if pedido_id is None:
+            return False, "No se pudo registrar el pedido. Inténtalo de nuevo."
+
+        # ── Patrón Observador: emite la señal ─────────────────────────────
+        operador_id = paquete.get("creado_por")   # puede ser None
+        self.pedido_creado.emit(pedido_id, operador_id or 0)
+
+        return True, f"¡Reserva confirmada! Tu número de pedido es #{pedido_id}."
+
     def guardar_perfil(self, telefono, preferencia):
         from src.modelo.dao.UserDAO import UserDAO
         dao = UserDAO()
