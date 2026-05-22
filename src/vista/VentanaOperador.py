@@ -13,22 +13,25 @@ PAG_HUB     = 0
 PAG_DISENO  = 1
 PAG_COMPRA  = 2
 PAG_EDICION = 3
+PAG_ANALISIS = 4
 
 _TITULOS = [
     "Centro del Operador",
     "Diseno de Paquetes",
     "Gestion de Compra",
     "Edicion de Paquetes",
+     "Analisis de Venta",
 ]
 _BREADCRUMBS = [
     "Softrip › Operador",
     "Softrip › Operador › Diseno de Paquetes",
     "Softrip › Operador › Gestion de Compra",
     "Softrip › Operador › Edicion de Paquetes",
+    "Softrip › Operador › Analisis de Venta",
 ]
 
 #etiquetas de los tres botones
-_NAV_BOTONES = ["btnNav1", "btnNav2", "btnNav3"]
+_NAV_BOTONES = ["btnNav1", "btnNav2", "btnNav3", "btnNav4"]
 
 
 class VentanaOperador(QMainWindow): #hereda de la ventana principal
@@ -49,6 +52,7 @@ class VentanaOperador(QMainWindow): #hereda de la ventana principal
         self._widget_diseno  = None
         self._widget_compra  = None
         self._widget_edicion = None
+        self._widget_analisis = None 
 
         #conecta los botones a sus acciones
         self._conectar_senales()
@@ -62,11 +66,14 @@ class VentanaOperador(QMainWindow): #hereda de la ventana principal
         self.moreBtn1.clicked.connect(lambda: self._navegar(PAG_DISENO))
         self.moreBtn2.clicked.connect(lambda: self._navegar(PAG_COMPRA))
         self.moreBtn3.clicked.connect(lambda: self._navegar(PAG_EDICION))
+        self.moreBtn4.clicked.connect(lambda: self._navegar(PAG_ANALISIS))
 
         # Botones de la barra lateral de navegación (misma función, distinto origen)
         self.btnNav1.clicked.connect(lambda: self._navegar(PAG_DISENO))
         self.btnNav2.clicked.connect(lambda: self._navegar(PAG_COMPRA))
         self.btnNav3.clicked.connect(lambda: self._navegar(PAG_EDICION))
+        self.btnNav4.clicked.connect(lambda: self._navegar(PAG_ANALISIS))
+
 
         # Botón de cerrar sesión
         self.btnLogout.clicked.connect(self._cerrar_sesion)
@@ -92,6 +99,8 @@ class VentanaOperador(QMainWindow): #hereda de la ventana principal
             self._cargar_compra()
         elif indice == PAG_EDICION:
             self._cargar_edicion()
+        elif indice == PAG_ANALISIS:
+            self._cargar_analisis()
 
     def _cargar_diseno(self):
         if self._widget_diseno is None:  #si es la primera vez
@@ -122,6 +131,16 @@ class VentanaOperador(QMainWindow): #hereda de la ventana principal
             layout.removeWidget(self.lblEdicionPlaceholder)
             self.lblEdicionPlaceholder.hide()
             layout.addWidget(self._widget_edicion)
+
+    def _cargar_analisis(self):
+        if self._widget_analisis is None:
+            from src.vista.VentanaAnalisis import VentanaAnalisis
+            self._widget_analisis = VentanaAnalisis(self.user)
+
+            layout = self.pageAnalisis.layout()
+            layout.removeWidget(self.lblAnalisisPlaceholder)
+            self.lblAnalisisPlaceholder.hide()
+            layout.addWidget(self._widget_analisis)
 
     def _cerrar_sesion(self):
         #muestra un dialogo de confirmación 
