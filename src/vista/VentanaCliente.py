@@ -143,10 +143,15 @@ class VentanaCliente(QMainWindow, Form):
         """Abre el detalle del paquete. Si el id es None la tarjeta estaba vacía."""
         if paquete_id is None:
             return
-        QMessageBox.information(
-            self, "Ver paquete",
-            f"Abriendo detalle del paquete ID {paquete_id}…"
-        )
+        from src.controlador.ControladorCliente import ControladorCliente
+        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
+
+        controlador = ControladorCliente(self.user)
+        paquete = PaqueteDAO().obtener_por_id(paquete_id)
+        self.ventana_detalle = VentanaDetallePaquete(self.user, paquete, controlador)
+
+        self.ventana_detalle.show()
+        self.hide()
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
