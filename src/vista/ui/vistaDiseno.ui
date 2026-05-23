@@ -3,7 +3,7 @@
  <class>VentanaDiseno</class>
  <widget class="QWidget" name="VentanaDiseno">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
+   <rect><x>0</x><y>0</y><width>900</width><height>650</height></rect>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -18,7 +18,7 @@ QLabel#lblSeccionTitulo {
     letter-spacing: 1px;
 }
 QLabel#lblSeccionSub {
-    font-size: 11px;
+    font-size: 16px;
     color: #999999;
 }
 QFrame#formCard {
@@ -27,27 +27,30 @@ QFrame#formCard {
     border: 1px solid #eeeeee;
 }
 QLabel {
-    font-size: 11px;
+    font-size: 16px;
     color: #555555;
 }
-QLineEdit, QTextEdit {
+QLineEdit, QTextEdit, QDateEdit {
     background-color: #f9f7f2;
     border: 1px solid #dddddd;
     border-radius: 6px;
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: 16px;
     color: #333333;
 }
-QLineEdit:focus, QTextEdit:focus {
+QLineEdit:focus, QTextEdit:focus, QDateEdit:focus {
     border: 1px solid #5e8d8d;
     background-color: #ffffff;
+}
+QDateEdit::drop-down {
+    border: none;
 }
 QPushButton#btnNuevoPaquete {
     background-color: transparent;
     border: 1px solid #5e8d8d;
     border-radius: 8px;
     padding: 8px 20px;
-    font-size: 11px;
+    font-size: 16px;
     font-weight: bold;
     color: #5e8d8d;
 }
@@ -60,7 +63,7 @@ QPushButton#btnGuardar {
     border: none;
     border-radius: 8px;
     padding: 8px 28px;
-    font-size: 11px;
+    font-size: 16px;
     font-weight: bold;
     color: white;
 }
@@ -72,7 +75,7 @@ QPushButton#btnLimpiar {
     border: 1px solid #dddddd;
     border-radius: 8px;
     padding: 8px 20px;
-    font-size: 11px;
+    font-size: 16px;
     color: #999999;
 }
 QPushButton#btnLimpiar:hover {
@@ -80,17 +83,9 @@ QPushButton#btnLimpiar:hover {
     color: #e05252;
 }
 QLabel#lblEstado {
-    font-size: 11px;
+    font-size: 16px;
     font-weight: bold;
 }
-QLabel#lblSeccionTitulo { font-size: 20px; }  /* se queda igual */
-QLabel#lblSeccionSub { font-size: 16px; }      /* era 11px */
-QLabel { font-size: 16px; }                    /* era 11px */
-QLineEdit, QTextEdit { font-size: 16px; }      /* era 11px */
-QPushButton#btnNuevoPaquete { font-size: 16px; } /* era 11px */
-QPushButton#btnGuardar { font-size: 16px; }    /* era 11px */
-QPushButton#btnLimpiar { font-size: 16px; }    /* era 11px */
-QLabel#lblEstado { font-size: 16px; }          /* era 11px */
    </string>
   </property>
 
@@ -212,6 +207,46 @@ QLabel#lblEstado { font-size: 16px; }          /* era 11px */
           <item>
            <widget class="QLineEdit" name="inputPrecio">
             <property name="placeholderText"><string>Ej: 1200.00</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+       </layout>
+      </item>
+
+      <!-- Fila 3: Fecha inicio + Fecha fin (calculada) -->
+      <item>
+       <layout class="QHBoxLayout" name="fila3">
+        <property name="spacing"><number>20</number></property>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblFechaIni">
+            <property name="text"><string>Fecha de inicio</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="inputFechaIni">
+            <property name="calendarPopup"><bool>true</bool></property>
+            <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item>
+           <widget class="QLabel" name="lblFechaFin">
+            <property name="text"><string>Fecha de fin (calculada)</string></property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QDateEdit" name="inputFechaFin">
+            <property name="calendarPopup"><bool>false</bool></property>
+            <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+            <property name="readOnly"><bool>true</bool></property>
            </widget>
           </item>
          </layout>
