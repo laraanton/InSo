@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pageFeedback</class>
+ <widget class="QWidget" name="pageFeedback">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1040</width><height>656</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget#pageFeedback { background-color: #f9f7f2; }
+
+QLabel#lblTitulo {
+    font-size: 22px; font-weight: bold;
+    color: #333333; letter-spacing: 2px;
+}
+QLabel#lblSubtitulo {
+    font-size: 12px; color: #888888;
+}
+
+/* Barra de filtros */
+QFrame#filterBar {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLineEdit#inputBuscar {
+    background-color: #f4f2ed;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #333333;
+}
+QLineEdit#inputBuscar:focus { border-color: #5e8d8d; }
+QComboBox#comboPaquete {
+    background-color: #f4f2ed;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px;
+    color: #333333;
+    min-width: 160px;
+}
+QComboBox#comboPaquete:hover { border-color: #5e8d8d; }
+QPushButton#btnBuscar {
+    background-color: #5e8d8d;
+    color: white; border: none;
+    border-radius: 8px;
+    padding: 7px 20px;
+    font-size: 12px; font-weight: bold;
+}
+QPushButton#btnBuscar:hover { background-color: #4a7474; }
+QPushButton#btnLimpiar {
+    background-color: transparent;
+    color: #888888; border: 1px solid #dddddd;
+    border-radius: 8px;
+    padding: 7px 16px; font-size: 12px;
+}
+QPushButton#btnLimpiar:hover { border-color: #5e8d8d; color: #5e8d8d; }
+
+/* Tabla */
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    gridline-color: #f0ede8;
+    font-size: 12px;
+    color: #333333;
+    selection-background-color: #e8f4f4;
+    selection-color: #333333;
+}
+QTableWidget::item { padding: 10px 12px; border-bottom: 1px solid #f0ede8; }
+QTableWidget::item:selected { background-color: #e8f4f4; }
+QHeaderView::section {
+    background-color: #f4f2ed;
+    color: #5e8d8d;
+    font-weight: bold; font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 12px;
+    border: none;
+    border-bottom: 2px solid #e0ddd8;
+}
+
+/* Panel detalle */
+QFrame#detalleFrame {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLabel#lblDetalleTitle {
+    font-size: 14px; font-weight: bold; color: #333333;
+}
+QLabel#lblDetalleSub {
+    font-size: 11px; color: #888888;
+}
+QFrame#starBar {
+    background-color: #f4f2ed;
+    border-radius: 8px;
+}
+QLabel#lblStarLabel {
+    font-size: 11px; color: #666666; font-weight: bold;
+}
+QLabel#lblStarVal {
+    font-size: 13px; color: #5e8d8d; font-weight: bold;
+}
+QLabel#lblComentarioTit {
+    font-size: 11px; color: #888888; font-weight: bold; letter-spacing: 1px;
+}
+QLabel#lblComentario {
+    font-size: 12px; color: #444444;
+    background-color: #f9f7f2;
+    border-radius: 8px;
+    padding: 10px;
+}
+
+QLabel#lblEstado { font-size: 11px; font-weight: bold; }
+
+QScrollBar:vertical { background: #f9f7f2; width: 6px; }
+QScrollBar::handle:vertical { background: #d0d0d0; border-radius: 3px; min-height: 20px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="rootLayout">
+   <property name="leftMargin"><number>32</number></property>
+   <property name="topMargin"><number>28</number></property>
+   <property name="rightMargin"><number>32</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+
+   <!-- Cabecera -->
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <layout class="QVBoxLayout">
+       <property name="spacing"><number>4</number></property>
+       <item>
+        <widget class="QLabel" name="lblTitulo">
+         <property name="text"><string>⭐  FEEDBACK DE CLIENTES</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSubtitulo">
+         <property name="text"><string>Valoraciones y opiniones de los viajeros</string></property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblEstado">
+       <property name="text"><string></string></property>
+       <property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Barra de filtros -->
+   <item>
+    <widget class="QFrame" name="filterBar">
+     <layout class="QHBoxLayout" name="filterLayout">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="topMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>12</number></property>
+      <property name="spacing"><number>12</number></property>
+      <item>
+       <widget class="QLineEdit" name="inputBuscar">
+        <property name="placeholderText"><string>🔍  Buscar por cliente o comentario…</string></property>
+        <property name="minimumWidth"><number>260</number></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboPaquete">
+        <item><property name="text"><string>Todos los paquetes</string></property></item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnBuscar">
+        <property name="text"><string>Buscar</string></property>
+        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnLimpiar">
+        <property name="text"><string>Limpiar</string></property>
+        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Cuerpo: tabla + panel detalle -->
+   <item>
+    <layout class="QHBoxLayout" name="bodyLayout">
+     <property name="spacing"><number>16</number></property>
+
+     <!-- Tabla -->
+     <item>
+      <widget class="QTableWidget" name="tablaFeedback">
+       <property name="minimumWidth"><number>560</number></property>
+       <property name="columnCount"><number>6</number></property>
+       <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+       <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+       <property name="alternatingRowColors"><bool>true</bool></property>
+       <property name="showGrid"><bool>false</bool></property>
+       <attribute name="horizontalHeaderStretchLastSection"><bool>true</bool></attribute>
+       <column><property name="text"><string>Pedido</string></property></column>
+       <column><property name="text"><string>Cliente</string></property></column>
+       <column><property name="text"><string>Paquete</string></property></column>
+       <column><property name="text"><string>Fecha</string></property></column>
+       <column><property name="text"><string>⭐ General</string></property></column>
+       <column><property name="text"><string>Trato</string></property></column>
+      </widget>
+     </item>
+
+     <!-- Panel detalle -->
+     <item>
+      <widget class="QFrame" name="detalleFrame">
+       <property name="minimumWidth"><number>320</number></property>
+       <property name="maximumWidth"><number>360</number></property>
+       <layout class="QVBoxLayout" name="detalleLayout">
+        <property name="leftMargin"><number>20</number></property>
+        <property name="topMargin"><number>20</number></property>
+        <property name="rightMargin"><number>20</number></property>
+        <property name="bottomMargin"><number>20</number></property>
+        <property name="spacing"><number>14</number></property>
+
+        <item>
+         <widget class="QLabel" name="lblDetalleTitle">
+          <property name="text"><string>Selecciona un feedback</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblDetalleSub">
+          <property name="text"><string>Haz clic en una fila para ver el detalle</string></property>
+          <property name="wordWrap"><bool>true</bool></property>
+         </widget>
+        </item>
+
+        <!-- Barras de valoración -->
+        <item>
+         <widget class="QFrame" name="starBar">
+          <layout class="QGridLayout" name="starGrid">
+           <property name="leftMargin"><number>12</number></property>
+           <property name="topMargin"><number>12</number></property>
+           <property name="rightMargin"><number>12</number></property>
+           <property name="bottomMargin"><number>12</number></property>
+           <property name="horizontalSpacing"><number>12</number></property>
+           <property name="verticalSpacing"><number>8</number></property>
+
+           <item row="0" column="0">
+            <widget class="QLabel" name="lblL1"><property name="text"><string>Trato operador</string></property></widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QLabel" name="lblV1"><property name="text"><string>—</string></property><property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property></widget>
+           </item>
+
+           <item row="1" column="0">
+            <widget class="QLabel" name="lblL2"><property name="text"><string>Transporte</string></property></widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QLabel" name="lblV2"><property name="text"><string>—</string></property><property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property></widget>
+           </item>
+
+           <item row="2" column="0">
+            <widget class="QLabel" name="lblL3"><property name="text"><string>Alojamiento</string></property></widget>
+           </item>
+           <item row="2" column="1">
+            <widget class="QLabel" name="lblV3"><property name="text"><string>—</string></property><property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property></widget>
+           </item>
+
+           <item row="3" column="0">
+            <widget class="QLabel" name="lblL4"><property name="text"><string>Valoración general</string></property></widget>
+           </item>
+           <item row="3" column="1">
+            <widget class="QLabel" name="lblV4"><property name="text"><string>—</string></property><property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property></widget>
+           </item>
+
+          </layout>
+         </widget>
+        </item>
+
+        <!-- Comentario -->
+        <item>
+         <widget class="QLabel" name="lblComentarioTit">
+          <property name="text"><string>COMENTARIO</string></property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QLabel" name="lblComentario">
+          <property name="text"><string>—</string></property>
+          <property name="wordWrap"><bool>true</bool></property>
+          <property name="alignment"><set>Qt::AlignTop|Qt::AlignLeft</set></property>
+          <property name="minimumHeight"><number>80</number></property>
+         </widget>
+        </item>
+
+        <item>
+         <spacer>
+          <property name="orientation"><enum>Qt::Vertical</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+         </spacer>
+        </item>
+
+       </layout>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+  </layout>
+ </widget>
+</ui>
