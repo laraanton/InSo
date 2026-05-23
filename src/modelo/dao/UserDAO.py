@@ -110,7 +110,7 @@ class UserDAO(Conexion):
             cursor.execute(
                 """INSERT INTO Usuarios 
                 (dni_nie, nombre_completo, email, telefono, password_hash, tipo_usuario, preferencia, preferencia_accesibilidad)
-                VALUES (?, ?, ?, ?, ?, ?, ?)""",
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
                 [
                     registroVO.dni_nie, registroVO.nombre_completo,
                     registroVO.email, registroVO.telefono,
