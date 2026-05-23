@@ -38,11 +38,6 @@ CREATE TABLE Clientes_Perfiles (
     presupuesto_promedio DECIMAL(10,2)
 );
 
-
-
-
-
-
 CREATE TABLE Paquetes_Turisticos (
     paquete_id INT IDENTITY(1,1) CONSTRAINT PK_paquete PRIMARY KEY,
     nombre_paquete NVARCHAR(150) NOT NULL,
@@ -302,20 +297,3 @@ SELECT 'PEDIDOS' AS Tabla, * FROM Pedidos_Viajes;
 SELECT 'FEEDBACK' AS Tabla, * FROM Feedback_Clientes;
 SELECT 'RECLAMACIONES' AS Tabla, * FROM Reclamaciones;
 
-USE SoftripDB;
-GO
-
-
-
-
--- 1. Borrar tablas en orden (primero las que tienen FK)
-DROP TABLE IF EXISTS Reclamaciones;
-DROP TABLE IF EXISTS Feedback_Clientes;
-DROP TABLE IF EXISTS Historial_Estados_Pedidos;
-DROP TABLE IF EXISTS Historial_Cambios_Paquetes;
-DROP TABLE IF EXISTS Sesiones;
-DROP TABLE IF EXISTS Pedidos_Viajes;
-DROP TABLE IF EXISTS Clientes_Perfiles;
-DROP TABLE IF EXISTS Paquetes_Turisticos;
-DROP TABLE IF EXISTS Usuarios;
-GO
