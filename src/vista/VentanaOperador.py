@@ -9,9 +9,9 @@ UI_FILE = os.path.join(
 )
 
 #indices de cada pantalla, operador -> diseno -> compra -> edicion
-PAG_HUB     = 0
-PAG_DISENO  = 1
-PAG_COMPRA  = 2
+PAG_HUB = 0
+PAG_DISENO = 1
+PAG_COMPRA = 2
 PAG_EDICION = 3
 PAG_ANALISIS = 4
 
@@ -147,10 +147,10 @@ class VentanaOperador(QMainWindow): #hereda de la ventana principal
         resp = QMessageBox.question(
             self, "Cerrar sesion",
             "Deseas cerrar la sesion actual?",
-            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Si | QMessageBox.No,
             QMessageBox.No,
         )
-        if resp == QMessageBox.Yes:
+        if resp == QMessageBox.Si:
             self.close()
             from src.vista.Login import MiVentana
             self.login = MiVentana()
