@@ -132,6 +132,24 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
     min-height: 20px;
 }
+QLabel#kpiValue1, QLabel#kpiValue2,
+QLabel#kpiValue3, QLabel#kpiValue4 { font-size: 27px; }   /* era 22px */
+
+QLabel#kpiLabel1, QLabel#kpiLabel2,
+QLabel#kpiLabel3, QLabel#kpiLabel4 { font-size: 14px; }   /* era 9px */
+
+QLabel#sectionLabel { font-size: 15px; }                   /* era 10px */
+
+QLabel#chartTitle1, QLabel#chartTitle2,
+QLabel#chartTitle3, QLabel#chartTitle4,
+QLabel#chartTitle5, QLabel#chartTitle6 { font-size: 15px; } /* era 10px */
+
+QLabel#chartSub1, QLabel#chartSub2,
+QLabel#chartSub3, QLabel#chartSub4,
+QLabel#chartSub5, QLabel#chartSub6 { font-size: 13px; }   /* era 8px */
+
+QComboBox#cbPeriodo { font-size: 15px; }                   /* era 10px */
+QPushButton#btnExportar { font-size: 15px; }               /* era 10px */
 QScrollBar::add-line:vertical,
 QScrollBar::sub-line:vertical { height: 0px; }
    </string>
