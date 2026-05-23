@@ -89,6 +89,17 @@ QComboBox#in_preferencia_edit:focus {
     border-bottom: 2px solid rgb(55, 138, 221);
 }
 QComboBox#in_preferencia_edit::drop-down { border: none; padding-right: 10px; }
+QComboBox#in_preferencia_accesibilidad_edit {
+    font-size: 13px; color: #2c4a6e;
+    background-color: rgba(230, 241, 251, 0.7);
+    border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+    border-radius: 8px; padding: 6px 12px;
+}
+QComboBox#in_preferencia_accesibilidad_edit:focus {
+    background-color: rgba(230, 241, 251, 0.95);
+    border-bottom: 2px solid rgb(55, 138, 221);
+}
+QComboBox#in_preferencia_accesibilidad_edit::drop-down { border: none; padding-right: 10px; }
 QPushButton#btnEditarPerfil {
     background-color: #5e8d8d; color: white; border: none;
     border-radius: 20px; padding: 8px 24px; font-size: 10px;
@@ -337,6 +348,22 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item><property name="text"><string>Jubilado</string></property></item>
               <item><property name="text"><string>Movilidad reducida</string></property></item>
               <item><property name="text"><string>Escolar</string></property></item>
+             </widget>
+            </item>
+
+            <!-- Preferencia accesibilidad (editable al pulsar Editar) -->
+            <item>
+             <widget class="QLabel">
+              <property name="text"><string>Accesibilidad</string></property>
+              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="in_preferencia_accesibilidad_edit">
+              <property name="enabled"><bool>false</bool></property>
+              <item><property name="text"><string>Ninguna</string></property></item>
+              <item><property name="text"><string>Dificultad lectura</string></property></item>
+              <item><property name="text"><string>Movilidad Reducida</string></property></item>
              </widget>
             </item>
 
