@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5 import uic
+import pyttsx3
 from src.modelo.dao.CuentaDAO import CuentaDAO
 from src.modelo.dao.UserDAO import UserDAO
 from src.modelo.vo.LoginVO import LoginVO
@@ -34,6 +35,12 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         if index1 >= 0:
             self.in_preferencia_accesibilidad_edit.setCurrentIndex(index1)
 
+        # Mostrar botón leer pantalla solo si tiene dificultad de lectura
+        tiene_dificultad_lectura = (
+            getattr(self.user, 'preferencia_accesibilidad', '') == 'Dificultad lectura'
+        )
+        self.btnLeerPantalla.setVisible(tiene_dificultad_lectura)
+
     def _connect_signals(self):
         self.logoBtn.clicked.connect(self._volver_principal)
         self.btnNavAjustes.clicked.connect(self._volver_principal)
@@ -42,6 +49,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         self.btnEditarPerfil.clicked.connect(self._activar_edicion)
         self.btnGuardarPerfil.clicked.connect(self._guardar_perfil)
         self.btnCambiarPass.clicked.connect(self._cambiar_contrasena)
+        self.btnLeerPantalla.clicked.connect(self._leer_pantalla)
 
     def _activar_edicion(self):
         self.in_telefono_edit.setReadOnly(False)
@@ -70,6 +78,11 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             self.in_preferencia_accesibilidad_edit.setEnabled(False)
             self.btnGuardarPerfil.setVisible(False)
             self.btnEditarPerfil.setVisible(True)
+            # Actualizar visibilidad del botón de lectura según nueva preferencia
+            tiene_dificultad_lectura = (
+                getattr(self.user, 'preferencia_accesibilidad', '') == 'Dificultad lectura'
+            )
+            self.btnLeerPantalla.setVisible(tiene_dificultad_lectura)
         else:
             QMessageBox.information(self, "Error", "No se pudo actualizar el perfil")
 
@@ -132,3 +145,24 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             from src.vista.Login import MiVentana
             self.login = MiVentana()
             self.login.show()
+
+    def _leer_pantalla(self, *args):
+        texto = (
+            f"Ajustes de cuenta. "
+            f"Nombre completo: {self.user.nombre_completo}. "
+            f"DNI: {self.user.dni_nie}. "
+            f"Email: {self.user.email}. "
+            f"Teléfono: {self.user.telefono or 'No indicado'}. "
+            f"Preferencia: {self.user.preferencia or 'General'}. "
+            f"Miembro desde: {str(self.user.fecha_registro)[:10] if self.user.fecha_registro else 'desconocido'}."
+        )
+        engine = pyttsx3.init()
+        voices = engine.getProperty('voices')
+        for voice in voices:
+            if "spanish" in voice.name.lower():
+                engine.setProperty('voice', voice.id)
+                break
+        engine.setProperty('rate', 150)
+        engine.setProperty('volume', 1.0)
+        engine.say(texto)
+        engine.runAndWait()
