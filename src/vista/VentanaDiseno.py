@@ -1,17 +1,3 @@
-"""
-VentanaDiseno.py  –  Vista de Diseño de Paquetes (Req_27)
-==========================================================
-Responsabilidad: recoger los datos del formulario y pasarlos al
-ControladorOperador. No contiene lógica de negocio ni acceso a BD.
-
-Widgets del .ui que usa esta vista:
-    inputNombre, inputDestino, inputDuracion, inputPrecio,
-    inputFechaIni, inputFechaFin,   ← QDateEdit (fecha mínima = hoy)
-    comboEmoji,                     ← QComboBox con emoticonos
-    textDescripcion, lblEstado,
-    btnNuevoPaquete, btnGuardar, btnLimpiar
-"""
-
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
@@ -25,30 +11,7 @@ UI_FILE = os.path.join(
     "vistaDiseno.ui"
 )
 
-# ── Emoticonos disponibles para el paquete ────────────────────────────────────
-# Tuplas (emoji, descripción) — se muestran juntos en el combo.
-EMOJIS_PAQUETE = [
-    ("☀️",  "Sol – destino soleado"),
-    ("🌴",  "Palmera – playa tropical"),
-    ("🦁",  "León – safari / aventura"),
-    ("⛱️",  "Sombrilla – playa y relax"),
-    ("❄️",  "Copo de nieve – destino de nieve"),
-    ("🏔️",  "Montaña – trekking / naturaleza"),
-    ("🚂",  "Tren – viaje ferroviario"),
-    ("✈️",  "Avión – viaje internacional"),
-    ("🌅",  "Atardecer – viaje romántico"),
-    ("🏛️",  "Monumento – turismo cultural"),
-    ("🍷",  "Copa de vino – enoturismo / gastronomía"),
-    ("🛳️",  "Crucero – viaje en barco"),
-    ("🎡",  "Noria – parques y ocio"),
-    ("🌿",  "Hoja – ecoturismo / naturaleza"),
-    ("🎭",  "Máscaras – turismo cultural y teatro"),
-]
-
-# Fechas predeterminadas
-_DEFAULT_INI = QDate(2026, 7, 14)
-_DEFAULT_FIN = QDate(2026, 7, 31)
-
+AVION = "✈️"
 
 class VentanaDiseno(QWidget):
 
@@ -56,36 +19,20 @@ class VentanaDiseno(QWidget):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        self._ctrl = ControladorOperador()   # ← único punto de acceso a la lógica
-        self._inicializar_emojis()
+        self._ctrl = ControladorOperador()
         self._inicializar_fechas()
         self._conectar_senales()
 
     # ── Inicialización ─────────────────────────────────────────────────────
 
-    def _inicializar_emojis(self):
-        """Rellena el QComboBox con los emoticonos predefinidos."""
-        self.comboEmoji.clear()
-        for emoji, descripcion in EMOJIS_PAQUETE:
-            self.comboEmoji.addItem(f"{emoji}  {descripcion}", userData=emoji)
-
     def _inicializar_fechas(self):
-        """
-        Establece la fecha mínima (hoy) y los valores predeterminados
-        en ambos QDateEdit. Conecta también la lógica de coherencia
-        inicio ≤ fin.
-        """
         hoy = QDate.currentDate()
 
         self.inputFechaIni.setMinimumDate(hoy)
         self.inputFechaFin.setMinimumDate(hoy)
 
-        # Si la fecha predeterminada es anterior a hoy, usar hoy
-        self.inputFechaIni.setDate(max(_DEFAULT_INI, hoy))
-        self.inputFechaFin.setDate(max(_DEFAULT_FIN, hoy))
-
-        # La fecha de fin no puede ser anterior a la de inicio
-        self.inputFechaIni.dateChanged.connect(self._ajustar_fecha_fin)
+        self.inputFechaIni.setDate(hoy)
+        self._actualizar_fecha_fin()
 
     # ── Señales ────────────────────────────────────────────────────────────
 
@@ -93,25 +40,23 @@ class VentanaDiseno(QWidget):
         self.btnNuevoPaquete.clicked.connect(self._limpiar_formulario)
         self.btnGuardar.clicked.connect(self._guardar_paquete)
         self.btnLimpiar.clicked.connect(self._limpiar_formulario)
+        self.inputFechaIni.dateChanged.connect(lambda _: self._actualizar_fecha_fin())
+        self.inputDuracion.textChanged.connect(lambda _: self._actualizar_fecha_fin())
 
     # ── Acciones ───────────────────────────────────────────────────────────
 
     def _guardar_paquete(self):
-        """Recoge el formulario y delega en el controlador (Req_27)."""
-        emoji_seleccionado = self.comboEmoji.currentData()  # solo el carácter emoji
-
         datos = {
-            "nombre":      self.inputNombre.text().strip(),
-            "destino":     self.inputDestino.text().strip(),
-            "duracion":    self.inputDuracion.text().strip(),
-            "precio":      self.inputPrecio.text().strip(),
+            "nombre": self.inputNombre.text().strip(),
+            "destino": self.inputDestino.text().strip(),
+            "duracion": self.inputDuracion.text().strip(),
+            "precio": self.inputPrecio.text().strip(),
             "descripcion": self.textDescripcion.toPlainText().strip(),
-            "fecha_ini":   self.inputFechaIni.date().toString("yyyy-MM-dd"),
-            "fecha_fin":   self.inputFechaFin.date().toString("yyyy-MM-dd"),
-            "emoji":       emoji_seleccionado,
-            # Campos pendientes de añadir al .ui:
-            "servicios":   "",
-            "perfil":      "",
+            "fecha_ini": self.inputFechaIni.date().toString("yyyy-MM-dd"),
+            "fecha_fin": self.inputFechaFin.date().toString("yyyy-MM-dd"),
+            "emoji": AVION,
+            "servicios": "",
+            "perfil": "",
         }
 
         ok, msg = self._ctrl.crear_paquete(datos)
@@ -124,19 +69,26 @@ class VentanaDiseno(QWidget):
         self.textDescripcion.clear()
         self.lblEstado.clear()
 
-        # Restaurar fechas y emoji predeterminados
         hoy = QDate.currentDate()
-        self.inputFechaIni.setDate(max(_DEFAULT_INI, hoy))
-        self.inputFechaFin.setDate(max(_DEFAULT_FIN, hoy))
-        self.comboEmoji.setCurrentIndex(0)
+        self.inputFechaIni.setDate(hoy)
+        self.inputFechaFin.setDate(hoy)
 
     # ── Helpers ────────────────────────────────────────────────────────────
 
-    def _ajustar_fecha_fin(self, nueva_ini: QDate):
-        """Si la fecha de fin es anterior a la de inicio, la adelanta."""
-        if self.inputFechaFin.date() < nueva_ini:
-            self.inputFechaFin.setDate(nueva_ini)
-        self.inputFechaFin.setMinimumDate(nueva_ini)
+    def _actualizar_fecha_fin(self):
+        """Calcula fecha_fin = fecha_ini + duración (días). Si la duración
+        no es un número válido, fecha_fin queda igual a fecha_ini."""
+        fecha_ini = self.inputFechaIni.date()
+        try:
+            dias = int(self.inputDuracion.text().strip())
+            if dias < 0:
+                dias = 0
+        except ValueError:
+            dias = 0
+
+        fecha_fin = fecha_ini.addDays(dias)
+        self.inputFechaFin.setMinimumDate(fecha_ini)
+        self.inputFechaFin.setDate(fecha_fin)
 
     def _set_estado(self, msg: str, error: bool = False):
         self.lblEstado.setText(msg)
