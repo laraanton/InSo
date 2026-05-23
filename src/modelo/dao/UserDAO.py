@@ -6,9 +6,11 @@ class UserDAO(Conexion):
     def consultaLogin(self, loginVO):
         try:
             cursor = self.getCursor()
+            # Añadida la columna preferencia_accesibilidad que faltaba en el SELECT
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, 
+                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
                    FROM Usuarios
                    WHERE email = ? AND password_hash = ?""",
                 [loginVO.email, loginVO.password_hash]
@@ -26,7 +28,8 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, 
+                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
                    FROM Usuarios WHERE usuario_id = ?""",
                 [usuario_id]
             )
@@ -41,7 +44,8 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, 
+                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
                    FROM Usuarios WHERE email = ?""",
                 [email]
             )
@@ -56,7 +60,8 @@ class UserDAO(Conexion):
             cursor = self.getCursor()
             cursor.execute(
                 """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+                          tipo_usuario, estado, preferencia, 
+                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
                    FROM Usuarios"""
             )
             rows = cursor.fetchall()
@@ -65,6 +70,27 @@ class UserDAO(Conexion):
             print(f"Error en obtenerTodosLosUsuarios: {e}")
             return []
 
+    def insertarUsuario(self, registroVO):
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                """INSERT INTO Usuarios 
+                (dni_nie, nombre_completo, email, telefono, tipo_usuario, preferencia, preferencia_accesibilidad, password_hash, )
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                [
+                    registroVO.dni_nie, registroVO.nombre_completo,
+                    registroVO.email, registroVO.telefono,
+                    registroVO.password_hash, registroVO.tipo_usuario, 
+                    registroVO.preferencia, registroVO.preferencia_accesibilidad
+                ]
+            )
+            # Asegura que los cambios se guarden de inmediato en la base de datos
+            if hasattr(self, 'commit'): self.commit() 
+            return True
+        except Exception as e:
+            print(f"Error en insertarUsuario: {e}")
+            return False
+
     def actualizarContrasena(self, usuario_id, nuevo_hash):
         try:
             cursor = self.getCursor()
@@ -72,6 +98,7 @@ class UserDAO(Conexion):
                 "UPDATE Usuarios SET password_hash = ? WHERE usuario_id = ?",
                 [nuevo_hash, usuario_id]
             )
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en actualizarContrasena: {e}")
@@ -84,6 +111,7 @@ class UserDAO(Conexion):
                 "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?",
                 [usuario_id]
             )
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en bloquearCuenta: {e}")
@@ -96,31 +124,10 @@ class UserDAO(Conexion):
                 "UPDATE Usuarios SET cuenta_bloqueada = 0 WHERE usuario_id = ?",
                 [usuario_id]
             )
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en desbloquearCuenta: {e}")
-            return False
-
-    def insertarUsuario(self, registroVO):
-        try:
-            cursor = self.getCursor()
-            print(f"Insertando: {registroVO.dni_nie}, {registroVO.nombre_completo}, {registroVO.email}, "
-                  f"{registroVO.telefono}, {registroVO.password_hash}, {registroVO.tipo_usuario}, "
-                  f"{registroVO.preferencia}, {registroVO.preferencia_accesibilidad}")
-            cursor.execute(
-                """INSERT INTO Usuarios 
-                (dni_nie, nombre_completo, email, telefono, password_hash, tipo_usuario, preferencia, preferencia_accesibilidad)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                [
-                    registroVO.dni_nie, registroVO.nombre_completo,
-                    registroVO.email, registroVO.telefono,
-                    registroVO.password_hash, registroVO.tipo_usuario, 
-                    registroVO.preferencia, registroVO.preferencia_accesibilidad
-                ]
-            )
-            return True
-        except Exception as e:
-            print(f"Error en insertarUsuario: {e}")
             return False
 
     def actualizarTelefono(self, usuario_id, telefono):
@@ -130,6 +137,7 @@ class UserDAO(Conexion):
                 "UPDATE Usuarios SET telefono = ? WHERE usuario_id = ?",
                 [telefono, usuario_id]
             )
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en actualizarTelefono: {e}")
@@ -142,7 +150,21 @@ class UserDAO(Conexion):
                 "UPDATE Usuarios SET preferencia = ? WHERE usuario_id = ?",
                 [preferencia, usuario_id]
             )
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en actualizarPreferencia: {e}")
+            return False
+            
+    def actualizarPreferenciaAccesibilidad(self, usuario_id, preferencia_accesibilidad):
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                "UPDATE Usuarios SET preferencia_accesibilidad = ? WHERE usuario_id = ?",
+                [preferencia_accesibilidad, usuario_id]
+            )
+            if hasattr(self, 'commit'): self.commit()
+            return True
+        except Exception as e:
+            print(f"Error en actualizarPreferenciaAccesibilidad: {e}")
             return False
