@@ -1,4 +1,9 @@
 
+DROP DATABASE IF EXISTS SoftripDB;
+GO
+CREATE DATABASE SoftripDB;
+GO
+
 USE SoftripDB;
 GO
 
@@ -18,10 +23,12 @@ CREATE TABLE Usuarios (
 	cuenta_bloqueada BIT DEFAULT 0
 );
 
+
 ALTER TABLE Usuarios 
 ADD preferencia NVARCHAR(20) DEFAULT 'General' CONSTRAINT CK_preferencia_usuario 
-    CHECK (preferencia IN ('General', 'Familiar', 'Jubilado', 'Movilidad reducida', 'Escolar'));
-
+        CHECK (preferencia IN ('General', 'Familiar', 'Jubilado', 'Movilidad reducida', 'Escolar')),
+    preferencia_accesibilidad NVARCHAR(20) DEFAULT 'Ninguna' CONSTRAINT CK_preferencia_accesibilidad
+        CHECK (preferencia_accesibilidad IN ('Ninguna', 'Dificultad lectura', 'Movilidad Reducida'));
 
 CREATE TABLE Clientes_Perfiles (
     usuario_id INT CONSTRAINT PK_cliente_perfil PRIMARY KEY 
@@ -30,6 +37,9 @@ CREATE TABLE Clientes_Perfiles (
     preferencia_accesibilidad NVARCHAR(50), 
     presupuesto_promedio DECIMAL(10,2)
 );
+
+
+
 
 
 
@@ -140,24 +150,24 @@ END;
 GO
 
  
-INSERT INTO Usuarios (dni_nie, nombre_completo, email, telefono, tipo_usuario, estado)
+INSERT INTO Usuarios (dni_nie, nombre_completo, email, telefono, tipo_usuario, estado,preferencia_accesibilidad)
 VALUES 
-('11111111A', 'Lara Antón (Admin)', 'lara.admin@softrip.com', '600111222', 'Administrador', 'Activo'),
-('22222222B', 'Daniela Pino (Operador)', 'daniela.ops@softrip.com', '600222333', 'Operador', 'Activo'),
-('33333333C', 'Nuria García (Cliente)', 'nuria.garcia@email.com', '600333444', 'Cliente', 'Activo'),
-('44444444D', 'Marta Royo (Cliente)', 'marta.royo@email.com', '600444555', 'Cliente', 'Activo'),
-('55555555E', 'Juan Pérez (Cliente)', 'juan.perez@email.com', '600555666', 'Cliente', 'Activo'),
-('10000001A', 'Carlos Medina', 'carlos.medina@email.com', '611001001', 'Cliente', 'Activo'),
-('10000002B', 'Sofia Herrera', 'sofia.herrera@email.com', '611002002', 'Cliente', 'Activo'),
-('10000003C', 'Andres Torres', 'andres.torres@email.com', '611003003', 'Cliente', 'Activo'),
-('10000004D', 'Elena Vidal', 'elena.vidal@email.com', '611004004', 'Cliente', 'Activo'),
-('10000005E', 'Pablo Ruiz', 'pablo.ruiz@email.com', '611005005', 'Cliente', 'Activo'),
-('10000006F', 'Laura Campos', 'laura.campos@email.com', '611006006', 'Cliente', 'Activo'),
-('10000007G', 'Miguel Serrano', 'miguel.serrano@email.com', '611007007', 'Cliente', 'Activo'),
-('10000008H', 'Ana Blanco', 'ana.blanco@email.com', '611008008', 'Cliente', 'Activo'),
-('10000009I', 'Roberto Iglesias', 'roberto.iglesias@email.com', '611009009', 'Cliente', 'Activo'),
-('10000010J', 'Carmen Navarro', 'carmen.navarro@email.com', '611010010', 'Cliente', 'Activo'),
-('20000001K', 'Pedro Sainz (Op)', 'pedro.ops@softrip.com', '622000001', 'Operador', 'Activo');
+('11111111A', 'Lara Antón (Admin)', 'lara.admin@softrip.com', '600111222', 'Administrador', 'Activo', 'Ninguna'),
+('22222222B', 'Daniela Pino (Operador)', 'daniela.ops@softrip.com', '600222333', 'Operador', 'Activo', 'Ninguna'),
+('33333333C', 'Nuria García (Cliente)', 'nuria.garcia@email.com', '600333444', 'Cliente', 'Activo', 'Ninguna'),
+('44444444D', 'Marta Royo (Cliente)', 'marta.royo@email.com', '600444555', 'Cliente', 'Activo', 'Dificultad Lectura'),
+('55555555E', 'Juan Pérez (Cliente)', 'juan.perez@email.com', '600555666', 'Cliente', 'Activo', 'Dificultad Lectura'),
+('10000001A', 'Carlos Medina', 'carlos.medina@email.com', '611001001', 'Cliente', 'Activo', 'Movilidad Reducida'),
+('10000002B', 'Sofia Herrera', 'sofia.herrera@email.com', '611002002', 'Cliente', 'Activo', 'Movilidad Reducida'),
+('10000003C', 'Andres Torres', 'andres.torres@email.com', '611003003', 'Cliente', 'Activo', 'Movilidad Reducida'),
+('10000004D', 'Elena Vidal', 'elena.vidal@email.com', '611004004', 'Cliente', 'Activo', 'Ninguna'),
+('10000005E', 'Pablo Ruiz', 'pablo.ruiz@email.com', '611005005', 'Cliente', 'Activo', 'Dificultad Lectura'),
+('10000006F', 'Laura Campos', 'laura.campos@email.com', '611006006', 'Cliente', 'Activo', 'Dificultad Lectura'),
+('10000007G', 'Miguel Serrano', 'miguel.serrano@email.com', '611007007', 'Cliente', 'Activo', 'Ninguna'),
+('10000008H', 'Ana Blanco', 'ana.blanco@email.com', '611008008', 'Cliente', 'Activo', 'Movilidad Reducida'),
+('10000009I', 'Roberto Iglesias', 'roberto.iglesias@email.com', '611009009', 'Cliente', 'Activo', 'Ninguna'),
+('10000010J', 'Carmen Navarro', 'carmen.navarro@email.com', '611010010', 'Cliente', 'Activo', 'Ninguna'),
+('20000001K', 'Pedro Sainz (Op)', 'pedro.ops@softrip.com', '622000001', 'Operador', 'Activo', 'Ninguna');
  
  
 INSERT INTO Clientes_Perfiles (usuario_id, perfil_viajero, preferencia_accesibilidad, presupuesto_promedio)
@@ -292,6 +302,12 @@ SELECT 'PEDIDOS' AS Tabla, * FROM Pedidos_Viajes;
 SELECT 'FEEDBACK' AS Tabla, * FROM Feedback_Clientes;
 SELECT 'RECLAMACIONES' AS Tabla, * FROM Reclamaciones;
 
+USE SoftripDB;
+GO
+
+
+
+
 -- 1. Borrar tablas en orden (primero las que tienen FK)
 DROP TABLE IF EXISTS Reclamaciones;
 DROP TABLE IF EXISTS Feedback_Clientes;
@@ -303,4 +319,3 @@ DROP TABLE IF EXISTS Clientes_Perfiles;
 DROP TABLE IF EXISTS Paquetes_Turisticos;
 DROP TABLE IF EXISTS Usuarios;
 GO
-
