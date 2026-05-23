@@ -4,10 +4,6 @@ from src.modelo.vo.RegistroVO import RegistroVO
 
 class AdminDAO(Conexion):
 
-    # ------------------------------------------------------------------ #
-    #  OPERADORES                                                          #
-    # ------------------------------------------------------------------ #
-
     def crearOperador(self, dni_nie, nombre_completo, email, telefono, password_hash):
         """Inserta un usuario con tipo_usuario = 'Operador'."""
         try:
@@ -101,10 +97,6 @@ class AdminDAO(Conexion):
             print(f"Error en obtenerTodosLosUsuarios: {e}")
             return []
 
-    # ------------------------------------------------------------------ #
-    #  BACKUP                                                              #
-    # ------------------------------------------------------------------ #
-
     def hacerBackup(self, ruta_carpeta: str, nombre_bd: str = "SoftripDB"):
         """
         Ejecuta BACKUP DATABASE en SQL Server.
@@ -136,9 +128,6 @@ class AdminDAO(Conexion):
             print(f"Error en hacerBackup: {e}")
             return False, str(e)
 
-    # ------------------------------------------------------------------ #
-    #  REGISTRO DE ACTIVIDAD                                               #
-    # ------------------------------------------------------------------ #
 
     def registrarActividad(self, usuario_id: int, tipo_accion: str,
                            detalle: str = None, ip: str = None):
