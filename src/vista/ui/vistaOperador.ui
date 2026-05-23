@@ -50,7 +50,7 @@ QPushButton#btnNav4 {
     border-left: 3px solid transparent;
     text-align: left;
     padding: 13px 20px;
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 500;
     color: #a0aec0;
 }
@@ -78,7 +78,7 @@ QPushButton#btnLogout {
     border-left: 3px solid transparent;
     text-align: left;
     padding: 12px 20px;
-    font-size: 11px;
+    font-size: 16px;
     color: #e05252;
     margin-top: 4px;
 }
@@ -88,7 +88,7 @@ QPushButton#btnLogout:hover {
     border-left: 3px solid #ff7070;
 }
 QLabel#sidebarFooter {
-    font-size: 9px;
+    font-size: 12px;
     color: #4a5568;
     padding: 6px 10px;
     background-color: transparent;
@@ -104,14 +104,14 @@ QLabel#pageTitle {
     letter-spacing: 1px;
 }
 QLabel#pageBreadcrumb {
-    font-size: 10px;
+    font-size: 14px;
     color: #999999;
 }
 QLabel#avatarLabel {
     background-color: #5e8d8d;
     color: white;
     font-weight: bold;
-    font-size: 13px;
+    font-size: 18px;
     border-radius: 17px;
     min-width: 34px;
     max-width: 34px;
@@ -119,7 +119,7 @@ QLabel#avatarLabel {
     max-height: 34px;
 }
 QLabel#userNameLabel {
-    font-size: 11px;
+    font-size: 18px;
     color: #333333;
 }
 QLabel#heroTitle {
@@ -129,7 +129,7 @@ QLabel#heroTitle {
     letter-spacing: 2px;
 }
 QLabel#heroSubtitle {
-    font-size: 13px;
+    font-size: 16px;
     color: #666666;
 }
 QFrame#card1, QFrame#card2, QFrame#card3, QFrame#card4 {
@@ -142,13 +142,13 @@ QLabel#iconLabel1, QLabel#iconLabel2, QLabel#iconLabel3, QLabel#iconLabel4 {
     color: #5e8d8d;
 }
 QLabel#cardTitle1, QLabel#cardTitle2, QLabel#cardTitle3, QLabel#cardTitle4 {
-    font-size: 11px;
+    font-size: 18px;
     font-weight: bold;
     color: #333333;
     letter-spacing: 1px;
 }
 QLabel#cardDesc1, QLabel#cardDesc2, QLabel#cardDesc3, QLabel#cardDesc4 {
-    font-size: 10px;
+    font-size: 16px;
     color: #666666;
 }
 QPushButton#moreBtn1, QPushButton#moreBtn2, QPushButton#moreBtn3, QPushButton#moreBtn4 {
@@ -157,7 +157,7 @@ QPushButton#moreBtn1, QPushButton#moreBtn2, QPushButton#moreBtn3, QPushButton#mo
     border: none;
     border-radius: 20px;
     padding: 8px 24px;
-    font-size: 10px;
+    font-size: 16px;
     font-weight: bold;
     letter-spacing: 0.5px;
 }
@@ -165,7 +165,7 @@ QPushButton#moreBtn1:hover, QPushButton#moreBtn2:hover, QPushButton#moreBtn3:hov
     background-color: #4a7474;
 }
 QLabel#footerLinks, QLabel#footerCopy {
-    font-size: 9px;
+    font-size: 13px;
     color: #bbbbbb;
 }
 QScrollBar:vertical {
