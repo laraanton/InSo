@@ -69,7 +69,7 @@ class VentanaCliente(QMainWindow, Form):
         contenedor.card_btn.clicked.connect(lambda _checked, p=pid: self._ver_paquete(p))
 
         contenedor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        contenedor.setFixedHeight(160)
+        contenedor.setFixedHeight(155)
         return contenedor
 
     # ── Señales ──────────────────────────────────────────────────────────────
