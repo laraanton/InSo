@@ -3,7 +3,7 @@
  <class>VentanaDiseno</class>
  <widget class="QWidget" name="VentanaDiseno">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>900</width><height>680</height></rect>
+   <rect><x>0</x><y>0</y><width>900</width><height>600</height></rect>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -41,75 +41,6 @@ QLineEdit, QTextEdit {
 QLineEdit:focus, QTextEdit:focus {
     border: 1px solid #5e8d8d;
     background-color: #ffffff;
-}
-QDateEdit {
-    background-color: #f9f7f2;
-    border: 1px solid #dddddd;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 11px;
-    color: #333333;
-}
-QDateEdit:focus {
-    border: 1px solid #5e8d8d;
-    background-color: #ffffff;
-}
-QDateEdit::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 22px;
-    border-left: 1px solid #dddddd;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-QDateEdit::down-arrow {
-    image: none;
-    width: 8px;
-    height: 8px;
-}
-QCalendarWidget QToolButton {
-    color: #333333;
-    background-color: #ffffff;
-    border: none;
-    font-size: 11px;
-}
-QCalendarWidget QMenu {
-    font-size: 11px;
-}
-QCalendarWidget QAbstractItemView:enabled {
-    font-size: 11px;
-    color: #333333;
-    selection-background-color: #5e8d8d;
-    selection-color: white;
-}
-QComboBox {
-    background-color: #f9f7f2;
-    border: 1px solid #dddddd;
-    border-radius: 6px;
-    padding: 6px 10px;
-    font-size: 13px;
-    color: #333333;
-}
-QComboBox:focus {
-    border: 1px solid #5e8d8d;
-    background-color: #ffffff;
-}
-QComboBox::drop-down {
-    subcontrol-origin: padding;
-    subcontrol-position: top right;
-    width: 22px;
-    border-left: 1px solid #dddddd;
-    border-top-right-radius: 6px;
-    border-bottom-right-radius: 6px;
-}
-QComboBox QAbstractItemView {
-    background-color: #ffffff;
-    border: 1px solid #dddddd;
-    border-radius: 6px;
-    selection-background-color: #5e8d8d;
-    selection-color: white;
-    font-size: 13px;
-    padding: 4px;
 }
 QPushButton#btnNuevoPaquete {
     background-color: transparent;
@@ -152,6 +83,14 @@ QLabel#lblEstado {
     font-size: 11px;
     font-weight: bold;
 }
+QLabel#lblSeccionTitulo { font-size: 20px; }  /* se queda igual */
+QLabel#lblSeccionSub { font-size: 16px; }      /* era 11px */
+QLabel { font-size: 16px; }                    /* era 11px */
+QLineEdit, QTextEdit { font-size: 16px; }      /* era 11px */
+QPushButton#btnNuevoPaquete { font-size: 16px; } /* era 11px */
+QPushButton#btnGuardar { font-size: 16px; }    /* era 11px */
+QPushButton#btnLimpiar { font-size: 16px; }    /* era 11px */
+QLabel#lblEstado { font-size: 16px; }          /* era 11px */
    </string>
   </property>
 
@@ -171,12 +110,12 @@ QLabel#lblEstado {
        <property name="spacing"><number>2</number></property>
        <item>
         <widget class="QLabel" name="lblSeccionTitulo">
-         <property name="text"><string>Diseño de Paquetes</string></property>
+         <property name="text"><string>Diseno de Paquetes</string></property>
         </widget>
        </item>
        <item>
         <widget class="QLabel" name="lblSeccionSub">
-         <property name="text"><string>Crea y configura nuevos paquetes turísticos</string></property>
+         <property name="text"><string>Crea y configura nuevos paquetes turisticos</string></property>
         </widget>
        </item>
       </layout>
@@ -220,7 +159,7 @@ QLabel#lblEstado {
           </item>
           <item>
            <widget class="QLineEdit" name="inputNombre">
-            <property name="placeholderText"><string>Ej: Escapada a París</string></property>
+            <property name="placeholderText"><string>Ej: Escapada a Paris</string></property>
            </widget>
           </item>
          </layout>
@@ -235,7 +174,7 @@ QLabel#lblEstado {
           </item>
           <item>
            <widget class="QLineEdit" name="inputDestino">
-            <property name="placeholderText"><string>Ej: París, Francia</string></property>
+            <property name="placeholderText"><string>Ej: Paris, Francia</string></property>
            </widget>
           </item>
          </layout>
@@ -243,7 +182,7 @@ QLabel#lblEstado {
        </layout>
       </item>
 
-      <!-- Fila 2: Duración + Precio -->
+      <!-- Fila 2: Duracion + Precio -->
       <item>
        <layout class="QHBoxLayout" name="fila2">
         <property name="spacing"><number>20</number></property>
@@ -252,7 +191,7 @@ QLabel#lblEstado {
           <property name="spacing"><number>4</number></property>
           <item>
            <widget class="QLabel" name="lblDuracion">
-            <property name="text"><string>Duración (días)</string></property>
+            <property name="text"><string>Duracion (dias)</string></property>
            </widget>
           </item>
           <item>
@@ -280,83 +219,19 @@ QLabel#lblEstado {
        </layout>
       </item>
 
-      <!-- Fila 3: Fecha inicio + Fecha fin -->
-      <item>
-       <layout class="QHBoxLayout" name="fila3">
-        <property name="spacing"><number>20</number></property>
-        <item>
-         <layout class="QVBoxLayout">
-          <property name="spacing"><number>4</number></property>
-          <item>
-           <widget class="QLabel" name="lblFechaIni">
-            <property name="text"><string>Fecha de inicio</string></property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDateEdit" name="inputFechaIni">
-            <property name="calendarPopup"><bool>true</bool></property>
-            <property name="displayFormat"><string>dd/MM/yyyy</string></property>
-            <!-- fecha predeterminada: 14/07/2026 -->
-            <property name="date">
-             <date><year>2026</year><month>7</month><day>14</day></date>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item>
-         <layout class="QVBoxLayout">
-          <property name="spacing"><number>4</number></property>
-          <item>
-           <widget class="QLabel" name="lblFechaFin">
-            <property name="text"><string>Fecha de fin</string></property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QDateEdit" name="inputFechaFin">
-            <property name="calendarPopup"><bool>true</bool></property>
-            <property name="displayFormat"><string>dd/MM/yyyy</string></property>
-            <!-- fecha predeterminada: 31/07/2026 -->
-            <property name="date">
-             <date><year>2026</year><month>7</month><day>31</day></date>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </item>
-
-      <!-- Fila 4: Emoticono -->
-      <item>
-       <layout class="QVBoxLayout">
-        <property name="spacing"><number>4</number></property>
-        <item>
-         <widget class="QLabel" name="lblEmoji">
-          <property name="text"><string>Icono del paquete</string></property>
-         </widget>
-        </item>
-        <item>
-         <widget class="QComboBox" name="comboEmoji">
-          <!-- Las opciones se rellenan desde el código Python -->
-         </widget>
-        </item>
-       </layout>
-      </item>
-
       <!-- Descripcion -->
       <item>
        <layout class="QVBoxLayout">
         <property name="spacing"><number>4</number></property>
         <item>
          <widget class="QLabel" name="lblDescripcion">
-          <property name="text"><string>Descripción</string></property>
+          <property name="text"><string>Descripcion</string></property>
          </widget>
         </item>
         <item>
          <widget class="QTextEdit" name="textDescripcion">
           <property name="placeholderText"><string>Describe el paquete: actividades, alojamiento, incluidos...</string></property>
-          <property name="minimumHeight"><number>80</number></property>
+          <property name="minimumHeight"><number>90</number></property>
          </widget>
         </item>
        </layout>
