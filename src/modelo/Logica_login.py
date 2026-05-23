@@ -4,11 +4,11 @@ from src.modelo.vo.RegistroVO import RegistroVO
 
 class BussinessObject():
 
-    def comprobarLogin(self, email, password_hash):
-        if not email or not password_hash:
+    def comprobarLogin(self, email, password):
+        if not email or not password:
             return None, "Email y contraseña obligatorios"
 
-        loginVO = LoginVO(email, password_hash)
+        loginVO = LoginVO(email, password)
         user = UserDAO().consultaLogin(loginVO)
 
         if not user:
@@ -49,14 +49,14 @@ class BussinessObject():
         return False, "No se pudo actualizar la contraseña"
     
 
-    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash, preferencia, accesibilidad):
-        if not all([dni_nie, nombre_completo, email, password_hash]):
+    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password, preferencia, accesibilidad):
+        if not all([dni_nie, nombre_completo, email, password]):
             return False, "Todos los campos obligatorios deben estar rellenos"
         
-        if len(password_hash) < 6:
+        if len(password) < 6:
             return False, "La contraseña debe tener al menos 6 caracteres"
 
-        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash, preferencia = preferencia, preferencia_accesibilidad=accesibilidad)
+        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password, preferencia = preferencia, preferencia_accesibilidad=accesibilidad)
         exito = UserDAO().insertarUsuario(registroVO)
 
         if exito:
