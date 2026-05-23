@@ -9,6 +9,7 @@ class RegistroVO:
         self.__password_hash   = password_hash
         self.__tipo_usuario    = tipo_usuario  # por defecto Cliente
         self.__preferencia = preferencia
+        self.__preferencia_accesibilidad = preferencia_accesibilidad
 
     @property
     def dni_nie(self):
@@ -37,4 +38,8 @@ class RegistroVO:
     @property
     def preferencia(self):
         return self.__preferencia
+        
+    @property
+    def preferencia_accesibilidad(self):
+        return self.__preferencia_accesibilidad
 
