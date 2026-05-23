@@ -103,6 +103,8 @@ class VentanaDetallePaquete(QMainWindow, Form):
 
         fecha_ini = self.dt_inicio.date().toPyDate()
         fecha_fin = self.dt_fin.date().toPyDate()
+        dias_exactos = (fecha_fin - fecha_ini).days
+
 
         personas = self.spin_personas.value()
         metodo = self.combo_pago.currentText()
@@ -119,7 +121,7 @@ class VentanaDetallePaquete(QMainWindow, Form):
             self.dt_inicio.setFocus()
             return
         
-        if fecha_fin-fecha_ini != self.paquete.get("duracion", 0):
+        if dias_exactos != int(self.paquete.get("duracion", 0)):
             QMessageBox.warning(
                 self,
                 "Duracion",
