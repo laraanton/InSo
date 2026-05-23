@@ -137,10 +137,10 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         resp = QMessageBox.question(
             self, "Cerrar sesion",
             "Deseas cerrar la sesion actual?",
-            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.Si | QMessageBox.No,
             QMessageBox.No,
         )
-        if resp == QMessageBox.Yes:
+        if resp == QMessageBox.Si:
             self.close()
             from src.vista.Login import MiVentana
             self.login = MiVentana()
