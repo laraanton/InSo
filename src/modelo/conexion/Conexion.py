@@ -1,7 +1,18 @@
 import jaydebeapi
 
 class Conexion:
+  _instancia = None
+
+  def __new__(cls, host='localhost', database='SoftripDB', user='sa', password='olacaracola'):
+    if cls._instancia is None:
+      cls._instancia = super().__new__(cls)
+    return cls._instancia
+  
   def __init__(self, host='localhost', database='SoftripDB', user= 'sa', password = 'olacaracola'):
+    if hasattr(self, '_inicializado'):
+      return
+    self._inicializado = True
+    
     self._host = host
     self._database = database
     self._user = user
@@ -10,13 +21,13 @@ class Conexion:
 
   def createConnection(self):
     try:
-      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"  # fix: faltaba 'r'
+      jdbc_driver = "com.microsoft.sqlserver.jdbc.SQLServerDriver"  
       jar_file = r".\lib\mssql-jdbc-13.4.0.jre11.jar"
       url = f"jdbc:sqlserver://{self._host}:1433;databaseName=SoftripDB;encrypt=true;trustServerCertificate=true;" 
       
       self.conexion = jaydebeapi.connect(
-        jdbc_driver,  # fix: driver como 1er argumento
-        url,          # fix: url como 2º argumento
+        jdbc_driver,  
+        url,          
         [self._user, self._password],
         jar_file
       )
@@ -32,19 +43,14 @@ class Conexion:
       self.createConnection()
     return self.conexion.cursor()
 
-def closeConnection(self):
-  try:
-    if self.conexion:
-      self.conexion.close()
-      self.conexion = None
-  except Exception as e:
-    print("Error cerrando conexión ->", e)
+  def closeConnection(self):
+    try:
+      if self.conexion:
+        self.conexion.close()
+        self.conexion = None
+    except Exception as e:
+      print("Error cerrando conexión ->", e)
 
 if __name__ == "__main__":
   print("Comenzando conexión con SoftripBD ->")
   db = Conexion()
-
-
-
-
-  
