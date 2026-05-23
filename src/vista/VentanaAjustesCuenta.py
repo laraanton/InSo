@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5 import uic
+from src.modelo.dao.CuentaDAO import CuentaDAO
 from src.modelo.dao.UserDAO import UserDAO
 from src.modelo.vo.LoginVO import LoginVO
 from src.vista.VentanaCliente import VentanaCliente
@@ -55,13 +56,13 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         preferencia = self.in_preferencia_edit.currentText()
         preferencia_acc = self.in_preferencia_accesibilidad_edit.currentText()
 
-        dao = UserDAO()
+        dao = CuentaDAO()
         exito_tel = dao.actualizarTelefono(self.user.usuario_id, telefono)
         exito_pref = dao.actualizarPreferencia(self.user.usuario_id, preferencia)
         exito_pref_acc = dao.actualizarPreferenciaAccesibilidad(self.user.usuario_id, preferencia_acc)
 
         if exito_tel and exito_pref and exito_pref_acc:
-            self.user = dao.obtenerUsuarioPorId(self.user.usuario_id)
+            self.user = UserDAO().obtenerUsuarioPorId(self.user.usuario_id)
             QMessageBox.information(self, "Éxito", "Perfil actualizado correctamente")
             # Vuelve a modo lectura
             self.in_telefono_edit.setReadOnly(True)
