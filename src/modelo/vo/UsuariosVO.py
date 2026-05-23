@@ -2,7 +2,7 @@
 class UsuarioVO:
     def __init__(self, usuario_id, dni_nie, nombre_completo, email,
                  telefono, tipo_usuario, estado, preferencia, cuenta_bloqueada,
-                 fecha_registro=None, password_hash=None, preferencia_accesibilidad='Ninguna'):
+                 fecha_registro=None, preferencia_accesibilidad='Ninguna', password_hash=None):
         self._usuario_id = usuario_id
         self._dni_nie = dni_nie
         self._nombre_completo  = nombre_completo
