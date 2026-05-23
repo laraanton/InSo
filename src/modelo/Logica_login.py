@@ -49,14 +49,14 @@ class BussinessObject():
         return False, "No se pudo actualizar la contraseña"
     
 
-    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash, preferencia):
+    def registrarUsuario(self, dni_nie, nombre_completo, email, telefono, password_hash, preferencia, acc):
         if not all([dni_nie, nombre_completo, email, password_hash]):
             return False, "Todos los campos obligatorios deben estar rellenos"
         
         if len(password_hash) < 6:
             return False, "La contraseña debe tener al menos 6 caracteres"
 
-        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash, preferencia = preferencia)
+        registroVO = RegistroVO(dni_nie, nombre_completo, email, telefono, password_hash, preferencia = preferencia, preferencia_accesibilidad=acc)
         exito = UserDAO().insertarUsuario(registroVO)
 
         if exito:
