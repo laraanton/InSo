@@ -67,7 +67,7 @@ CREATE TABLE Historial_Cambios_Paquetes (
     descripcion_cambio NVARCHAR(MAX)
 );
 
-
+SET DATEFORMAT ymd;
 CREATE TABLE Pedidos_Viajes (
     pedido_id INT IDENTITY(1,1) CONSTRAINT PK_pedido PRIMARY KEY,
     identificador_unico AS ('ORD-' + CAST(pedido_id AS NVARCHAR(10))), 
