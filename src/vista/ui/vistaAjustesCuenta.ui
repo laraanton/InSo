@@ -118,10 +118,15 @@ QPushButton#btnCambiarPass {
     font-weight: bold; letter-spacing: 0.5px;
 }
 QPushButton#btnCambiarPass:hover { background-color: #4a7474; }
+QPushButton#btnLeerPantalla {
+    background-color: #1a1a1a; color: #ffffff; border: 3px solid #ffffff;
+    border-radius: 10px; padding: 8px 20px; font-size: 15px;
+    font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase;
+}
+QPushButton#btnLeerPantalla:hover { background-color: #3a3a3a; border-color: #ffff00; color: #ffff00; }
 QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
    </string>
   </property>
-
   <widget class="QWidget" name="centralwidget">
    <layout class="QHBoxLayout" name="rootLayout">
     <property name="spacing"><number>0</number></property>
@@ -129,7 +134,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
     <property name="topMargin"><number>0</number></property>
     <property name="rightMargin"><number>0</number></property>
     <property name="bottomMargin"><number>0</number></property>
-
     <!-- SIDEBAR -->
     <item>
      <widget class="QFrame" name="sidebarFrame">
@@ -141,7 +145,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
        <property name="topMargin"><number>0</number></property>
        <property name="rightMargin"><number>0</number></property>
        <property name="bottomMargin"><number>0</number></property>
-
        <item>
         <widget class="QFrame" name="logoFrame">
          <property name="minimumHeight"><number>72</number></property>
@@ -156,7 +159,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
          </layout>
         </widget>
        </item>
-
        <item>
         <widget class="QPushButton" name="btnNavAjustes">
          <property name="text"><string>   Ajustes de cuenta</string></property>
@@ -172,14 +174,12 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
         </widget>
        </item>
-
        <item>
         <spacer name="sidebarSpacer">
          <property name="orientation"><enum>Qt::Vertical</enum></property>
          <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
         </spacer>
        </item>
-
        <item>
         <widget class="QPushButton" name="btnLogout">
          <property name="text"><string>   Cerrar sesion</string></property>
@@ -192,11 +192,9 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
          <property name="alignment"><set>Qt::AlignCenter</set></property>
         </widget>
        </item>
-
       </layout>
      </widget>
     </item>
-
     <!-- CONTENT -->
     <item>
      <widget class="QFrame" name="contentFrame">
@@ -206,7 +204,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
        <property name="topMargin"><number>0</number></property>
        <property name="rightMargin"><number>0</number></property>
        <property name="bottomMargin"><number>0</number></property>
-
        <!-- TOPBAR -->
        <item>
         <widget class="QFrame" name="topbarFrame">
@@ -238,6 +235,13 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
            </spacer>
           </item>
           <item>
+           <widget class="QPushButton" name="btnLeerPantalla">
+            <property name="text"><string>&#x1F50A; LEER PANTALLA</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+            <property name="toolTip"><string>Leer el contenido de la pantalla en voz alta</string></property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="avatarLabel">
             <property name="text"><string>U</string></property>
             <property name="alignment"><set>Qt::AlignCenter</set></property>
@@ -251,7 +255,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
          </layout>
         </widget>
        </item>
-
        <!-- MAIN CONTENT -->
        <item>
         <layout class="QHBoxLayout" name="mainLayout">
@@ -260,7 +263,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
          <property name="rightMargin"><number>40</number></property>
          <property name="bottomMargin"><number>32</number></property>
          <property name="spacing"><number>28</number></property>
-
          <!-- CARD DATOS PERSONALES -->
          <item>
           <widget class="QFrame" name="cardDatos">
@@ -270,13 +272,11 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <property name="rightMargin"><number>28</number></property>
             <property name="bottomMargin"><number>24</number></property>
             <property name="spacing"><number>10</number></property>
-
             <item>
              <widget class="QLabel" name="seccionTitle">
               <property name="text"><string>DATOS PERSONALES</string></property>
              </widget>
             </item>
-
             <!-- Nombre completo (solo lectura) -->
             <item>
              <widget class="QLabel">
@@ -290,7 +290,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="placeholderText"><string>—</string></property>
              </widget>
             </item>
-
             <!-- DNI (solo lectura) -->
             <item>
              <widget class="QLabel">
@@ -304,7 +303,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="placeholderText"><string>—</string></property>
              </widget>
             </item>
-
             <!-- Email (solo lectura) -->
             <item>
              <widget class="QLabel">
@@ -318,7 +316,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="placeholderText"><string>—</string></property>
              </widget>
             </item>
-
             <!-- Teléfono (editable al pulsar Editar) -->
             <item>
              <widget class="QLabel">
@@ -332,7 +329,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="placeholderText"><string>No indicado</string></property>
              </widget>
             </item>
-
             <!-- Preferencia (editable al pulsar Editar) -->
             <item>
              <widget class="QLabel">
@@ -350,7 +346,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item><property name="text"><string>Escolar</string></property></item>
              </widget>
             </item>
-
             <!-- Preferencia accesibilidad (editable al pulsar Editar) -->
             <item>
              <widget class="QLabel">
@@ -366,7 +361,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item><property name="text"><string>Movilidad Reducida</string></property></item>
              </widget>
             </item>
-
             <!-- Fecha registro (solo lectura) -->
             <item>
              <widget class="QLabel">
@@ -380,14 +374,12 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="placeholderText"><string>—</string></property>
              </widget>
             </item>
-
             <item>
              <spacer>
               <property name="orientation"><enum>Qt::Vertical</enum></property>
               <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
              </spacer>
             </item>
-
             <!-- Botones editar / guardar -->
             <item>
              <layout class="QHBoxLayout">
@@ -412,16 +404,13 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               </item>
              </layout>
             </item>
-
            </layout>
           </widget>
          </item>
-
          <!-- CARD CONTRASEÑA -->
          <item>
           <layout class="QVBoxLayout" name="rightColumn">
            <property name="spacing"><number>28</number></property>
-
            <item>
             <widget class="QFrame" name="cardContrasena">
              <layout class="QVBoxLayout" name="cardPassLayout">
@@ -430,14 +419,12 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="rightMargin"><number>28</number></property>
               <property name="bottomMargin"><number>24</number></property>
               <property name="spacing"><number>10</number></property>
-
               <item>
                <widget class="QLabel" name="seccionTitlePass">
                 <property name="text"><string>CAMBIAR CONTRASEÑA</string></property>
                 <property name="styleSheet"><string>font-size: 13px; font-weight: bold; color: #333333; letter-spacing: 1px;</string></property>
                </widget>
               </item>
-
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Contraseña actual</string></property>
@@ -450,7 +437,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
                 <property name="placeholderText"><string>Contraseña actual</string></property>
                </widget>
               </item>
-
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Nueva contraseña</string></property>
@@ -463,7 +449,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
                 <property name="placeholderText"><string>Nueva contraseña</string></property>
                </widget>
               </item>
-
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Repetir nueva contraseña</string></property>
@@ -476,14 +461,12 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
                 <property name="placeholderText"><string>Repetir nueva contraseña</string></property>
                </widget>
               </item>
-
               <item>
                <spacer>
                 <property name="orientation"><enum>Qt::Vertical</enum></property>
                 <property name="sizeHint" stdset="0"><size><width>20</width><height>10</height></size></property>
                </spacer>
               </item>
-
               <item>
                <layout class="QHBoxLayout">
                 <item>
@@ -500,18 +483,15 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
                 </item>
                </layout>
               </item>
-
              </layout>
             </widget>
            </item>
-
            <item>
             <spacer>
              <property name="orientation"><enum>Qt::Vertical</enum></property>
              <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
             </spacer>
            </item>
-
            <!-- Footer -->
            <item>
             <layout class="QVBoxLayout" name="footerLayout">
@@ -530,17 +510,13 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
              </item>
             </layout>
            </item>
-
           </layout>
          </item>
-
         </layout>
        </item>
-
       </layout>
      </widget>
     </item>
-
    </layout>
   </widget>
  </widget>
