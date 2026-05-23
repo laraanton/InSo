@@ -1,13 +1,14 @@
 """
 ControladorOperador.py
 ======================
-Controlador MVC único para las tres vistas del módulo Operador:
+Controlador MVC único para las cuatro vistas del módulo Operador:
 
-    VentanaDiseno  → crear_paquete()
-    VentanaEditar  → obtener_todos(), obtener_por_id(),
-                     editar_paquete(), eliminar_paquete()
-    VentanaCompra  → buscar_reservas(), cambiar_estado_reserva(),
-                     registrar_reserva(), exportar_csv()
+    VentanaDiseno   → crear_paquete()
+    VentanaEditar   → obtener_todos(), obtener_por_id(),
+                      editar_paquete(), eliminar_paquete()
+    VentanaCompra   → buscar_reservas(), cambiar_estado_reserva(),
+                      registrar_reserva(), exportar_csv()
+    VentanaAnalisis → get_datos_analisis(), exportar_analisis()
 
 Ninguna Vista accede a la BD directamente.  Siempre llaman aquí.
 
@@ -18,10 +19,12 @@ Flujo MVC:
 
 from __future__ import annotations
 import csv
-from datetime import date
+import os
+from datetime import date, timedelta
 
-from src.modelo.dao.PaqueteDAO import PaqueteDAO
-from src.modelo.dao.ReservaDAO import ReservaDAO
+from src.modelo.dao.PaqueteDAO  import PaqueteDAO
+from src.modelo.dao.ReservaDAO  import ReservaDAO
+from src.modelo.dao.AnalisisDAO import AnalisisDAO
 
 
 class ControladorOperador:
@@ -41,10 +44,9 @@ class ControladorOperador:
         self._usuario_id = usuario_id
         self._paq = PaqueteDAO()
         self._res = ReservaDAO()
+        self._ana = AnalisisDAO()
 
-    # ═══════════════════════════════════════════════════════════════════════
     # Req_27 · VentanaDiseno – crear paquete
-    # ═══════════════════════════════════════════════════════════════════════
 
     def crear_paquete(self, datos: dict) -> tuple[bool, str]:
         """
@@ -64,16 +66,13 @@ class ControladorOperador:
         if nuevo_id is None:
             return False, "Error al guardar el paquete en la base de datos."
 
-        # Historial de creación
         self._paq.registrar_historial(
             nuevo_id, self._usuario_id,
             f"Paquete '{datos['nombre']}' creado."
         )
         return True, f"Paquete '{datos['nombre']}' guardado correctamente (ID {nuevo_id})."
 
-    # ═══════════════════════════════════════════════════════════════════════
     # Req_27 · VentanaEditar – listar, editar y eliminar
-    # ═══════════════════════════════════════════════════════════════════════
 
     def obtener_todos(self) -> list[dict]:
         """
@@ -125,9 +124,8 @@ class ControladorOperador:
         )
         return True, f"Paquete '{paq['nombre']}' eliminado correctamente."
 
-    # ═══════════════════════════════════════════════════════════════════════
+
     # Req_25 / Req_26 · VentanaCompra – reservas
-    # ═══════════════════════════════════════════════════════════════════════
 
     def obtener_reservas(self) -> list[dict]:
         """
@@ -173,9 +171,6 @@ class ControladorOperador:
             metodo_pago  (str),
             fecha_inicio (str YYYY-MM-DD, opcional),
             fecha_fin    (str YYYY-MM-DD, opcional)
-
-        Para crear reservas desde la interfaz, abrir primero un diálogo
-        que resuelva cliente_id y paquete_id a partir de los nombres.
         """
         if not datos.get("cliente_id"):
             return False, "El campo 'cliente_id' es obligatorio."
@@ -201,7 +196,6 @@ class ControladorOperador:
                          "fecha", "precio", "estado", "metodo_pago"]
 
             with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
-                # utf-8-sig para que Excel reconozca la codificación
                 f.write(",".join(cabecera_visible) + "\n")
                 writer = csv.DictWriter(
                     f, fieldnames=campos_bd, extrasaction="ignore"
@@ -212,9 +206,141 @@ class ControladorOperador:
         except Exception as e:
             return False, f"Error al exportar: {e}"
 
-    # ═══════════════════════════════════════════════════════════════════════
-    # Validaciones privadas
-    # ═══════════════════════════════════════════════════════════════════════
+    # Req_28 · VentanaAnalisis – análisis de venta
+
+    def get_datos_analisis(self, periodo: str) -> dict:
+        """
+        Reúne todos los datos necesarios para la página de Análisis de Venta
+        y los devuelve en un único dict que VentanaAnalisis distribuye entre
+        los KPI labels y los seis gráficos Matplotlib.
+
+        Parámetro:
+            periodo : str  – valor del QComboBox de VentanaAnalisis:
+                             "Últimos 30 días" | "Últimos 3 meses" |
+                             "Últimos 6 meses" | "Este año"
+
+        Estructura devuelta:
+            kpi_ingresos    str   p.ej. "14.320 €"
+            kpi_pedidos     str   p.ej. "87"
+            kpi_satisf      str   p.ej. "4.2 / 5"
+            kpi_reclam      str   p.ej. "5"
+            ventas_paquete  list[{"paquete": str, "ventas": int}]
+            ingresos_mes    list[{"mes": str, "total": float}]
+            estado_pedidos  list[{"estado": str, "cantidad": int}]
+            satisfaccion    list[{"paquete": str, "media": float}]
+            reclamaciones   list[{"categoria": str, "cantidad": int}]
+            perfil_viajero  list[{"perfil": str, "cantidad": int}]
+        """
+        fecha_desde = self._resolver_fecha_desde(periodo)
+
+        # ── KPIs 
+        kpis = self._ana.kpis_resumen(fecha_desde)
+
+        ingresos_raw = kpis.get("ingresos_totales") or 0.0
+        kpi_ingresos = f"{ingresos_raw:,.0f} €".replace(",", ".")
+
+        kpi_pedidos = str(kpis.get("total_pedidos") or 0)
+
+        satisf_raw = kpis.get("satisfaccion_media")
+        kpi_satisf = f"{satisf_raw:.1f} / 5" if satisf_raw is not None else "— / 5"
+
+        kpi_reclam = str(kpis.get("total_reclamaciones") or 0)
+
+        # ── Datos de gráficos 
+        return {
+            "kpi_ingresos":   kpi_ingresos,
+            "kpi_pedidos":    kpi_pedidos,
+            "kpi_satisf":     kpi_satisf,
+            "kpi_reclam":     kpi_reclam,
+            "ventas_paquete": self._ana.ventas_por_paquete(fecha_desde),
+            "ingresos_mes":   self._ana.ingresos_por_mes(fecha_desde),
+            "estado_pedidos": self._ana.distribucion_estados(fecha_desde),
+            "satisfaccion":   self._ana.satisfaccion_por_paquete(fecha_desde),
+            "reclamaciones":  self._ana.reclamaciones_por_categoria(fecha_desde),
+            "perfil_viajero": self._ana.distribucion_perfiles(),
+        }
+
+    def exportar_analisis(self, periodo: str) -> tuple[bool, str]:
+        """
+        Exporta un resumen del análisis de venta a CSV (Req_19 / Req_28).
+        VentanaAnalisis lo llama desde btnExportar.
+
+        El archivo se guarda en ~/Documents con el nombre:
+            analisis_<periodo_slug>_<hoy>.csv
+
+        Devuelve:
+            (True,  "Exportado en: <ruta>")   si todo va bien.
+            (False, "Error al exportar: …")   si falla.
+        """
+        try:
+            fecha_desde = self._resolver_fecha_desde(periodo)
+            filas = self._ana.exportar_resumen(fecha_desde)
+
+            if not filas:
+                return False, "No hay datos para exportar en el período seleccionado."
+
+            # Nombre de archivo seguro para cualquier SO
+            slug = (
+                periodo.lower()
+                .replace(" ", "_")
+                .replace("á", "a").replace("é", "e")
+                .replace("í", "i").replace("ó", "o").replace("ú", "u")
+            )
+            nombre_archivo = f"analisis_{slug}_{date.today().isoformat()}.csv"
+            ruta = os.path.join(os.path.expanduser("~"), "Documents", nombre_archivo)
+            os.makedirs(os.path.dirname(ruta), exist_ok=True)
+
+            cabeceras_visibles = [
+                "ID Pedido", "Cliente", "Paquete",
+                "Fecha", "Monto (€)", "Estado",
+                "Val. Trato Operador", "Val. Transporte",
+                "Val. Alojamiento", "Val. General",
+                "Categoría Reclamación",
+            ]
+            campos_bd = [
+                "id_pedido", "cliente", "paquete",
+                "fecha", "monto", "estado",
+                "val_trato", "val_transporte",
+                "val_alojamiento", "val_general",
+                "categoria_reclamacion",
+            ]
+
+            with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
+                f.write(",".join(cabeceras_visibles) + "\n")
+                writer = csv.DictWriter(
+                    f, fieldnames=campos_bd, extrasaction="ignore"
+                )
+                writer.writerows(filas)
+
+            return True, f"Exportado correctamente en: {ruta}"
+
+        except Exception as exc:
+            return False, f"Error al exportar: {exc}"
+
+    # 
+    # Helpers privados
+
+    @staticmethod
+    def _resolver_fecha_desde(periodo: str) -> date | None:
+        """
+        Convierte el texto del QComboBox en un objeto date para filtrar la BD.
+
+        Valores esperados (deben coincidir con los items del cbPeriodo del .ui):
+            "Últimos 30 días"  → hoy − 30 días
+            "Últimos 3 meses"  → hoy − 90 días
+            "Últimos 6 meses"  → hoy − 180 días
+            "Este año"         → 1 enero del año en curso
+
+        Cualquier otro valor devuelve None (sin filtro de fecha).
+        """
+        hoy = date.today()
+        mapping = {
+            "Últimos 30 días": hoy - timedelta(days=30),
+            "Últimos 3 meses": hoy - timedelta(days=90),
+            "Últimos 6 meses": hoy - timedelta(days=180),
+            "Este año":        date(hoy.year, 1, 1),
+        }
+        return mapping.get(periodo)
 
     @staticmethod
     def _validar_paquete(datos: dict) -> tuple[bool, str]:
