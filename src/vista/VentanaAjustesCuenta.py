@@ -29,6 +29,10 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         if index >= 0:
             self.in_preferencia_edit.setCurrentIndex(index)
 
+        index1 = self.in_preferencia_accesibilidad_edit.findText(self.user.preferencia_accesibilidad or "Ninguna")
+        if index1 >= 0:
+            self.in_preferencia_accesibilidad_edit.setCurrentIndex(index1)
+
     def _connect_signals(self):
         self.logoBtn.clicked.connect(self._volver_principal)
         self.btnNavAjustes.clicked.connect(self._volver_principal)
@@ -49,17 +53,20 @@ class VentanaAjustesCuenta(QMainWindow, Form):
     def _guardar_perfil(self):
         telefono = self.in_telefono_edit.text().strip()
         preferencia = self.in_preferencia_edit.currentText()
+        preferencia_acc = self.in_preferencia_accesibilidad_edit.currentText()
 
         dao = UserDAO()
         exito_tel = dao.actualizarTelefono(self.user.usuario_id, telefono)
         exito_pref = dao.actualizarPreferencia(self.user.usuario_id, preferencia)
+        exito_pref_acc = dao.actualizarPreferenciaAccesibilidad(self.user.usuario_id, preferencia_acc)
 
-        if exito_tel and exito_pref:
+        if exito_tel and exito_pref and exito_pref_acc:
             self.user = dao.obtenerUsuarioPorId(self.user.usuario_id)
             QMessageBox.information(self, "Éxito", "Perfil actualizado correctamente")
             # Vuelve a modo lectura
             self.in_telefono_edit.setReadOnly(True)
             self.in_preferencia_edit.setEnabled(False)
+            self.in_preferencia_accesibilidad_edit.setEnabled(False)
             self.btnGuardarPerfil.setVisible(False)
             self.btnEditarPerfil.setVisible(True)
         else:
@@ -88,7 +95,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         
         # Verificar que la contraseña actual es correcta
         loginVO = LoginVO(self.user.email, pass_actual)
-        user_check = UserDAO().consultaLogin(LoginVO)
+        user_check = UserDAO().consultaLogin(loginVO)
         if not user_check:
             QMessageBox.warning(self, "Error", "La contraseña actual no es correcta")
             return
