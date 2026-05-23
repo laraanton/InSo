@@ -1,5 +1,3 @@
-CREATE DATABASE SoftripDB;
-GO
 
 USE SoftripDB;
 GO
@@ -216,7 +214,6 @@ VALUES
 -- Marzo 2025
 (15, 7,  750.00, 'Finalizado',  'PayPal',         '2025-03-02', '2025-03-08', '2025-03-13'),  -- 13
 ( 6, 8, 1400.00, 'Finalizado',  'Tarjeta',        '2025-03-07', '2025-03-14', '2025-03-21'),  -- 14
-( 7, 9, 2100.00, 'Finalizado',  'Transferencia',  '2025-03-11', '2025-03-18', '2025-03-26'),  -- 15
 ( 8, 4,  980.00, 'Reembolsado', 'PayPal',         '2025-03-15', NULL,          NULL),          -- 16
 ( 9, 1,  850.00, 'Finalizado',  'Tarjeta',        '2025-03-20', '2025-03-25', '2025-04-01'),  -- 17
  
@@ -230,7 +227,6 @@ VALUES
 -- Mayo 2025
 (15, 8, 1400.00, 'Finalizado',  'Tarjeta',        '2025-05-01', '2025-05-07', '2025-05-14'),  -- 23
 ( 6, 2,  450.00, 'Finalizado',  'PayPal',         '2025-05-06', '2025-05-12', '2025-05-17'),  -- 24
-( 7, 9, 2100.00, 'En curso',    'Transferencia',  '2025-05-10', '2025-05-15', '2025-05-23'),  -- 25
 ( 8, 6,  980.00, 'Finalizado',  'Tarjeta',        '2025-05-16', '2025-05-20', '2025-05-26'),  -- 26
 ( 9, 3, 1200.00, 'Cancelado',   'PayPal',         '2025-05-21', NULL,          NULL),          -- 27
 (10, 1,  850.00, 'Pendiente',   'Tarjeta',        '2025-05-23', NULL,          NULL);          -- 28
@@ -239,7 +235,7 @@ VALUES
  
 INSERT INTO Feedback_Clientes (pedido_id, val_trato_operador, val_calidad_transporte, val_satisfaccion_alojamiento, val_general, comentarios)
 VALUES 
-(1, 5, 4, 5, 5, 'Una experiencia increíble, el guía fue muy amable.'),
+(1,  5, 4, 5, 5, 'Una experiencia increíble, el guía fue muy amable.'),
 ( 4, 5, 5, 4, 5, 'El hotel en Tenerife era espectacular, repetiria sin dudarlo.'),
 ( 5, 4, 3, 4, 4, 'Disneyland genial para los ninos, el transporte mejorable.'),
 ( 6, 4, 4, 3, 4, 'Buen senderismo, las cabanas algo basicas pero cumple.'),
@@ -250,16 +246,12 @@ VALUES
 (12, 5, 5, 4, 5, 'Tenerife en febrero es lo mejor que puedes hacer.'),
 (13, 4, 4, 4, 4, 'Roma preciosa, el tour guiado muy completo.'),
 (14, 5, 5, 5, 5, 'Esquiar en los Alpes fue un sueno, repetiremos.'),
-(15, 4, 3, 4, 4, 'Tokyo es fascinante aunque el vuelo fue largo.'),
 (17, 5, 5, 5, 5, 'Tenerife por segunda vez y sigue siendo perfecta.'),
 (18, 4, 4, 3, 4, 'Los Pirineos en abril, una pasada.'),
-(19, 5, 5, 5, 5, 'El crucero mediterraneo merece cada euro invertido.'),
-(21, 4, 4, 4, 4, 'Roma siempre sorprende, muy bien organizado.'),
 (23, 4, 4, 3, 4, 'Semana de esqui muy bien organizada, forfait sin colas.'),
-(24, 5, 5, 5, 5, 'Los Pirineos en mayo son espectaculares.'),
-(26, 4, 4, 4, 4, 'Safari increible, repetiremos con mas dias.');
+(24, 5, 5, 5, 5, 'Los Pirineos en mayo son espectaculares.');
 
-
+SELECT pedido_id, cliente_id, estado_pedido FROM Pedidos_Viajes ORDER BY pedido_id;
 INSERT INTO Reclamaciones (pedido_id, categoria, descripcion_incidente, fecha_incidente, estado_reclamacion)
 VALUES 
 (2, 'Transporte', 'El vuelo de ida sufrió un retraso de 4 horas sin previo aviso.', '2024-03-10', 'En revisión'),
@@ -299,3 +291,4 @@ SELECT 'PAQUETES' AS Tabla, * FROM Paquetes_Turisticos;
 SELECT 'PEDIDOS' AS Tabla, * FROM Pedidos_Viajes;
 SELECT 'FEEDBACK' AS Tabla, * FROM Feedback_Clientes;
 SELECT 'RECLAMACIONES' AS Tabla, * FROM Reclamaciones;
+
