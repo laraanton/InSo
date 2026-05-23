@@ -41,6 +41,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
     def _activar_edicion(self):
         self.in_telefono_edit.setReadOnly(False)
         self.in_preferencia_edit.setEnabled(True)
+        self.in_preferencia_accesibilidad_edit.setEnabled(True)
         self.btnGuardarPerfil.setVisible(True)
         self.btnEditarPerfil.setVisible(False)
         self.in_telefono_edit.setFocus()
