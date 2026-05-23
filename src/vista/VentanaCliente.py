@@ -1,11 +1,14 @@
 from PyQt5 import uic
-from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox, QSizePolicy
 from PyQt5.QtCore import QDate
 from datetime import date
 
-from src.modelo.dao.PaqueteDAO import PaqueteDAO 
+from src.modelo.dao.PaqueteDAO import PaqueteDAO
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaCliente.ui")
+
+_COLS = 3  # tarjetas por fila
+
 
 class VentanaCliente(QMainWindow, Form):
     def __init__(self, user):
@@ -14,11 +17,62 @@ class VentanaCliente(QMainWindow, Form):
         self.user = user
         self.menuCuenta.hide()
         self._connect_signals()
-        self._cargar_paquetes_destacados()
-        
+        self._cargar_paquetes()
+
         hoy = QDate.currentDate()
         self.in_fecha_ida.setDate(hoy)
         self.in_fecha_vuelta.setDate(hoy.addDays(1))
+
+    # ── Carga de tarjetas ────────────────────────────────────────────────────
+
+    def _cargar_paquetes(self):
+        while self.gridPaquetes.count():
+            item = self.gridPaquetes.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
+
+        dao = PaqueteDAO()
+        paquetes = dao.obtener_todos()
+
+        for i, p in enumerate(paquetes):
+            card = self._crear_tarjeta(p)
+            if card is None:
+                continue
+            fila = i // _COLS
+            col  = i % _COLS
+            self.gridPaquetes.addWidget(card, fila, col)
+            
+        self.scrollContent.adjustSize()
+        self.scrollPaquetes.updateGeometry()
+
+    def _crear_tarjeta(self, p: dict):
+        import os
+        from PyQt5.QtWidgets import QWidget
+        
+        contenedor = QWidget()
+        uic.loadUi(os.path.join(os.path.dirname(__file__), "ui", "cardPaquete.ui"), contenedor)
+
+        duracion = p["duracion"]
+        sufijo = f"{duracion} noche" if duracion == "1" else f"{duracion} noches"
+        contenedor.card_titulo.setText(f"{p['destino']} · {sufijo}")
+
+        descripcion = p["servicios"] if p["servicios"] else p["descripcion"][:40]
+        contenedor.card_desc.setText(descripcion)
+
+        try:
+            precio_fmt = f"Desde {float(p['precio']):.0f} €"
+        except (ValueError, TypeError):
+            precio_fmt = f"Desde {p['precio']} €"
+        contenedor.card_precio.setText(precio_fmt)
+
+        pid = p["id"]
+        contenedor.card_btn.clicked.connect(lambda _checked, p=pid: self._ver_paquete(p))
+
+        contenedor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        contenedor.setFixedHeight(160)
+        return contenedor
+
+    # ── Señales ──────────────────────────────────────────────────────────────
 
     def _connect_signals(self):
         self.btnCuenta.clicked.connect(self._abrir_cuenta)
@@ -26,68 +80,6 @@ class VentanaCliente(QMainWindow, Form):
         self.btnMisViajes.clicked.connect(self._ir_mis_viajes)
         self.btnCerrarSesion.clicked.connect(self._cerrar_sesion)
         self.btnBuscar.clicked.connect(self._buscar_paquetes)
-        # Los botones de tarjeta se reconectan en _cargar_paquetes_destacados
-
-    def _cargar_paquetes_destacados(self):
-        dao = PaqueteDAO()
-        paquetes = dao.obtener_todos()[:6]
-
-        tarjetas = [
-            {"card": self.card1, "icono": self.card1_icono, "titulo": self.card1_titulo,
-            "desc": self.card1_desc, "precio": self.card1_precio, "btn": self.card1_btn},
-            {"card": self.card2, "icono": self.card2_icono, "titulo": self.card2_titulo,
-            "desc": self.card2_desc, "precio": self.card2_precio, "btn": self.card2_btn},
-            {"card": self.card3, "icono": self.card3_icono, "titulo": self.card3_titulo,
-            "desc": self.card3_desc, "precio": self.card3_precio, "btn": self.card3_btn},
-            {"card": self.card4, "icono": self.card4_icono, "titulo": self.card4_titulo,
-            "desc": self.card4_desc, "precio": self.card4_precio, "btn": self.card4_btn},
-            {"card": self.card5, "icono": self.card5_icono, "titulo": self.card5_titulo,
-            "desc": self.card5_desc, "precio": self.card5_precio, "btn": self.card5_btn},
-            {"card": self.card6, "icono": self.card6_icono, "titulo": self.card6_titulo,
-            "desc": self.card6_desc, "precio": self.card6_precio, "btn": self.card6_btn},
-        ]
-
-        self._ids_destacados = []
-
-        for i, tarjeta in enumerate(tarjetas):
-            if i < len(paquetes):
-                p = paquetes[i]
-                self._ids_destacados.append(p["id"])
-
-                tarjeta["icono"].setText("✈️")
-
-                duracion = p["duracion"]
-                sufijo   = f"{duracion} noche" if duracion == "1" else f"{duracion} noches"
-                tarjeta["titulo"].setText(f"{p['destino']} · {sufijo}")
-
-                descripcion = p["servicios"] if p["servicios"] else p["descripcion"][:32]
-                tarjeta["desc"].setText(descripcion)
-
-                try:
-                    precio_fmt = f"Desde {float(p['precio']):.0f} €"
-                except ValueError:
-                    precio_fmt = f"Desde {p['precio']} €"
-                tarjeta["precio"].setText(precio_fmt)
-
-                tarjeta["card"].show()
-            else:
-                self._ids_destacados.append(None)
-                tarjeta["card"].hide()
-
-        # Reconectar botones con IDs reales
-        botones = [self.card1_btn, self.card2_btn, self.card3_btn,
-                self.card4_btn, self.card5_btn, self.card6_btn]
-        for btn in botones:
-            try:
-                btn.clicked.disconnect()
-            except TypeError:
-                pass
-
-        for i, btn in enumerate(botones):
-            pid = self._ids_destacados[i]
-            btn.clicked.connect(lambda _checked, p=pid: self._ver_paquete(p))
-
-    # ── Resto de métodos (sin cambios) ─────────────────────────────────────
 
     def _abrir_cuenta(self):
         if self.menuCuenta.isVisible():
@@ -127,7 +119,7 @@ class VentanaCliente(QMainWindow, Form):
                 "La fecha de vuelta no puede ser anterior a la de ida."
             )
             return
-        elif fecha_ida < date.today():
+        elif fecha_ida < QDate.fromString(str(date.today()), "yyyy-MM-dd"):
             QMessageBox.warning(
                 self, "Fechas incorrectas",
                 "La fecha no puede ser anterior a la fecha de hoy."
@@ -140,16 +132,14 @@ class VentanaCliente(QMainWindow, Form):
         )
 
     def _ver_paquete(self, paquete_id):
-        """Abre el detalle del paquete. Si el id es None la tarjeta estaba vacía."""
         if paquete_id is None:
             return
         from src.controlador.ControladorCliente import ControladorCliente
         from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
 
         controlador = ControladorCliente(self.user)
-        paquete = PaqueteDAO().obtener_por_id(paquete_id)
+        paquete     = PaqueteDAO().obtener_por_id(paquete_id)
         self.ventana_detalle = VentanaDetallePaquete(self.user, paquete, controlador)
-
         self.ventana_detalle.show()
         self.hide()
 
@@ -157,10 +147,10 @@ class VentanaCliente(QMainWindow, Form):
         resp = QMessageBox.question(
             self, "Cerrar sesión",
             "¿Deseas cerrar la sesión actual?",
-            QMessageBox.Si | QMessageBox.No,
+            QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )
-        if resp == QMessageBox.Si:
+        if resp == QMessageBox.Yes:
             self.close()
             from src.vista.Login import MiVentana
             self.login = MiVentana()
