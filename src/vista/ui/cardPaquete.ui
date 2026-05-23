@@ -3,7 +3,7 @@
  <class>CardPaquete</class>
  <widget class="QWidget" name="CardPaquete">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>370</width><height>160</height></rect>
+   <rect><x>0</x><y>0</y><width>370</width><height>155</height></rect>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -73,7 +73,7 @@ QPushButton#card_btn:hover {
   </widget>
 
   <widget class="QPushButton" name="card_btn">
-   <property name="geometry"><rect><x>15</x><y>118</y><width>340</width><height>28</height></rect></property>
+   <property name="geometry"><rect><x>15</x><y>122</y><width>285</width><height>28</height></rect></property>
    <property name="text"><string>Ver paquete</string></property>
    <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
   </widget>
