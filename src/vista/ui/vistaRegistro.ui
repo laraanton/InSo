@@ -305,6 +305,80 @@ QComboBox QAbstractItemView {
           </item>
          </widget>
 
+<!-- Accesibilidad -->
+         <widget class="QLabel" name="lbl_accesibilidad">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>512</y>
+            <width>371</width>
+            <height>18</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QLabel {
+	font-size: 11px;
+	color: rgba(44, 74, 110, 0.6);
+	padding-left: 4px;
+}</string>
+          </property>
+          <property name="text">
+           <string>Accesibilidad</string>
+          </property>
+         </widget>
+
+         <widget class="QComboBox" name="in_accesibilidad">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>530</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QComboBox {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QComboBox:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}
+QComboBox::drop-down {
+	border: none;
+	padding-right: 10px;
+}
+QComboBox QAbstractItemView {
+	background-color: #ffffff;
+	color: #2c4a6e;
+	selection-background-color: rgba(55, 138, 221, 0.15);
+	border: 1px solid rgba(55, 138, 221, 0.3);
+	border-radius: 8px;
+	padding: 4px;
+}</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>Ninguna</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dificultad lectura</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Movilidad Reducida</string>
+           </property>
+          </item>
+         </widget>
          <!-- Botón -->
          <widget class="QPushButton" name="botonRegistrar">
           <property name="geometry">
