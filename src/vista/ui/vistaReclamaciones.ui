@@ -1,0 +1,316 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>pageReclamaciones</class>
+ <widget class="QWidget" name="pageReclamaciones">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1040</width><height>656</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget#pageReclamaciones { background-color: #f9f7f2; }
+
+QLabel#lblTitulo {
+    font-size: 22px; font-weight: bold;
+    color: #333333; letter-spacing: 2px;
+}
+QLabel#lblSubtitulo { font-size: 12px; color: #888888; }
+
+QFrame#filterBar {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLineEdit#inputBuscar {
+    background-color: #f4f2ed;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px; color: #333333;
+}
+QLineEdit#inputBuscar:focus { border-color: #5e8d8d; }
+QComboBox#comboCategoria, QComboBox#comboEstado {
+    background-color: #f4f2ed;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 12px; color: #333333;
+    min-width: 140px;
+}
+QComboBox#comboCategoria:hover, QComboBox#comboEstado:hover { border-color: #5e8d8d; }
+QPushButton#btnBuscar {
+    background-color: #5e8d8d; color: white;
+    border: none; border-radius: 8px;
+    padding: 7px 20px; font-size: 12px; font-weight: bold;
+}
+QPushButton#btnBuscar:hover { background-color: #4a7474; }
+QPushButton#btnLimpiar {
+    background-color: transparent; color: #888888;
+    border: 1px solid #dddddd; border-radius: 8px;
+    padding: 7px 16px; font-size: 12px;
+}
+QPushButton#btnLimpiar:hover { border-color: #5e8d8d; color: #5e8d8d; }
+
+QTableWidget {
+    background-color: #ffffff;
+    border: 1px solid #eeeeee;
+    border-radius: 12px;
+    gridline-color: #f0ede8;
+    font-size: 12px; color: #333333;
+    selection-background-color: #fef3e2;
+    selection-color: #333333;
+}
+QTableWidget::item { padding: 10px 12px; border-bottom: 1px solid #f0ede8; }
+QTableWidget::item:selected { background-color: #fef3e2; }
+QHeaderView::section {
+    background-color: #f4f2ed;
+    color: #5e8d8d;
+    font-weight: bold; font-size: 11px;
+    letter-spacing: 1px;
+    padding: 10px 12px;
+    border: none; border-bottom: 2px solid #e0ddd8;
+}
+
+QFrame#detalleFrame {
+    background-color: #ffffff;
+    border-radius: 12px;
+    border: 1px solid #eeeeee;
+}
+QLabel#lblDetalleTitle { font-size: 14px; font-weight: bold; color: #333333; }
+QLabel#lblDetalleSub   { font-size: 11px; color: #888888; }
+
+QLabel#lblCampoTit {
+    font-size: 10px; color: #aaaaaa;
+    font-weight: bold; letter-spacing: 1px;
+}
+QLabel#lblCampoVal {
+    font-size: 12px; color: #333333;
+}
+QLabel#lblDescTit {
+    font-size: 10px; color: #aaaaaa;
+    font-weight: bold; letter-spacing: 1px;
+}
+QLabel#lblDesc {
+    font-size: 12px; color: #444444;
+    background-color: #f9f7f2;
+    border-radius: 8px; padding: 10px;
+}
+
+QComboBox#comboEstadoDetalle {
+    background-color: #f4f2ed;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 6px 10px; font-size: 12px;
+}
+QPushButton#btnGuardarEstado {
+    background-color: #5e8d8d; color: white;
+    border: none; border-radius: 8px;
+    padding: 7px 18px; font-size: 12px; font-weight: bold;
+}
+QPushButton#btnGuardarEstado:hover { background-color: #4a7474; }
+
+QLabel#lblEstado { font-size: 11px; font-weight: bold; }
+
+QScrollBar:vertical { background: #f9f7f2; width: 6px; }
+QScrollBar::handle:vertical { background: #d0d0d0; border-radius: 3px; min-height: 20px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+   </string>
+  </property>
+
+  <layout class="QVBoxLayout" name="rootLayout">
+   <property name="leftMargin"><number>32</number></property>
+   <property name="topMargin"><number>28</number></property>
+   <property name="rightMargin"><number>32</number></property>
+   <property name="bottomMargin"><number>24</number></property>
+   <property name="spacing"><number>16</number></property>
+
+   <!-- Cabecera -->
+   <item>
+    <layout class="QHBoxLayout">
+     <item>
+      <layout class="QVBoxLayout">
+       <property name="spacing"><number>4</number></property>
+       <item>
+        <widget class="QLabel" name="lblTitulo">
+         <property name="text"><string>⚠  RECLAMACIONES</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lblSubtitulo">
+         <property name="text"><string>Incidencias reportadas por los clientes</string></property>
+        </widget>
+       </item>
+      </layout>
+     </item>
+     <item>
+      <spacer>
+       <property name="orientation"><enum>Qt::Horizontal</enum></property>
+       <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QLabel" name="lblEstado">
+       <property name="text"><string></string></property>
+       <property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+
+   <!-- Filtros -->
+   <item>
+    <widget class="QFrame" name="filterBar">
+     <layout class="QHBoxLayout" name="filterLayout">
+      <property name="leftMargin"><number>16</number></property>
+      <property name="rightMargin"><number>16</number></property>
+      <property name="topMargin"><number>12</number></property>
+      <property name="bottomMargin"><number>12</number></property>
+      <property name="spacing"><number>12</number></property>
+      <item>
+       <widget class="QLineEdit" name="inputBuscar">
+        <property name="placeholderText"><string>🔍  Buscar por cliente, paquete o descripción…</string></property>
+        <property name="minimumWidth"><number>240</number></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboCategoria">
+        <item><property name="text"><string>Todas las categorías</string></property></item>
+        <item><property name="text"><string>Transporte</string></property></item>
+        <item><property name="text"><string>Alojamiento</string></property></item>
+        <item><property name="text"><string>Atencion al cliente</string></property></item>
+        <item><property name="text"><string>Actividades</string></property></item>
+        <item><property name="text"><string>Seguridad</string></property></item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QComboBox" name="comboEstado">
+        <item><property name="text"><string>Todos los estados</string></property></item>
+        <item><property name="text"><string>Registrada</string></property></item>
+        <item><property name="text"><string>En revisión</string></property></item>
+        <item><property name="text"><string>En gestión</string></property></item>
+        <item><property name="text"><string>Resuelta</string></property></item>
+        <item><property name="text"><string>Rechazada</string></property></item>
+        <item><property name="text"><string>Cerrada</string></property></item>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnBuscar">
+        <property name="text"><string>Buscar</string></property>
+        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnLimpiar">
+        <property name="text"><string>Limpiar</string></property>
+        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+       </widget>
+      </item>
+      <item>
+       <spacer>
+        <property name="orientation"><enum>Qt::Horizontal</enum></property>
+        <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+       </spacer>
+      </item>
+     </layout>
+    </widget>
+   </item>
+
+   <!-- Cuerpo: tabla + detalle -->
+   <item>
+    <layout class="QHBoxLayout" name="bodyLayout">
+     <property name="spacing"><number>16</number></property>
+
+     <!-- Tabla -->
+     <item>
+      <widget class="QTableWidget" name="tablaReclamaciones">
+       <property name="minimumWidth"><number>540</number></property>
+       <property name="columnCount"><number>6</number></property>
+       <property name="selectionBehavior"><enum>QAbstractItemView::SelectRows</enum></property>
+       <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
+       <property name="alternatingRowColors"><bool>true</bool></property>
+       <property name="showGrid"><bool>false</bool></property>
+       <attribute name="horizontalHeaderStretchLastSection"><bool>true</bool></attribute>
+       <column><property name="text"><string>Ref.</string></property></column>
+       <column><property name="text"><string>Cliente</string></property></column>
+       <column><property name="text"><string>Paquete</string></property></column>
+       <column><property name="text"><string>Categoría</string></property></column>
+       <column><property name="text"><string>Fecha</string></property></column>
+       <column><property name="text"><string>Estado</string></property></column>
+      </widget>
+     </item>
+
+     <!-- Panel detalle -->
+     <item>
+      <widget class="QFrame" name="detalleFrame">
+       <property name="minimumWidth"><number>320</number></property>
+       <property name="maximumWidth"><number>360</number></property>
+       <layout class="QVBoxLayout" name="detalleLayout">
+        <property name="leftMargin"><number>20</number></property>
+        <property name="topMargin"><number>20</number></property>
+        <property name="rightMargin"><number>20</number></property>
+        <property name="bottomMargin"><number>20</number></property>
+        <property name="spacing"><number>12</number></property>
+
+        <item><widget class="QLabel" name="lblDetalleTitle"><property name="text"><string>Selecciona una reclamación</string></property></widget></item>
+        <item><widget class="QLabel" name="lblDetalleSub"><property name="text"><string>Haz clic en una fila para ver el detalle</string></property><property name="wordWrap"><bool>true</bool></property></widget></item>
+
+        <!-- Campos informativos -->
+        <item><widget class="QLabel" name="lblCampoTit1"><property name="text"><string>REFERENCIA</string></property></widget></item>
+        <item><widget class="QLabel" name="lblRef"><property name="text"><string>—</string></property></widget></item>
+
+        <item><widget class="QLabel" name="lblCampoTit2"><property name="text"><string>CLIENTE</string></property></widget></item>
+        <item><widget class="QLabel" name="lblCliente"><property name="text"><string>—</string></property></widget></item>
+
+        <item><widget class="QLabel" name="lblCampoTit3"><property name="text"><string>CATEGORÍA</string></property></widget></item>
+        <item><widget class="QLabel" name="lblCategoria"><property name="text"><string>—</string></property></widget></item>
+
+        <item><widget class="QLabel" name="lblCampoTit4"><property name="text"><string>FECHA INCIDENTE</string></property></widget></item>
+        <item><widget class="QLabel" name="lblFecha"><property name="text"><string>—</string></property></widget></item>
+
+        <!-- Descripción -->
+        <item><widget class="QLabel" name="lblDescTit"><property name="text"><string>DESCRIPCIÓN</string></property></widget></item>
+        <item>
+         <widget class="QLabel" name="lblDesc">
+          <property name="text"><string>—</string></property>
+          <property name="wordWrap"><bool>true</bool></property>
+          <property name="alignment"><set>Qt::AlignTop|Qt::AlignLeft</set></property>
+          <property name="minimumHeight"><number>70</number></property>
+         </widget>
+        </item>
+
+        <!-- Cambiar estado -->
+        <item><widget class="QLabel" name="lblCampoTit5"><property name="text"><string>CAMBIAR ESTADO</string></property></widget></item>
+        <item>
+         <widget class="QComboBox" name="comboEstadoDetalle">
+          <item><property name="text"><string>Registrada</string></property></item>
+          <item><property name="text"><string>En revisión</string></property></item>
+          <item><property name="text"><string>En gestión</string></property></item>
+          <item><property name="text"><string>Resuelta</string></property></item>
+          <item><property name="text"><string>Rechazada</string></property></item>
+          <item><property name="text"><string>Cerrada</string></property></item>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnGuardarEstado">
+          <property name="text"><string>Guardar estado</string></property>
+          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+          <property name="enabled"><bool>false</bool></property>
+         </widget>
+        </item>
+
+        <item>
+         <spacer>
+          <property name="orientation"><enum>Qt::Vertical</enum></property>
+          <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+         </spacer>
+        </item>
+
+       </layout>
+      </widget>
+     </item>
+
+    </layout>
+   </item>
+
+  </layout>
+ </widget>
+</ui>
