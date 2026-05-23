@@ -27,12 +27,13 @@ class VentanaRegistro(QMainWindow, Form):
     contrasena = self.in_contrasena.text().strip()
     confirmar = self.in_confirmar.text().strip()
     preferencia = self.in_preferencia.currentText()
+    acc = self.in_accesibilidad.currentText()
 
     if contrasena != confirmar:
       QMessageBox.warning(self, "Error", "Las contraseñas no coinciden")
       return
 
-    exito, mensaje = self.logica.registrarUsuario(dni_nie, nombre, email, telefono, contrasena, preferencia)
+    exito, mensaje = self.logica.registrarUsuario(dni_nie, nombre, email, telefono, contrasena, preferencia, acc)
 
     if not exito:
       QMessageBox.warning(self, "Error de registro", mensaje)
