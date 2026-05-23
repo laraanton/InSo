@@ -22,7 +22,7 @@ QPushButton#logoBtn {
 QPushButton#logoBtn:hover { color: #a0d4d4; }
 QPushButton#btnNavAjustes, QPushButton#btnNavViajes {
     background: transparent; border: none; border-left: 3px solid transparent;
-    text-align: left; padding: 13px 20px; font-size: 11px; font-weight: 500; color: #a0aec0;
+    text-align: left; padding: 13px 20px; font-size: 16px; font-weight: 500; color: #a0aec0;
 }
 QPushButton#btnNavAjustes:hover, QPushButton#btnNavViajes:hover {
     background-color: #2a3347; color: #7eb8b8; border-left: 3px solid #7eb8b8;
@@ -33,33 +33,33 @@ QPushButton#btnNavAjustes:checked, QPushButton#btnNavViajes:checked {
 QPushButton#btnLogout {
     background: transparent; border: none; border-top: 1px solid #444444;
     border-left: 3px solid transparent; text-align: left; padding: 12px 20px;
-    font-size: 11px; color: #e05252; margin-top: 4px;
+    font-size: 16px; color: #e05252; margin-top: 4px;
 }
 QPushButton#btnLogout:hover { background-color: #3a2020; color: #ff7070; border-left: 3px solid #ff7070; }
-QLabel#sidebarFooter { font-size: 9px; color: #4a5568; padding: 6px 10px; background-color: transparent; }
+QLabel#sidebarFooter { font-size: 16px; color: #4a5568; padding: 6px 10px; background-color: transparent; }
 QFrame#topbarFrame { background-color: #f9f7f2; border-bottom: 1px solid #e8e5de; }
-QLabel#pageTitle { font-size: 18px; font-weight: bold; color: #333333; letter-spacing: 1px; }
-QLabel#pageBreadcrumb { font-size: 10px; color: #999999; }
+QLabel#pageTitle { font-size: 20px; font-weight: bold; color: #333333; letter-spacing: 1px; }
+QLabel#pageBreadcrumb { font-size: 16px; color: #999999; }
 QLabel#avatarLabel {
-    background-color: #5e8d8d; color: white; font-weight: bold; font-size: 13px;
+    background-color: #5e8d8d; color: white; font-weight: bold; font-size: 16px;
     border-radius: 17px; min-width: 34px; max-width: 34px; min-height: 34px; max-height: 34px;
 }
-QLabel#userNameLabel { font-size: 11px; color: #333333; }
+QLabel#userNameLabel { font-size: 16px; color: #333333; }
 QFrame#cardDatos, QFrame#cardContrasena {
     background-color: #ffffff; border-radius: 15px; border: 1px solid #eeeeee;
 }
 QLabel#seccionTitle {
-    font-size: 13px; font-weight: bold; color: #333333; letter-spacing: 1px;
+    font-size: 20px; font-weight: bold; color: #333333; letter-spacing: 1px;
 }
-QLabel.fieldLabel { font-size: 10px; color: #999999; }
+QLabel.fieldLabel { font-size: 16px; color: #999999; }
 QLineEdit#in_nombre_completo, QLineEdit#in_dni, QLineEdit#in_email,
 QLineEdit#in_telefono, QLineEdit#in_fecha_registro {
-    font-size: 13px; color: #333333;
+    font-size: 16px; color: #333333;
     background-color: #f4f4f4; border: 1px solid #e0e0e0;
     border-radius: 8px; padding: 6px 12px;
 }
 QLineEdit#in_telefono_edit {
-    font-size: 13px; color: #2c4a6e;
+    font-size: 16px; color: #2c4a6e;
     background-color: rgba(230, 241, 251, 0.7);
     border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5);
     border-radius: 8px; padding: 6px 12px;
@@ -69,7 +69,7 @@ QLineEdit#in_telefono_edit:focus {
     border-bottom: 2px solid rgb(55, 138, 221);
 }
 QLineEdit#in_pass_actual, QLineEdit#in_pass_nueva, QLineEdit#in_pass_confirmar {
-    font-size: 13px; color: #2c4a6e;
+    font-size: 16px; color: #2c4a6e;
     background-color: rgba(230, 241, 251, 0.7);
     border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5);
     border-radius: 8px; padding: 6px 12px;
@@ -79,7 +79,7 @@ QLineEdit#in_pass_actual:focus, QLineEdit#in_pass_nueva:focus, QLineEdit#in_pass
     border-bottom: 2px solid rgb(55, 138, 221);
 }
 QComboBox#in_preferencia_edit {
-    font-size: 13px; color: #2c4a6e;
+    font-size: 16px; color: #2c4a6e;
     background-color: rgba(230, 241, 251, 0.7);
     border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5);
     border-radius: 8px; padding: 6px 12px;
@@ -90,7 +90,7 @@ QComboBox#in_preferencia_edit:focus {
 }
 QComboBox#in_preferencia_edit::drop-down { border: none; padding-right: 10px; }
 QComboBox#in_preferencia_accesibilidad_edit {
-    font-size: 13px; color: #2c4a6e;
+    font-size: 16px; color: #2c4a6e;
     background-color: rgba(230, 241, 251, 0.7);
     border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5);
     border-radius: 8px; padding: 6px 12px;
@@ -102,19 +102,19 @@ QComboBox#in_preferencia_accesibilidad_edit:focus {
 QComboBox#in_preferencia_accesibilidad_edit::drop-down { border: none; padding-right: 10px; }
 QPushButton#btnEditarPerfil {
     background-color: #5e8d8d; color: white; border: none;
-    border-radius: 20px; padding: 8px 24px; font-size: 10px;
+    border-radius: 20px; padding: 8px 24px; font-size: 16px;
     font-weight: bold; letter-spacing: 0.5px;
 }
 QPushButton#btnEditarPerfil:hover { background-color: #4a7474; }
 QPushButton#btnGuardarPerfil {
     background-color: #1d93c5; color: white; border: none;
-    border-radius: 20px; padding: 8px 24px; font-size: 10px;
+    border-radius: 20px; padding: 8px 24px; font-size: 16px;
     font-weight: bold; letter-spacing: 0.5px;
 }
 QPushButton#btnGuardarPerfil:hover { background-color: #185fa5; }
 QPushButton#btnCambiarPass {
     background-color: #5e8d8d; color: white; border: none;
-    border-radius: 20px; padding: 8px 24px; font-size: 10px;
+    border-radius: 20px; padding: 8px 24px; font-size: 16px;
     font-weight: bold; letter-spacing: 0.5px;
 }
 QPushButton#btnCambiarPass:hover { background-color: #4a7474; }
@@ -124,7 +124,7 @@ QPushButton#btnLeerPantalla {
     font-weight: bold; letter-spacing: 1.5px; text-transform: uppercase;
 }
 QPushButton#btnLeerPantalla:hover { background-color: #3a3a3a; border-color: #ffff00; color: #ffff00; }
-QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
+QLabel#footerLinks, QLabel#footerCopy { font-size: 16px; color: #bbbbbb; }
    </string>
   </property>
   <widget class="QWidget" name="centralwidget">
@@ -281,7 +281,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Nombre completo</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -294,7 +294,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>DNI / NIE</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -307,7 +307,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Email</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -320,7 +320,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Teléfono</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -333,7 +333,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Preferencia</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -350,7 +350,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Accesibilidad</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -365,7 +365,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
             <item>
              <widget class="QLabel">
               <property name="text"><string>Miembro desde</string></property>
-              <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+              <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
              </widget>
             </item>
             <item>
@@ -422,13 +422,13 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item>
                <widget class="QLabel" name="seccionTitlePass">
                 <property name="text"><string>CAMBIAR CONTRASEÑA</string></property>
-                <property name="styleSheet"><string>font-size: 13px; font-weight: bold; color: #333333; letter-spacing: 1px;</string></property>
+                <property name="styleSheet"><string>font-size: 20px; font-weight: bold; color: #333333; letter-spacing: 1px;</string></property>
                </widget>
               </item>
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Contraseña actual</string></property>
-                <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+                <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
                </widget>
               </item>
               <item>
@@ -440,7 +440,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Nueva contraseña</string></property>
-                <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+                <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
                </widget>
               </item>
               <item>
@@ -452,7 +452,7 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <item>
                <widget class="QLabel">
                 <property name="text"><string>Repetir nueva contraseña</string></property>
-                <property name="styleSheet"><string>font-size: 10px; color: #999999;</string></property>
+                <property name="styleSheet"><string>font-size: 16px; color: #999999;</string></property>
                </widget>
               </item>
               <item>
