@@ -104,9 +104,7 @@ class UserDAO(Conexion):
     def insertarUsuario(self, registroVO):
         try:
             cursor = self.getCursor()
-            print(f"Insertando: {registroVO.dni_nie}, {registroVO.nombre_completo}, "
-                  f"{registroVO.email}, {registroVO.telefono}, "
-                  f"{registroVO.password_hash}, {registroVO.tipo_usuario}, {registroVO.preferencia}")
+            print(f"Insertando: {registroVO.dni_nie}, {registroVO.nombre_completo}, {registroVO.email}, {registroVO.telefono}, {registroVO.password_hash}, {registroVO.tipo_usuario}, {registroVO.preferencia}, {registroVO.preferencia_accesibilidad}")
             cursor.execute(
                 """INSERT INTO Usuarios 
                 (dni_nie, nombre_completo, email, telefono, password_hash, tipo_usuario, preferencia)
