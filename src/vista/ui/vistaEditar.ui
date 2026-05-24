@@ -3,7 +3,7 @@
  <class>VentanaEditar</class>
  <widget class="QWidget" name="VentanaEditar">
   <property name="geometry">
-   <rect><x>0</x><y>0</y><width>900</width><height>640</height></rect>
+   <rect><x>0</x><y>0</y><width>900</width><height>620</height></rect>
   </property>
   <property name="styleSheet">
    <string notr="true">
@@ -18,21 +18,16 @@ QLabel#lblSeccionTitulo {
     letter-spacing: 1px;
 }
 QLabel#lblSeccionSub {
-    font-size: 11px;
+    font-size: 16px;
     color: #999999;
 }
-QFrame#panelIzq {
-    background-color: #ffffff;
-    border-radius: 12px;
-    border: 1px solid #eeeeee;
-}
-QFrame#panelDer {
+QFrame#panelIzq, QFrame#panelDer {
     background-color: #ffffff;
     border-radius: 12px;
     border: 1px solid #eeeeee;
 }
 QLabel {
-    font-size: 11px;
+    font-size: 16px;
     color: #555555;
 }
 QLineEdit, QTextEdit, QDateEdit {
@@ -40,23 +35,23 @@ QLineEdit, QTextEdit, QDateEdit {
     border: 1px solid #dddddd;
     border-radius: 6px;
     padding: 6px 10px;
-    font-size: 11px;
+    font-size: 16px;
     color: #333333;
 }
 QLineEdit:focus, QTextEdit:focus, QDateEdit:focus {
     border: 1px solid #5e8d8d;
     background-color: #ffffff;
 }
+QDateEdit::drop-down {
+    border: none;
+}
 QComboBox {
     background-color: #f9f7f2;
     border: 1px solid #dddddd;
     border-radius: 6px;
     padding: 5px 10px;
-    font-size: 11px;
+    font-size: 16px;
     color: #333333;
-}
-QComboBox#comboEmoji {
-    font-size: 13px;
 }
 QComboBox:focus {
     border: 1px solid #5e8d8d;
@@ -67,14 +62,14 @@ QComboBox QAbstractItemView {
     border-radius: 6px;
     selection-background-color: #5e8d8d;
     selection-color: white;
-    font-size: 13px;
+    font-size: 16px;
     padding: 4px;
 }
 QListWidget {
     background-color: #f9f7f2;
     border: 1px solid #dddddd;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 16px;
     color: #333333;
 }
 QListWidget::item {
@@ -92,7 +87,7 @@ QPushButton#btnGuardarCambios {
     border: none;
     border-radius: 8px;
     padding: 8px 24px;
-    font-size: 11px;
+    font-size: 16px;
     font-weight: bold;
     color: white;
 }
@@ -104,7 +99,7 @@ QPushButton#btnEliminar {
     border: 1px solid #e05252;
     border-radius: 8px;
     padding: 8px 20px;
-    font-size: 11px;
+    font-size: 16px;
     font-weight: bold;
     color: #e05252;
 }
@@ -117,19 +112,15 @@ QPushButton#btnLimpiar {
     border: 1px solid #dddddd;
     border-radius: 8px;
     padding: 8px 20px;
-    font-size: 11px;
+    font-size: 16px;
     color: #999999;
 }
 QPushButton#btnLimpiar:hover {
     border-color: #999999;
     color: #555555;
 }
-QLabel#lblEstado {
-    font-size: 11px;
-    font-weight: bold;
-}
-QLabel#lblAviso {
-    font-size: 11px;
+QLabel#lblEstado, QLabel#lblAviso {
+    font-size: 16px;
     font-weight: bold;
 }
 QScrollBar:vertical {
@@ -141,19 +132,9 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
     min-height: 20px;
 }
-QLabel#lblSeccionTitulo { font-size: 20px; }  /* se queda igual, ya es grande */
-QLabel#lblSeccionSub { font-size: 16px; }      /* era 11px */
-QLabel { font-size: 16px; }                    /* era 11px */
-QLineEdit, QTextEdit, QDateEdit { font-size: 16px; } /* era 11px */
-QComboBox { font-size: 16px; }                 /* era 11px */
-QComboBox#comboEmoji { font-size: 18px; }      /* era 13px */
-QListWidget { font-size: 16px; }               /* era 11px */
-QPushButton#btnGuardarCambios { font-size: 16px; } /* era 11px */
-QPushButton#btnEliminar { font-size: 16px; }   /* era 11px */
-QPushButton#btnLimpiar { font-size: 16px; }    /* era 11px */
-QLabel#lblEstado { font-size: 16px; }          /* era 11px */
-QLabel#lblAviso { font-size: 16px; }           /* era 11px */
-QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
+QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
+    height: 0px;
+}
    </string>
   </property>
 
@@ -202,7 +183,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
     <layout class="QHBoxLayout" name="cuerpoLayout">
      <property name="spacing"><number>16</number></property>
 
-     <!-- Panel izquierdo: lista de paquetes -->
+     <!-- Panel izquierdo -->
      <item>
       <widget class="QFrame" name="panelIzq">
        <property name="minimumWidth"><number>220</number></property>
@@ -233,7 +214,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
       </widget>
      </item>
 
-     <!-- Panel derecho: formulario de edición -->
+     <!-- Panel derecho -->
      <item>
       <widget class="QFrame" name="panelDer">
        <layout class="QVBoxLayout" name="derLayout">
@@ -243,7 +224,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
         <property name="bottomMargin"><number>20</number></property>
         <property name="spacing"><number>11</number></property>
 
-        <!-- Banner de aviso: paquete caducado (oculto por defecto) -->
+        <!-- Banner aviso caducado -->
         <item>
          <widget class="QLabel" name="lblAviso">
           <property name="text"><string></string></property>
@@ -294,7 +275,7 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
          </layout>
         </item>
 
-        <!-- Fila 3: Fecha inicio + Fecha fin -->
+        <!-- Fila 3: Fecha inicio + Fecha fin (calculada) -->
         <item>
          <layout class="QHBoxLayout">
           <property name="spacing"><number>16</number></property>
@@ -302,36 +283,10 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
            <layout class="QVBoxLayout">
             <property name="spacing"><number>4</number></property>
             <item><widget class="QLabel" name="lblFechaInicio"><property name="text"><string>Fecha de inicio</string></property></widget></item>
-            <item><widget class="QDateEdit" name="inputFechaInicio"><property name="calendarPopup"><bool>true</bool></property><property name="displayFormat"><string>dd/MM/yyyy</string></property></widget></item>
-           </layout>
-          </item>
-          <item>
-           <layout class="QVBoxLayout">
-            <property name="spacing"><number>4</number></property>
-            <item><widget class="QLabel" name="lblFechaFin"><property name="text"><string>Fecha de fin</string></property></widget></item>
-            <item><widget class="QDateEdit" name="inputFechaFin"><property name="calendarPopup"><bool>true</bool></property><property name="displayFormat"><string>dd/MM/yyyy</string></property></widget></item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-
-        <!-- Fila 4: Perfil + Emoji -->
-        <item>
-         <layout class="QHBoxLayout">
-          <property name="spacing"><number>16</number></property>
-          <item>
-           <layout class="QVBoxLayout">
-            <property name="spacing"><number>4</number></property>
-            <item><widget class="QLabel" name="lblPerfil"><property name="text"><string>Perfil objetivo</string></property></widget></item>
             <item>
-             <widget class="QComboBox" name="comboPerfil">
-              <item><property name="text"><string>General</string></property></item>
-              <item><property name="text"><string>Familias</string></property></item>
-              <item><property name="text"><string>Jovenes</string></property></item>
-              <item><property name="text"><string>Jubilados</string></property></item>
-              <item><property name="text"><string>Parejas</string></property></item>
-              <item><property name="text"><string>Grupos escolares</string></property></item>
-              <item><property name="text"><string>Movilidad reducida</string></property></item>
+             <widget class="QDateEdit" name="inputFechaInicio">
+              <property name="calendarPopup"><bool>true</bool></property>
+              <property name="displayFormat"><string>dd/MM/yyyy</string></property>
              </widget>
             </item>
            </layout>
@@ -339,17 +294,39 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
           <item>
            <layout class="QVBoxLayout">
             <property name="spacing"><number>4</number></property>
-            <item><widget class="QLabel" name="lblEmoji"><property name="text"><string>Icono del paquete</string></property></widget></item>
+            <item><widget class="QLabel" name="lblFechaFin"><property name="text"><string>Fecha de fin (calculada)</string></property></widget></item>
             <item>
-             <!-- Las opciones se rellenan desde el código Python -->
-             <widget class="QComboBox" name="comboEmoji"/>
+             <widget class="QDateEdit" name="inputFechaFin">
+              <property name="calendarPopup"><bool>false</bool></property>
+              <property name="displayFormat"><string>dd/MM/yyyy</string></property>
+              <property name="readOnly"><bool>true</bool></property>
+             </widget>
             </item>
            </layout>
           </item>
          </layout>
         </item>
 
-        <!-- Servicios incluidos -->
+        <!-- Fila 4: Perfil (ocupa todo el ancho) -->
+        <item>
+         <layout class="QVBoxLayout">
+          <property name="spacing"><number>4</number></property>
+          <item><widget class="QLabel" name="lblPerfil"><property name="text"><string>Perfil objetivo</string></property></widget></item>
+          <item>
+           <widget class="QComboBox" name="comboPerfil">
+            <item><property name="text"><string>General</string></property></item>
+            <item><property name="text"><string>Familias</string></property></item>
+            <item><property name="text"><string>Jovenes</string></property></item>
+            <item><property name="text"><string>Jubilados</string></property></item>
+            <item><property name="text"><string>Parejas</string></property></item>
+            <item><property name="text"><string>Grupos escolares</string></property></item>
+            <item><property name="text"><string>Movilidad reducida</string></property></item>
+           </widget>
+          </item>
+         </layout>
+        </item>
+
+        <!-- Servicios -->
         <item>
          <layout class="QVBoxLayout">
           <property name="spacing"><number>4</number></property>
