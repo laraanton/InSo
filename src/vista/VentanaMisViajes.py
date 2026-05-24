@@ -1,5 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5 import uic
+from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaMisViajes.ui")
 
@@ -8,6 +9,8 @@ class VentanaMisViajes(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
         self.user = user
+        self.controlador = ControladorCliente(user)
+        self.controlador.ventana_viajes = self
         self._cargar_datos()
         self._connect_signals()
 
@@ -22,16 +25,11 @@ class VentanaMisViajes(QMainWindow, Form):
         self.btnLogout.clicked.connect(self._cerrar_sesion)
 
     def _volver_principal(self):
-        from src.vista.VentanaCliente import VentanaCliente
-        self.ventana_principal = VentanaCliente(self.user)
-        self.ventana_principal.show()
-        self.hide()
+        self.controlador.volver_a_principal()
 
     def _ir_ajustes(self):
-        from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
-        self.ventana_ajustes = VentanaAjustesCuenta(self.user)
-        self.ventana_ajustes.show()
-        self.hide()
+        self.controlador.ir_a_ajustes()
+
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
@@ -41,7 +39,4 @@ class VentanaMisViajes(QMainWindow, Form):
             QMessageBox.No,
         )
         if resp == QMessageBox.Yes:
-            from src.vista.Login import MiVentana
-            self.login = MiVentana()
-            self.login.show()
-            self.close()
+            self.controlador.cerrar_sesion()
