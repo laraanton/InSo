@@ -199,7 +199,6 @@ class VentanaEditar(QWidget):
     # ── Helpers ────────────────────────────────────────────────────────────
 
     def _actualizar_fecha_fin(self):
-        print(f">>> actualizar_fecha_fin | cargando={self._cargando_formulario} | duracion='{self.inputDuracion.text()}'")
         if self._cargando_formulario:
             return
 
