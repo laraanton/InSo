@@ -358,7 +358,6 @@ QLabel#footerLinks, QLabel#footerCopy { font-size: 9px; color: #bbbbbb; }
               <property name="enabled"><bool>false</bool></property>
               <item><property name="text"><string>Ninguna</string></property></item>
               <item><property name="text"><string>Dificultad lectura</string></property></item>
-              <item><property name="text"><string>Movilidad Reducida</string></property></item>
              </widget>
             </item>
             <!-- Fecha registro (solo lectura) -->
