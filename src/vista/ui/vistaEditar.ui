@@ -82,7 +82,7 @@ QListWidget::item:selected {
 QListWidget::item:hover {
     background-color: #f0f5f5;
 }
-QPushButton#btnGuardarCambios {
+QPushButton#btnEditar {
     background-color: #5e8d8d;
     border: none;
     border-radius: 8px;
@@ -91,8 +91,20 @@ QPushButton#btnGuardarCambios {
     font-weight: bold;
     color: white;
 }
-QPushButton#btnGuardarCambios:hover {
+QPushButton#btnEditar:hover {
     background-color: #4a7474;
+}
+QPushButton#btnGuardarCambios {
+    background-color: #1d93c5;
+    border: none;
+    border-radius: 8px;
+    padding: 8px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    color: white;
+}
+QPushButton#btnGuardarCambios:hover {
+    background-color: #185fa5;
 }
 QPushButton#btnEliminar {
     background-color: transparent;
@@ -379,9 +391,19 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical {
            </widget>
           </item>
           <item>
+           <!-- Visible por defecto: igual que btnEditarPerfil en AjustesCuenta -->
+           <widget class="QPushButton" name="btnEditar">
+            <property name="text"><string>Editar paquete</string></property>
+            <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+            <property name="visible"><bool>true</bool></property>
+           </widget>
+          </item>
+          <item>
+           <!-- Oculto por defecto: igual que btnGuardarPerfil en AjustesCuenta -->
            <widget class="QPushButton" name="btnGuardarCambios">
             <property name="text"><string>Guardar cambios</string></property>
             <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+            <property name="visible"><bool>false</bool></property>
            </widget>
           </item>
          </layout>
