@@ -58,6 +58,7 @@ class VentanaEditar(QWidget):
     def _conectar_senales(self):
         self.listaPaquetes.currentItemChanged.connect(self._on_seleccionar)
         self.inputFiltroLista.textChanged.connect(self._recargar_lista)
+        self.btnEditar.clicked.connect(self._activar_edicion)
         self.btnGuardarCambios.clicked.connect(self._guardar_cambios)
         self.btnEliminar.clicked.connect(self._eliminar_paquete)
         self.btnLimpiar.clicked.connect(self._limpiar_formulario)
@@ -118,6 +119,7 @@ class VentanaEditar(QWidget):
 
             self._mostrar_aviso_caducidad(p.get("fecha_fin", ""))
             self.lblEstado.clear()
+            self._set_modo_lectura(True) 
 
     def _mostrar_aviso_caducidad(self, fecha_fin_str: str):
         if _fecha_fin_caducada(fecha_fin_str):
@@ -148,8 +150,15 @@ class VentanaEditar(QWidget):
         self.inputFechaFin.setReadOnly(False)
         self.inputFechaFin.setDate(hoy)
         self.inputFechaFin.setReadOnly(True)
+        self._set_modo_lectura(True) 
 
     # ── Acciones ───────────────────────────────────────────────────────────
+
+    def _activar_edicion(self):
+        self._set_modo_lectura(False)
+        self.btnGuardarCambios.setVisible(True)
+        self.btnEditar.setVisible(False)
+        self.inputNombre.setFocus()
 
     def _guardar_cambios(self):
         if self._id_seleccionado is None:
@@ -174,6 +183,7 @@ class VentanaEditar(QWidget):
         if ok:
             self._recargar_lista(self.inputFiltroLista.text())
             self._mostrar_aviso_caducidad(datos["fecha_fin"])
+            self._set_modo_lectura(True)
 
     def _eliminar_paquete(self):
         if self._id_seleccionado is None:
@@ -209,11 +219,23 @@ class VentanaEditar(QWidget):
                 dias = 0
         except ValueError:
             dias = 0
-
-        print(f">>> setDate → {fecha_ini.addDays(dias).toString('dd/MM/yyyy')}")
         self.inputFechaFin.setReadOnly(False)
         self.inputFechaFin.setDate(fecha_ini.addDays(dias))
         self.inputFechaFin.setReadOnly(True)
+
+    def _set_modo_lectura(self, solo_lectura: bool):
+        campos = [
+            self.inputNombre, self.inputDestino,
+            self.inputDuracion, self.inputPrecio,
+            self.inputServicios,
+        ]
+        for campo in campos:
+            campo.setReadOnly(solo_lectura)
+        self.textDescripcion.setReadOnly(solo_lectura)
+        self.comboPerfil.setEnabled(not solo_lectura)
+        self.inputFechaInicio.setReadOnly(solo_lectura)
+        self.btnGuardarCambios.setVisible(not solo_lectura)
+        self.btnEditar.setVisible(solo_lectura)
 
     def _set_estado(self, msg: str, error: bool = False):
         self.lblEstado.setText(msg)
