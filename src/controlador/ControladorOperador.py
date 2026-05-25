@@ -7,7 +7,6 @@ from src.modelo.dao.PaqueteDAO  import PaqueteDAO
 from src.modelo.dao.ReservaDAO  import ReservaDAO
 from src.modelo.dao.AnalisisDAO import AnalisisDAO
 
-
 class ControladorOperador:
     def __init__(self, usuario_id: int | None = None):
         self._usuario_id = usuario_id
@@ -118,16 +117,6 @@ class ControladorOperador:
         return True, f"Pedido {id_pedido} → '{nuevo_estado}'."
 
     def registrar_reserva(self, datos: dict) -> tuple[bool, str]:
-        """
-        Crea una nueva reserva (Req_25).
-
-        datos esperados:
-            cliente_id*  (int),  paquete_id*  (int),
-            monto_total* (float),
-            metodo_pago  (str),
-            fecha_inicio (str YYYY-MM-DD, opcional),
-            fecha_fin    (str YYYY-MM-DD, opcional)
-        """
         if not datos.get("cliente_id"):
             return False, "El campo 'cliente_id' es obligatorio."
         if not datos.get("paquete_id"):
@@ -165,30 +154,7 @@ class ControladorOperador:
     # Req_28 · VentanaAnalisis – análisis de venta
 
     def get_datos_analisis(self, periodo: str) -> dict:
-        """
-        Reúne todos los datos necesarios para la página de Análisis de Venta
-        y los devuelve en un único dict que VentanaAnalisis distribuye entre
-        los KPI labels y los seis gráficos Matplotlib.
-
-        Parámetro:
-            periodo : str  – valor del QComboBox de VentanaAnalisis:
-                             "Últimos 30 días" | "Últimos 3 meses" |
-                             "Últimos 6 meses" | "Este año"
-
-        Estructura devuelta:
-            kpi_ingresos    str   p.ej. "14.320 €"
-            kpi_pedidos     str   p.ej. "87"
-            kpi_satisf      str   p.ej. "4.2 / 5"
-            kpi_reclam      str   p.ej. "5"
-            ventas_paquete  list[{"paquete": str, "ventas": int}]
-            ingresos_mes    list[{"mes": str, "total": float}]
-            estado_pedidos  list[{"estado": str, "cantidad": int}]
-            satisfaccion    list[{"paquete": str, "media": float}]
-            reclamaciones   list[{"categoria": str, "cantidad": int}]
-            perfil_viajero  list[{"perfil": str, "cantidad": int}]
-        """
         fecha_desde = self._resolver_fecha_desde(periodo)
-
         # ── KPIs 
         kpis = self._ana.kpis_resumen(fecha_desde)
 
