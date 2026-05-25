@@ -544,6 +544,7 @@ QFrame#sep_vertical {
              <item><property name="text"><string>PayPal</string></property></item>
              <item><property name="text"><string>Tarjeta de crédito</string></property></item>
              <item><property name="text"><string>Transferencia bancaria</string></property></item>
+             <item><property name="text"><string>Efectivo</string></property></item>
             </widget>
            </item>
           </layout>
