@@ -231,7 +231,6 @@ INSERT INTO Feedback_Clientes
 VALUES 
 ( 1, 5, 4, 5, 5, 'Una experiencia increíble, el guía fue muy amable.'),
 ( 4, 5, 5, 4, 5, 'El hotel en Tenerife era espectacular, repetiria sin dudarlo.'),
-( 5, 4, 3, 4, 4, 'Disneyland genial para los ninos, el transporte mejorable.'),
 ( 6, 4, 4, 3, 4, 'Buen senderismo, las cabanas algo basicas pero cumple.'),
 ( 7, 5, 5, 5, 5, 'El crucero supero todas mis expectativas, absolutamente recomendable.'),
 ( 8, 3, 4, 4, 3, 'El safari estuvo bien organizado pero el lodge decepciono.'),
@@ -269,8 +268,7 @@ VALUES
 (11, 'Pendiente',  'Cancelado', 'Cliente solicito cancelacion por motivos personales.', 2),
 (15, 'Confirmado', 'Reembolsado', 'Paquete no disponible en fecha solicitada.', 2),
 (19, 'Pendiente',  'Confirmado', 'Confirmado tras verificacion de disponibilidad.', 2),
-(21, 'Confirmado', 'Pagado', 'Pago recibido por transferencia bancaria.', 2),
-(25, 'Pendiente',  'Cancelado', 'Cliente cancelo antes del plazo de confirmacion.', 2); 
+(21, 'Confirmado', 'Pagado', 'Pago recibido por transferencia bancaria.', 2);
 
 UPDATE Usuarios 
 SET preferencia = 'General' 
