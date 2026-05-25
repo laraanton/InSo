@@ -183,17 +183,6 @@ class ControladorOperador:
         }
 
     def exportar_analisis(self, periodo: str) -> tuple[bool, str]:
-        """
-        Exporta un resumen del análisis de venta a CSV (Req_19 / Req_28).
-        VentanaAnalisis lo llama desde btnExportar.
-
-        El archivo se guarda en ~/Documents con el nombre:
-            analisis_<periodo_slug>_<hoy>.csv
-
-        Devuelve:
-            (True,  "Exportado en: <ruta>")   si todo va bien.
-            (False, "Error al exportar: …")   si falla.
-        """
         try:
             fecha_desde = self._resolver_fecha_desde(periodo)
             filas = self._ana.exportar_resumen(fecha_desde)
@@ -244,17 +233,6 @@ class ControladorOperador:
 
     @staticmethod
     def _resolver_fecha_desde(periodo: str) -> date | None:
-        """
-        Convierte el texto del QComboBox en un objeto date para filtrar la BD.
-
-        Valores esperados (deben coincidir con los items del cbPeriodo del .ui):
-            "Últimos 30 días"  → hoy − 30 días
-            "Últimos 3 meses"  → hoy − 90 días
-            "Últimos 6 meses"  → hoy − 180 días
-            "Este año"         → 1 enero del año en curso
-
-        Cualquier otro valor devuelve None (sin filtro de fecha).
-        """
         hoy = date.today()
         mapping = {
             "Últimos 30 días": hoy - timedelta(days=30),
