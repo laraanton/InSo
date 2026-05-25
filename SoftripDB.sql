@@ -1,4 +1,10 @@
-DROP DATABASE IF EXISTS SoftripDB;
+USE master;
+GO
+IF EXISTS (SELECT name FROM sys.databases WHERE name = 'SoftripDB')
+BEGIN
+    ALTER DATABASE SoftripDB SET SINGLE_USER WITH ROLLBACK IMMEDIATE;
+    DROP DATABASE SoftripDB;
+END
 GO
 
 CREATE DATABASE SoftripDB;
@@ -226,41 +232,46 @@ VALUES
 ( 9, 3, 1200.00, 'Cancelado',   'PayPal', '2025-05-21', NULL, NULL),
 (10, 1,  850.00, 'Pendiente',   'Tarjeta', '2025-05-23', NULL, NULL);
 
+SELECT pedido_id, cliente_id, estado_pedido FROM Pedidos_Viajes ORDER BY pedido_id;
+
 INSERT INTO Feedback_Clientes
     (pedido_id, val_trato_operador, val_calidad_transporte, val_satisfaccion_alojamiento, val_general, comentarios)
 VALUES 
 ( 1, 5, 4, 5, 5, 'Una experiencia increíble, el guía fue muy amable.'),
 ( 4, 5, 5, 4, 5, 'El hotel en Tenerife era espectacular, repetiria sin dudarlo.'),
-( 6, 4, 4, 3, 4, 'Buen senderismo, las cabanas algo basicas pero cumple.'),
-( 7, 5, 5, 5, 5, 'El crucero supero todas mis expectativas, absolutamente recomendable.'),
-( 8, 3, 4, 4, 3, 'El safari estuvo bien organizado pero el lodge decepciono.'),
-( 9, 5, 4, 5, 5, 'Tenerife es un destino increible, el personal muy atento.'),
-(10, 4, 5, 5, 5, 'El Mediterraneo desde el barco es incomparable.'),
-(12, 5, 5, 4, 5, 'Tenerife en febrero es lo mejor que puedes hacer.'),
-(13, 4, 4, 4, 4, 'Roma preciosa, el tour guiado muy completo.'),
-(14, 5, 5, 5, 5, 'Esquiar en los Alpes fue un sueno, repetiremos.'),
-(16, 5, 5, 5, 5, 'Tenerife por segunda vez y sigue siendo perfecta.'),
-(17, 4, 4, 3, 4, 'Los Pirineos en abril, una pasada.'),
-(22, 4, 4, 3, 4, 'Semana de esqui muy bien organizada, forfait sin colas.'),
-(23, 5, 5, 5, 5, 'Los Pirineos en mayo son espectaculares.');
+( 5, 4, 4, 3, 4, 'Buen senderismo, las cabanas algo basicas pero cumple.'),
+( 6, 5, 5, 5, 5, 'El crucero supero todas mis expectativas, absolutamente recomendable.'),
+( 7, 3, 4, 4, 3, 'El safari estuvo bien organizado pero el lodge decepciono.'),
+( 8, 5, 4, 5, 5, 'Tenerife es un destino increible, el personal muy atento.'),
+( 9, 4, 5, 5, 5, 'El Mediterraneo desde el barco es incomparable.'),
+(10, 5, 5, 4, 5, 'Tenerife en febrero es lo mejor que puedes hacer.'),
+(12, 4, 4, 4, 4, 'Roma preciosa, el tour guiado muy completo.'),
+(13, 5, 5, 5, 5, 'Esquiar en los Alpes fue un sueno, repetiremos.'),
+(15, 5, 5, 5, 5, 'Tenerife por segunda vez y sigue siendo perfecta.'),
+(16, 4, 4, 3, 4, 'Los Pirineos en abril, una pasada.'),
+(17, 4, 4, 3, 4, 'Semana de esqui muy bien organizada, forfait sin colas.'),
+(19, 5, 5, 5, 5, 'Tokyo increible, guia excelente.'),
+(21, 4, 4, 5, 4, 'Segunda visita a Tenerife, igual de buena.'),
+(22, 5, 5, 5, 5, 'Los Pirineos en mayo son espectaculares.');
+
 
 SELECT pedido_id, cliente_id, estado_pedido FROM Pedidos_Viajes ORDER BY pedido_id;
 
 INSERT INTO Reclamaciones
     (pedido_id, categoria, descripcion_incidente, fecha_incidente, estado_reclamacion)
 VALUES 
-( 2, 'Transporte', 'El vuelo de ida sufrió un retraso de 4 horas sin previo aviso.', '2024-03-10', 'En revisión'),
-( 5, 'Transporte', 'La maleta llego con danos visibles en la cerradura.', '2025-01-21', 'Resuelta'),
-(10, 'Transporte', 'El traslado al lodge llego con 3 horas de retraso.', '2025-02-22', 'Cerrada'),
-(16, 'Transporte', 'Cancelacion de tren sin reembolso inmediato.', '2025-03-19', 'En revisión'),
-( 6, 'Alojamiento', 'La cabana asignada no tenia agua caliente el primer dia.', '2025-01-26', 'Resuelta'),
-(13, 'Alojamiento', 'La habitacion del hotel no coincidia con la reserva.', '2025-03-09', 'Cerrada'),
-(18, 'Alojamiento', 'El camarote del crucero tenia problemas con el aire acondicionado.', '2025-04-15', 'Registrada'),
-( 7, 'Atencion al cliente','El guia no hablaba espanol segun lo acordado.', '2025-01-27', 'Resuelta'),
-(22, 'Atencion al cliente','No recibimos informacion sobre cambios en el itinerario.', '2025-05-08', 'En revisión'),
-( 9, 'Actividades', 'Una de las entradas al parque no funciono en la puerta.', '2025-02-17', 'Resuelta'),
-(14, 'Actividades', 'La clase de esqui fue cancelada sin alternativa ofrecida.', '2025-03-16', 'En gestión'),
-( 4, 'Seguridad', 'Falta de socorrista en la zona de piscina del hotel.', '2025-01-12', 'Cerrada');
+( 2, 'Transporte',          'El vuelo de ida sufrió un retraso de 4 horas sin previo aviso.',    '2024-03-10', 'En revisión'),
+( 3, 'Transporte',          'La maleta llego con danos visibles en la cerradura.',                '2025-01-21', 'Resuelta'),
+( 8, 'Transporte',          'El traslado al lodge llego con 3 horas de retraso.',                 '2025-02-22', 'Cerrada'),
+(16, 'Transporte',          'Cancelacion de tren sin reembolso inmediato.',                       '2025-03-19', 'En revisión'),
+( 5, 'Alojamiento',         'La cabana asignada no tenia agua caliente el primer dia.',           '2025-01-26', 'Resuelta'),
+(13, 'Alojamiento',         'La habitacion del hotel no coincidia con la reserva.',               '2025-03-09', 'Cerrada'),
+(18, 'Alojamiento',         'El camarote del crucero tenia problemas con el aire acondicionado.','2025-04-15', 'Registrada'),
+( 6, 'Atencion al cliente', 'El guia no hablaba espanol segun lo acordado.',                      '2025-01-27', 'Resuelta'),
+(22, 'Atencion al cliente', 'No recibimos informacion sobre cambios en el itinerario.',           '2025-05-08', 'En revisión'),
+( 7, 'Actividades',         'Una de las entradas al parque no funciono en la puerta.',            '2025-02-17', 'Resuelta'),
+(13, 'Actividades',         'La clase de esqui fue cancelada sin alternativa ofrecida.',          '2025-03-16', 'En gestión'),
+( 4, 'Seguridad',           'Falta de socorrista en la zona de piscina del hotel.',              '2025-01-12', 'Cerrada');
 
 INSERT INTO Historial_Estados_Pedidos
     (pedido_id, estado_anterior, estado_nuevo, motivo, usuario_responsable)
