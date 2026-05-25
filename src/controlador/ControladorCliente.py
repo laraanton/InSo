@@ -98,7 +98,7 @@ class ControladorCliente:
 
         vo = PedidoVO(
             cliente_id=self.user.usuario_id,
-            paquete_id=paquete["id"],
+            paquete_id=paquete.get("id") or paquete.get("paquete_id"),
             monto_total=monto_total,
             metodo_pago=metodo_pago,
             fecha_inicio=fecha_inicio,
