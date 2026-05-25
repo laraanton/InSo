@@ -1,11 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5 import uic
 import pyttsx3
-from src.modelo.dao.CuentaDAO import CuentaDAO
-from src.modelo.dao.UserDAO import UserDAO
-from src.modelo.vo.LoginVO import LoginVO
-from src.vista.VentanaCliente import VentanaCliente
-from src.vista.VentanaMisViajes import VentanaMisViajes
+from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAjustesCuenta.ui")
  
@@ -14,6 +10,8 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
         self.user = user
+        self.controlador = ControladorCliente(user)
+        self.controlador.ventana_ajustes = self
         self._cargar_datos()
         self._connect_signals()
 
@@ -42,14 +40,17 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         self.btnLeerPantalla.setVisible(tiene_dificultad_lectura)
 
     def _connect_signals(self):
-        self.logoBtn.clicked.connect(self._volver_principal)
-        self.btnNavAjustes.clicked.connect(self._volver_principal)
-        self.btnNavViajes.clicked.connect(self._ir_mis_viajes)
+        self.logoBtn.clicked.connect(self.controlador.volver_a_principal)
+        self.btnNavAjustes.clicked.connect(self.controlador.volver_a_principal)
+        self.btnNavViajes.clicked.connect(self.controlador.ir_a_mis_viajes)
         self.btnLogout.clicked.connect(self._cerrar_sesion)
         self.btnEditarPerfil.clicked.connect(self._activar_edicion)
         self.btnGuardarPerfil.clicked.connect(self._guardar_perfil)
         self.btnCambiarPass.clicked.connect(self._cambiar_contrasena)
         self.btnLeerPantalla.clicked.connect(self._leer_pantalla)
+        self.in_pass_actual.returnPressed.connect(lambda: self.in_pass_nueva.setFocus())
+        self.in_pass_nueva.returnPressed.connect(lambda: self.in_pass_confirmar.setFocus())
+        self.in_pass_confirmar.returnPressed.connect(self._cambiar_contrasena)
 
     def _activar_edicion(self):
         self.in_telefono_edit.setReadOnly(False)
@@ -64,13 +65,9 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         preferencia = self.in_preferencia_edit.currentText()
         preferencia_acc = self.in_preferencia_accesibilidad_edit.currentText()
 
-        dao = CuentaDAO()
-        exito_tel = dao.actualizarTelefono(self.user.usuario_id, telefono)
-        exito_pref = dao.actualizarPreferencia(self.user.usuario_id, preferencia)
-        exito_pref_acc = dao.actualizarPreferenciaAccesibilidad(self.user.usuario_id, preferencia_acc)
+        exito = self.controlador.guardar_perfil(telefono, preferencia, preferencia_acc)
 
-        if exito_tel and exito_pref and exito_pref_acc:
-            self.user = UserDAO().obtenerUsuarioPorId(self.user.usuario_id)
+        if exito:
             QMessageBox.information(self, "Éxito", "Perfil actualizado correctamente")
             # Vuelve a modo lectura
             self.in_telefono_edit.setReadOnly(True)
@@ -106,45 +103,29 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         if pass_actual == pass_nueva:
             QMessageBox.warning(self, "Error", "La nueva contraseña no puede ser igual a la actual")
             return
+
+        exito = self.controlador.cambiar_contrasena(pass_actual, pass_nueva, pass_confirmar)
+        if exito == (False, 'contraseña incorrecta'):
+            QMessageBox.warning(self, "Error", "La contraseña actual es incorrecta")
         
-        # Verificar que la contraseña actual es correcta
-        loginVO = LoginVO(self.user.email, pass_actual)
-        user_check = UserDAO().consultaLogin(loginVO)
-        if not user_check:
-            QMessageBox.warning(self, "Error", "La contraseña actual no es correcta")
-            return
-        
-        exito = UserDAO().actualizarContrasena(self.user.usuario_id, pass_nueva)
-        if exito:
+        elif exito:
             QMessageBox.information(self, "Éxito", "Contraseña actualizada correctamente")
             self.in_pass_actual.clear()
             self.in_pass_nueva.clear()
             self.in_pass_confirmar.clear()
+
         else:
             QMessageBox.warning(self, "Error", "No se pudo actualizar la contraseña")
-
-    def _volver_principal(self):
-        self.ventana_princial = VentanaCliente(self.user)
-        self.ventana_princial.show()
-        self.hide()
-
-    def _ir_mis_viajes(self):
-        self.ventana_princial = VentanaMisViajes(self.user)
-        self.ventana_princial.show()
-        self.hide()
     
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
             self, "Cerrar sesion",
             "Deseas cerrar la sesion actual?",
-            QMessageBox.Si | QMessageBox.No,
+            QMessageBox.Yes | QMessageBox.No,
             QMessageBox.No,
         )
-        if resp == QMessageBox.Si:
-            self.close()
-            from src.vista.Login import MiVentana
-            self.login = MiVentana()
-            self.login.show()
+        if resp == QMessageBox.Yes:
+            self.controlador.cerrar_sesion()
 
     def _leer_pantalla(self, *args):
         texto = (
