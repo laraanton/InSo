@@ -3,19 +3,21 @@ from datetime import date
 from PyQt5 import uic
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePaquete.ui")
 
 
 class VentanaDetallePaquete(QMainWindow, Form):
-    def __init__(self, user, paquete: dict, controlador):
+    def __init__(self, user, paquete: dict):
         super().__init__()
 
         self.setupUi(self)
 
         self.user = user
         self.paquete = paquete
-        self.controlador = controlador
+        self.controlador = ControladorCliente(user)
+        self.controlador.ventana_detalle = self
 
         self._rellenar_datos()
         self._conectar_señales()
@@ -63,18 +65,20 @@ class VentanaDetallePaquete(QMainWindow, Form):
         self._actualizar_total()
 
     def _conectar_señales(self):
-
-        self.dt_inicio.dateChanged.connect(self._actualizar_total)
+        self.dt_inicio.dateChanged.connect(self._actualizar_fecha_fin)
         self.dt_fin.dateChanged.connect(self._actualizar_total)
-
-        self.spin_personas.valueChanged.connect(
-            self._actualizar_total
-        )
-
+        self.spin_personas.valueChanged.connect(self._actualizar_total)
         self.btn_confirmar.clicked.connect(self._confirmar)
+        self.btn_volver.clicked.connect(self.controlador.volver_a_principal)
 
-        self.btn_volver.clicked.connect(self._volver_principal)
-
+    def _actualizar_fecha_fin(self):
+        duracion = int(self.paquete.get("duracion", 0))
+        nueva_fin = self.dt_inicio.date().addDays(duracion)
+        # Bloquear señal para no disparar _actualizar_total dos veces
+        self.dt_fin.blockSignals(True)
+        self.dt_fin.setDate(nueva_fin)
+        self.dt_fin.blockSignals(False)
+        self._actualizar_total()
   
     def _actualizar_total(self):
 
@@ -195,9 +199,3 @@ class VentanaDetallePaquete(QMainWindow, Form):
                 "Error en la reserva",
                 mensaje
             )
-
-    def _volver_principal(self):
-        from src.vista.VentanaCliente import VentanaCliente
-        self.ventana_principal = VentanaCliente(self.user)
-        self.ventana_principal.show()
-        self.hide()
