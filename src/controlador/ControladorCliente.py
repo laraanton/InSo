@@ -1,5 +1,6 @@
 from src.modelo.Logica_login import BussinessObject
 from src.modelo.dao.UserDAO import UserDAO
+from src.modelo.dao.CuentaDAO import CuentaDAO
 from src.modelo.dao.PedidoDAO import PedidoDAO
 from src.modelo.vo.LoginVO import LoginVO
 from src.modelo.vo.PedidoVO import PedidoVO
@@ -112,33 +113,25 @@ class ControladorCliente:
 
     # ── Perfil ───────────────────────────────────────────────────────────────
 
-    def guardar_perfil(self, telefono: str, preferencia: str,
-                       preferencia_acc: str) -> tuple[bool, str]:
-        dao = UserDAO()
+    def guardar_perfil(self, telefono: str, preferencia: str, preferencia_acc: str):
+        dao = CuentaDAO()
         ok_tel  = dao.actualizarTelefono(self.user.usuario_id, telefono)
         ok_pref = dao.actualizarPreferencia(self.user.usuario_id, preferencia)
         ok_acc  = dao.actualizarPreferenciaAccesibilidad(
                       self.user.usuario_id, preferencia_acc)
 
         if ok_tel and ok_pref and ok_acc:
-            self.user = dao.obtenerUsuarioPorId(self.user.usuario_id)
-            return True, "Perfil actualizado correctamente."
-        return False, "No se pudo actualizar el perfil."
+            self.user = UserDAO().obtenerUsuarioPorId(self.user.usuario_id)
+            return True
+        return False
 
-    def cambiar_contrasena(self, pass_actual: str, pass_nueva: str,
-                           pass_confirmar: str) -> tuple[bool, str]:
-        if not all([pass_actual, pass_nueva, pass_confirmar]):
-            return False, "Todos los campos son obligatorios."
-        if pass_nueva != pass_confirmar:
-            return False, "Las contraseñas nuevas no coinciden."
-        if len(pass_nueva) < 6:
-            return False, "La contraseña debe tener al menos 6 caracteres."
-        if pass_actual == pass_nueva:
-            return False, "La nueva contraseña no puede ser igual a la actual."
-
+    def cambiar_contrasena(self, pass_actual: str, pass_nueva: str, pass_confirmar: str):        
         loginVO = LoginVO(self.user.email, pass_actual)
-        if not UserDAO().consultaLogin(loginVO):
-            return False, "La contraseña actual no es correcta."
-
-        exito, mensaje = self.logica.actualizarContrasena(self.user.email, pass_nueva)
-        return exito, mensaje
+        user_check = UserDAO().consultaLogin(loginVO)
+        exito = False
+        if not user_check:
+            return False, 'contraseña incorrecta'
+        
+        exito = UserDAO().actualizarContrasena(self.user.usuario_id, pass_nueva)
+        return exito
+        
