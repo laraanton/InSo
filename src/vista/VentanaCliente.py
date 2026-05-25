@@ -139,7 +139,7 @@ class VentanaCliente(QMainWindow, Form):
 
         controlador = ControladorCliente(self.user)
         paquete     = PaqueteDAO().obtener_por_id(paquete_id)
-        self.ventana_detalle = VentanaDetallePaquete(self.user, paquete, controlador)
+        self.ventana_detalle = VentanaDetallePaquete(self.user, paquete)
         self.ventana_detalle.show()
         self.hide()
 
