@@ -1,22 +1,3 @@
-"""
-ControladorOperador.py
-======================
-Controlador MVC único para las cuatro vistas del módulo Operador:
-
-    VentanaDiseno   → crear_paquete()
-    VentanaEditar   → obtener_todos(), obtener_por_id(),
-                      editar_paquete(), eliminar_paquete()
-    VentanaCompra   → buscar_reservas(), cambiar_estado_reserva(),
-                      registrar_reserva(), exportar_csv()
-    VentanaAnalisis → get_datos_analisis(), exportar_analisis()
-
-Ninguna Vista accede a la BD directamente.  Siempre llaman aquí.
-
-Flujo MVC:
-    Vista  ──▶  ControladorOperador  ──▶  DAO  ──▶  BD (SQL Server)
-      ◀──────────────────────────────────────────────────────────────
-"""
-
 from __future__ import annotations
 import csv
 import os
@@ -28,18 +9,6 @@ from src.modelo.dao.AnalisisDAO import AnalisisDAO
 
 
 class ControladorOperador:
-    """
-    Punto de entrada único para la lógica de negocio del Operador.
-
-    Instanciar en cada Vista:
-        self._ctrl = ControladorOperador()
-        ok, msg = self._ctrl.crear_paquete(datos)
-
-    El usuario en sesión puede inyectarse opcionalmente para
-    mantener la trazabilidad en los historiales:
-        self._ctrl = ControladorOperador(usuario_id=user.usuario_id)
-    """
-
     def __init__(self, usuario_id: int | None = None):
         self._usuario_id = usuario_id
         self._paq = PaqueteDAO()
@@ -49,15 +18,6 @@ class ControladorOperador:
     # Req_27 · VentanaDiseno – crear paquete
 
     def crear_paquete(self, datos: dict) -> tuple[bool, str]:
-        """
-        Valida y persiste un paquete nuevo (Req_27).
-
-        Campos esperados en `datos`:
-            nombre*, destino*, duracion, precio*,
-            descripcion, servicios, perfil,
-            accesibilidad, fecha_ini, fecha_fin
-        (*) obligatorios según ERS § 2.2.4
-        """
         ok, msg = self._validar_paquete(datos)
         if not ok:
             return False, msg
@@ -75,10 +35,6 @@ class ControladorOperador:
     # Req_27 · VentanaEditar – listar, editar y eliminar
 
     def obtener_todos(self) -> list[dict]:
-        """
-        Devuelve todos los paquetes activos.
-        Usado por VentanaEditar (lista lateral) y VentanaCompra (catálogo).
-        """
         return self._paq.obtener_todos()
 
     def obtener_por_id(self, id_paquete: int) -> dict | None:
