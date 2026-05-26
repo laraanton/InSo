@@ -3,16 +3,31 @@ from src.modelo.vo.LoginVO import LoginVO
 from src.modelo.vo.RegistroVO import RegistroVO
 
 class BussinessObject():
-
+    _intentos = {}
     def comprobarLogin(self, email, password):
         if not email or not password:
             return None, "Email y contraseña obligatorios"
 
+        if email in self._intentos and self._intentos[email] >= 2:
+            return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
+    
         loginVO = LoginVO(email, password)
         user = UserDAO().consultaLogin(loginVO)
 
         if not user:
+            if email in self._intentos:
+                self._intentos[email] += 1
+            else:
+                self._intentos[email] = 1
+                if self._intentos[email] >= 2:
+                    return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
             return None, "Credenciales incorrectas"
+
+        self._intentos[email] = 0
+        
+        #Sin control de intentos
+        #if not user:
+        #    return None, "Credenciales incorrectas"
 
         if not user.es_activo():
             if user.cuenta_bloqueada:
