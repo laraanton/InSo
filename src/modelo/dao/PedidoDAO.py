@@ -54,3 +54,26 @@ class PedidoDAO(Conexion):
         except Exception as e:
             print(f"[PedidoDAO] Error en obtener_por_cliente: {e}")
             return []
+        
+    def obtener_por_paquete(self, pedido_id: int) -> dict | None:
+        try:
+            cursor = self.getCursor()
+            cursor.execute(
+                """SELECT pv.pedido_id, pv.paquete_id, pt.nombre_paquete, pt.destino,
+                        pt.duracion_dias, pt.servicios_incluidos, pt.descripcion_detallada,
+                        pv.fecha_inicio, pv.fecha_fin,
+                        pv.monto_total, pv.estado_pedido, pv.metodo_pago
+                FROM   Pedidos_Viajes pv
+                JOIN   Paquetes_Turisticos pt ON pt.paquete_id = pv.paquete_id
+                WHERE  pv.pedido_id = ?""",
+                [pedido_id]
+            )
+            cols = ["pedido_id", "paquete_id", "nombre", "destino",
+                    "duracion", "servicios", "descripcion",
+                    "fecha_inicio", "fecha_fin",
+                    "monto_total", "estado", "metodo_pago"]
+            row = cursor.fetchone()
+            return dict(zip(cols, row)) if row else None
+        except Exception as e:
+            print(f"[PedidoDAO] Error en obtener_por_id: {e}")
+            return None
