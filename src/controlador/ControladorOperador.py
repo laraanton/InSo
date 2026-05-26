@@ -6,7 +6,8 @@ from datetime import date, timedelta
 from src.modelo.dao.PaqueteDAO  import PaqueteDAO
 from src.modelo.dao.ReservaDAO  import ReservaDAO
 from src.modelo.dao.AnalisisDAO import AnalisisDAO
-
+from src.modelo.dao.FeedbackDAO  import FeedbackDAO
+from src.modelo.dao.ReclamacionDAO  import ReclamacionDAO
 
 class ControladorOperador:
     def __init__(self, usuario_id= None):
@@ -14,6 +15,8 @@ class ControladorOperador:
         self._paq = PaqueteDAO()
         self._res = ReservaDAO()
         self._ana = AnalisisDAO()
+        self._feed= FeedbackDAO()
+        self._rec= ReclamacionDAO()
 
     #-----------GESTIÓN DE PAQUETES------------------
 
@@ -150,11 +153,11 @@ class ControladorOperador:
         #Extrae ingresos totales del dict
         ingresos_raw = kpis.get("ingresos_totales") or 0.0
 
-        # Formatea el número como moneda europea: 14320.0 → "14.320 €"
+        # Formatea el número como moneda europea: 14320.0 -> "14.320 €"
         # :,.0f añade separadores de miles con coma, .replace los cambia a punto
         kpi_ingresos = f"{ingresos_raw:,.0f} €".replace(",", ".")
 
-        # Convierte el total de pedidos a string para mostrarlo en un QLabel
+        # Conviertir total pedidos a string para mostrarlo en un QLabel
         kpi_pedidos = str(kpis.get("total_pedidos") or 0)
 
         # Extrae la media de satisfacción; puede ser None si no hay valoraciones
@@ -214,18 +217,11 @@ class ControladorOperador:
             os.makedirs(os.path.dirname(ruta), exist_ok=True)
 
             cabeceras_visibles = [
-                "ID Pedido", "Cliente", "Paquete",
-                "Fecha", "Monto (€)", "Estado",
-                "Val. Trato Operador", "Val. Transporte",
-                "Val. Alojamiento", "Val. General",
+                "ID Pedido", "Cliente", "Paquete", "Fecha", "Monto (€)", "Estado", "Val. Trato Operador", "Val. Transporte","Val. Alojamiento", "Val. General",
                 "Categoría Reclamación",
             ]
             campos_bd = [
-                "id_pedido", "cliente", "paquete",
-                "fecha", "monto", "estado",
-                "val_trato", "val_transporte",
-                "val_alojamiento", "val_general",
-                "categoria_reclamacion",
+                "id_pedido", "cliente", "paquete", "fecha", "monto", "estado", "val_trato", "val_transporte", "val_alojamiento", "val_general", "categoria_reclamacion",
             ]
 
             with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
@@ -239,6 +235,36 @@ class ControladorOperador:
 
         except Exception as exc:
             return False, f"Error al exportar: {exc}"
+    
+    # -------------- FEEDBACK ------------------
+    def obtener_feedbacks(self) -> list[dict]:
+        return self._feed.obtener_todos()
+    
+    def buscar_feedbacks(self, texto="", paquete="") -> list[dict]:
+        return self._feed.buscar(texto=texto, paquete=paquete)
+
+    def obtener_paquetes_con_feedback(self) -> list[str]:
+        return self._feed.obtener_paquetes_con_feedback()
+
+    # -------------- RECLAMACIONES ------------------
+
+    def obtener_reclamaciones(self) -> list[dict]:
+            return self._rec.obtener_todas()
+
+    def buscar_reclamaciones(self, texto="", categoria="", estado="") -> list[dict]:
+        return self._rec.buscar(texto=texto, categoria=categoria, estado=estado)
+
+    def cambiar_estado_reclamacion(self, reclamacion_id: int,
+                                    nuevo_estado: str) -> tuple[bool, str]:
+        estados_validos = {
+            "Registrada", "En revisión", "En gestión", "Resuelta", "Rechazada", "Cerrada",
+        }
+        if nuevo_estado not in estados_validos:
+            return False, f"Estado '{nuevo_estado}' no reconocido."
+        ok = self._rec.actualizar_estado(reclamacion_id, nuevo_estado)
+        if not ok:
+            return False, "Error al actualizar el estado en la base de datos."
+        return True, f"Estado actualizado a '{nuevo_estado}'."
 
     # Helpers privados
 
@@ -249,7 +275,7 @@ class ControladorOperador:
             "Últimos 30 días": hoy - timedelta(days=30),
             "Últimos 3 meses": hoy - timedelta(days=90),
             "Últimos 6 meses": hoy - timedelta(days=180),
-            "Este año":        date(hoy.year, 1, 1),
+            "Este año": date(hoy.year, 1, 1),
         }
         return mapping.get(periodo)
 
