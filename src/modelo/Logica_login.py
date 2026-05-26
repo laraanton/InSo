@@ -8,7 +8,7 @@ class BussinessObject():
         if not email or not password:
             return None, "Email y contraseña obligatorios"
 
-        if email in self._intentos and self._intentos[email] >= 2:
+        if email in self._intentos and self._intentos[email] >= 5:
             return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
     
         loginVO = LoginVO(email, password)
@@ -19,7 +19,7 @@ class BussinessObject():
                 self._intentos[email] += 1
             else:
                 self._intentos[email] = 1
-                if self._intentos[email] >= 2:
+                if self._intentos[email] >= 5:
                     return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
             return None, "Credenciales incorrectas"
 
