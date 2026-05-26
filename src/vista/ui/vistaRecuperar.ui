@@ -24,13 +24,15 @@
      <layout class="QHBoxLayout" name="horizontalLayout_2">
       <item>
        <widget class="QWidget" name="widget" native="true">
+
+        <!-- Tarjeta blanca central -->
         <widget class="QWidget" name="widget_2" native="true">
          <property name="geometry">
           <rect>
            <x>9</x>
            <y>230</y>
            <width>531</width>
-           <height>440</height>
+           <height>480</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -62,7 +64,7 @@
           </property>
          </widget>
 
-         <!-- Input Email -->
+         <!-- Input: Email -->
          <widget class="QLineEdit" name="in_email">
           <property name="geometry">
            <rect>
@@ -92,7 +94,7 @@ QLineEdit:focus {
           </property>
          </widget>
 
-         <!-- Input DNI -->
+         <!-- Input: DNI -->
          <widget class="QLineEdit" name="in_dni">
           <property name="geometry">
            <rect>
@@ -122,7 +124,7 @@ QLineEdit:focus {
           </property>
          </widget>
 
-         <!-- Input Nueva Contraseña -->
+         <!-- Input: Nueva contraseña -->
          <widget class="QLineEdit" name="in_nueva_contrasena">
           <property name="geometry">
            <rect>
@@ -155,7 +157,7 @@ QLineEdit:focus {
           </property>
          </widget>
 
-         <!-- Input Confirmar Nueva Contraseña -->
+         <!-- Input: Confirmar nueva contraseña -->
          <widget class="QLineEdit" name="in_confirmar">
           <property name="geometry">
            <rect>
@@ -188,7 +190,7 @@ QLineEdit:focus {
           </property>
          </widget>
 
-         <!-- Botón Actualizar -->
+         <!-- Botón: Actualizar contraseña -->
          <widget class="QPushButton" name="botonRecuperar">
           <property name="geometry">
            <rect>
@@ -221,9 +223,47 @@ QPushButton:pressed {
           </property>
          </widget>
 
+         <!-- Botón: Volver al login -->
+         <widget class="QPushButton" name="botonVolver">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>415</y>
+            <width>371</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton {
+	background-color: transparent;
+	color: rgb(29, 147, 197);
+	font-size: 13px;
+	font-weight: 400;
+	border: none;
+	border-radius: 8px;
+	padding: 6px;
+}
+QPushButton:hover {
+	color: rgb(24, 95, 165);
+	text-decoration: underline;
+}
+QPushButton:pressed {
+	color: rgb(12, 68, 124);
+}</string>
+          </property>
+          <property name="text">
+           <string>← Volver al inicio de sesión</string>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
+          </property>
+         </widget>
+
         </widget>
        </widget>
       </item>
+
+      <!-- Espaciador derecho -->
       <item>
        <widget class="QWidget" name="widget_3" native="true"/>
       </item>
