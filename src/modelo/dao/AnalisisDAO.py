@@ -16,7 +16,6 @@ Esquema real (extraído del CREATE TABLE):
                          val_satisfaccion_alojamiento, val_general
                          (NO existe columna 'puntuacion')
     Clientes_Perfiles  → PK: usuario_id  (NO existe columna 'perfil_id')
-                         perfil_viajero, preferencia_accesibilidad,
                          presupuesto_promedio
 """
 
@@ -28,10 +27,7 @@ from src.modelo.conexion.Conexion import Conexion
 
 class AnalisisDAO(Conexion):
 
-    # ════════════════════════════════════════════════════════════════════
     # KPIs  –  cuatro cifras de cabecera
-    # ════════════════════════════════════════════════════════════════════
-
     def kpis_resumen(self, fecha_desde: date | None = None) -> dict:
         """
         Devuelve un único dict con los cuatro KPI de cabecera:
@@ -46,7 +42,7 @@ class AnalisisDAO(Conexion):
         try:
             cursor = self.getCursor()
 
-            # ── Ingresos y pedidos ────────────────────────────────────────
+            # ── Ingresos y pedidos 
             params1 = []
             where1  = self._where_fecha("fecha_pedido", fecha_desde, params1)
             cursor.execute(f"""
@@ -57,7 +53,7 @@ class AnalisisDAO(Conexion):
             """, params1)
             row_pv = cursor.fetchone()
 
-            # ── Satisfacción media (val_general de Feedback_Clientes) ─────
+            # ── Satisfacción media (val_general de Feedback_Clientes) 
             # JOIN con Pedidos_Viajes para aplicar el filtro de fecha
             params2 = []
             join2   = "JOIN Pedidos_Viajes pv ON fc.pedido_id = pv.pedido_id"
@@ -70,7 +66,7 @@ class AnalisisDAO(Conexion):
             """, params2)
             row_fc = cursor.fetchone()
 
-            # ── Reclamaciones ─────────────────────────────────────────────
+            # ── Reclamaciones 
             params3 = []
             join3   = "JOIN Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id"
             where3  = self._where_fecha("pv.fecha_pedido", fecha_desde, params3)
@@ -83,9 +79,9 @@ class AnalisisDAO(Conexion):
             row_rc = cursor.fetchone()
 
             return {
-                "ingresos_totales":    float(row_pv[0]) if row_pv and row_pv[0] is not None else None,
-                "total_pedidos":       int(row_pv[1])   if row_pv and row_pv[1] is not None else 0,
-                "satisfaccion_media":  float(row_fc[0]) if row_fc and row_fc[0] is not None else None,
+                "ingresos_totales": float(row_pv[0]) if row_pv and row_pv[0] is not None else None,
+                "total_pedidos": int(row_pv[1])   if row_pv and row_pv[1] is not None else 0,
+                "satisfaccion_media": float(row_fc[0]) if row_fc and row_fc[0] is not None else None,
                 "total_reclamaciones": int(row_rc[0])   if row_rc and row_rc[0] is not None else 0,
             }
         except Exception as e:
@@ -95,10 +91,8 @@ class AnalisisDAO(Conexion):
                 "satisfaccion_media": None, "total_reclamaciones": 0,
             }
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 1  –  Ventas por paquete (barras)
+    # GRAFICO 1:  Ventas por paquete (barras)
     # Tablas: Pedidos_Viajes JOIN Paquetes_Turisticos
-    # ════════════════════════════════════════════════════════════════════
 
     def ventas_por_paquete(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -129,10 +123,9 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en ventas_por_paquete: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 2  –  Ingresos por mes (línea)
+
+    # GRAFICO 2: Ingresos por mes (línea)
     # Tabla: Pedidos_Viajes.fecha_pedido + monto_total
-    # ════════════════════════════════════════════════════════════════════
 
     def ingresos_por_mes(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -172,10 +165,8 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en ingresos_por_mes: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 3  –  Distribución de estados de pedido (tarta)
+    # GRAFICO 3: Distribución de estados de pedido (tarta)
     # Tabla: Pedidos_Viajes.estado_pedido
-    # ════════════════════════════════════════════════════════════════════
 
     def distribucion_estados(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -205,12 +196,9 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en distribucion_estados: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 4  –  Satisfacción media por paquete (barras horizontales)
+    # GRAFICO 4: Satisfacción media por paquete (barras horizontales)
     # Tablas: Feedback_Clientes JOIN Pedidos_Viajes JOIN Paquetes_Turisticos
-    # Columnas usadas: val_trato_operador, val_calidad_transporte,
-    #                  val_satisfaccion_alojamiento, val_general
-    # ════════════════════════════════════════════════════════════════════
+    # Columnas usadas: val_trato_operador, val_calidad_transporte, val_satisfaccion_alojamiento, val_general
 
     def satisfaccion_por_paquete(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -247,10 +235,8 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en satisfaccion_por_paquete: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 5  –  Reclamaciones por categoría (barras)
+    # GRAFICO 5:  Reclamaciones por categoría (barras)
     # Tabla: Reclamaciones.categoria JOIN Pedidos_Viajes (filtro fecha)
-    # ════════════════════════════════════════════════════════════════════
 
     def reclamaciones_por_categoria(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -281,15 +267,13 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en reclamaciones_por_categoria: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Gráfico 6  –  Perfil de viajero más común (tarta)
+    # GRAFICO 6:  Perfil de viajero más común (tarta)
     # Tabla: Clientes_Perfiles  –  PK: usuario_id  (no perfil_id)
     # Sin filtro de fecha (dato de perfil, no transaccional)
-    # ════════════════════════════════════════════════════════════════════
 
     def distribucion_perfiles(self) -> list[dict]:
         """
-        Cuenta de clientes por Clientes_Perfiles.perfil_viajero.
+        Cuenta de clientes por Clientes_Perfiles.presupuesto_promedio.
         No filtra por fecha: el perfil es un atributo estático del cliente.
 
         Retorna: [{"perfil": str, "cantidad": int}, ...]
@@ -297,24 +281,23 @@ class AnalisisDAO(Conexion):
         try:
             cursor = self.getCursor()
             cursor.execute("""
-                SELECT   perfil_viajero,
-                         COUNT(usuario_id) AS cantidad
+                SELECT   presupuesto_promedio,
+                        COUNT(usuario_id) AS cantidad
                 FROM     Clientes_Perfiles
-                GROUP BY perfil_viajero
+                GROUP BY presupuesto_promedio
                 ORDER BY cantidad DESC
             """)
 
             return [
-                {"perfil": row[0] or "Sin perfil", "cantidad": int(row[1])}
+                {"perfil": str(row[0]) if row[0] is not None else "Sin presupuesto", "cantidad": int(row[1])}
                 for row in cursor.fetchall()
             ]
         except Exception as e:
             print(f"[AnalisisDAO] Error en distribucion_perfiles: {e}")
             return []
+        
 
-    # ════════════════════════════════════════════════════════════════════
     # Exportación CSV  –  usado por ControladorOperador.exportar_analisis()
-    # ════════════════════════════════════════════════════════════════════
 
     def exportar_resumen(self, fecha_desde: date | None = None) -> list[dict]:
         """
@@ -390,9 +373,7 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en exportar_resumen: {e}")
             return []
 
-    # ════════════════════════════════════════════════════════════════════
-    # Helper privado de filtrado por fecha
-    # ════════════════════════════════════════════════════════════════════
+    # Helper privado para filtrar por fecha
 
     @staticmethod
     def _where_fecha(columna: str, fecha_desde: date | None,
