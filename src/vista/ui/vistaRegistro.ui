@@ -363,7 +363,7 @@ QComboBox QAbstractItemView {
           <property name="geometry">
            <rect>
             <x>70</x>
-            <y>620</y>
+            <y>595</y>
             <width>371</width>
             <height>28</height>
            </rect>
@@ -390,7 +390,41 @@ QPushButton:pressed {
            <string>Registrarse</string>
           </property>
          </widget>
-
+        <!-- Botón Volver al Login -->
+        <widget class="QPushButton" name="botonVolver">
+        <property name="geometry">
+        <rect>
+        <x>70</x>
+        <y>635</y>
+        <width>371</width>
+        <height>28</height>
+        </rect>
+        </property>
+        <property name="styleSheet">
+        <string notr="true">QPushButton {
+            background-color: transparent;
+            color: rgb(29, 147, 197);
+            font-size: 13px;
+            font-weight: 400;
+            border: none;
+            border-radius: 8px;
+            padding: 6px;
+        }
+        QPushButton:hover {
+            color: rgb(24, 95, 165);
+            text-decoration: underline;
+        }
+        QPushButton:pressed {
+            color: rgb(12, 68, 124);
+        }</string>
+        </property>
+        <property name="text">
+        <string>← Volver al inicio de sesión</string>
+        </property>
+        <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        </widget>
         </widget>
        </widget>
       </item>
