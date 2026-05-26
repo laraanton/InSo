@@ -1,15 +1,3 @@
-"""
-VentanaCompra.py  Vista de Gestión de Compra / Reservas (Req_25, Req_26)
-============================================================================
-Responsabilidad: mostrar reservas, filtrarlas, cambiar su estado y exportar.
-Toda la lógica de datos pasa por ControladorOperador.
-
-Widgets del .ui que usa esta vista:
-    tablaReservas (QTableWidget, 7 columnas),
-    inputBuscar, comboEstado, lblEstado,
-    btnNuevaReserva, btnExportar
-"""
-
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import (
@@ -134,6 +122,7 @@ class VentanaCompra(QWidget):
         if estado_actual in ESTADOS:
             combo.setCurrentIndex(ESTADOS.index(estado_actual))
         combo.setFixedWidth(170)
+        combo.wheelEvent = lambda event: None
 
         combo.currentTextChanged.connect(
             lambda nuevo, pid=id_pedido, f=fila: self._cambiar_estado(pid, nuevo, f)
