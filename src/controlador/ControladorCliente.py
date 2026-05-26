@@ -59,12 +59,27 @@ class ControladorCliente:
 
     # ── Paquetes ─────────────────────────────────────────────────────────────
 
+    def ver_pedido(self, pedido_id: int):
+        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje
+        pedidos = PedidoDAO().obtener_por_cliente(self.user.usuario_id)
+
+        pedido = next((p for p in pedidos if p["pedido_id"] == pedido_id), None)
+        if not pedido:
+            return
+        
+        self.ventana_detalle = VentanaDetalleMViaje(self.user, pedido)
+        self.ventana_detalle.show()
+        self._ocultar_todas_menos(self.ventana_detalle)
+    
+    
     def ver_paquete(self, paquete_id: int):
         from src.modelo.dao.PaqueteDAO import PaqueteDAO
         from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
+
         paquete = PaqueteDAO().obtener_por_id(paquete_id)
         if not paquete:
             return
+
         self.ventana_detalle = VentanaDetallePaquete(self.user, paquete)
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
