@@ -2,13 +2,12 @@ import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5 import uic
 
-from src.modelo.dao.AdminDAO import AdminDAO
-from src.vista.PageDashboard  import PageDashboard
-from src.vista.PageOperadores import PageOperadores
-from src.vista.PageUsuarios   import PageUsuarios
-from src.vista.PageActividad  import PageActividad
-from src.vista.PageSistema    import PageSistema
-from src.vista.SOFTRIP_STYLE  import SOFTRIP_STYLE 
+from src.controlador.ControladorAdmin import ControladorAdmin
+from src.vista.VentanaDashboard_admin  import VentanaDashboard_admin
+from src.vista.VentanaOperadores_admin import VentanaOperadores_admin
+from src.vista.VentanaUsuarios_admin   import VentanaUsuarios_admin
+from src.vista.VentanaActividad_admin  import VentanaActividad_admin
+from src.vista.VentanaSistema_admin    import VentanaSistema_admin
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAdmin.ui")
 
@@ -32,16 +31,17 @@ class VentanaAdmin(QMainWindow, Form):
     def __init__(self, usuario_actual):
         super().__init__()
         self.setupUi(self)
-        self.setStyleSheet(SOFTRIP_STYLE)   
         self.usuario_actual = usuario_actual
-        self.dao = AdminDAO()
+
+        # El controlador centraliza el acceso al DAO
+        self.controlador = ControladorAdmin(usuario_actual)
 
         self._pages = {
-            PAGE_DASHBOARD:  PageDashboard(self.dao, usuario_actual),
-            PAGE_OPERADORES: PageOperadores(self.dao, usuario_actual),
-            PAGE_USUARIOS:   PageUsuarios(self.dao, usuario_actual),
-            PAGE_ACTIVIDAD:  PageActividad(self.dao, usuario_actual),
-            PAGE_SISTEMA:    PageSistema(self.dao, usuario_actual),
+            PAGE_DASHBOARD:  VentanaDashboard_admin(self.controlador),
+            PAGE_OPERADORES: VentanaOperadores_admin(self.controlador),
+            PAGE_USUARIOS:   VentanaUsuarios_admin(self.controlador),
+            PAGE_ACTIVIDAD:  VentanaActividad_admin(self.controlador),
+            PAGE_SISTEMA:    VentanaSistema_admin(self.controlador),
         }
 
         for idx in sorted(self._pages.keys()):
@@ -50,8 +50,6 @@ class VentanaAdmin(QMainWindow, Form):
         self._configurar_topbar()
         self._conectar_senales()
         self._navegar(PAGE_DASHBOARD)
-
-   
 
     def _configurar_topbar(self):
         nombre  = self.usuario_actual.nombre_completo or "Admin"
@@ -72,9 +70,8 @@ class VentanaAdmin(QMainWindow, Form):
             lambda: self._navegar(PAGE_ACTIVIDAD)
         )
 
-
     def _navegar(self, pagina):
-        self.stackedWidget.setCurrentWidget(self._pages[pagina])  # usar widget, no índice
+        self.stackedWidget.setCurrentWidget(self._pages[pagina])
         self.pageTitle.setText(_TITULOS[pagina][0])
         self.pageBreadcrumb.setText(_TITULOS[pagina][1])
 
@@ -92,7 +89,6 @@ class VentanaAdmin(QMainWindow, Form):
 
         self._pages[pagina].cargar()
 
-  
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
             self, "Cerrar sesión",
