@@ -12,6 +12,9 @@ class VentanaRegistro(QMainWindow, Form):
     self.logica = BussinessObject()
 
     self.botonRegistrar.clicked.connect(self.on_registrar)
+    self.botonVolver.clicked.connect(self.volver_al_login)
+    self.in_preferencia.wheelEvent = lambda event: None 
+    self.in_accesibilidad.wheelEvent = lambda event: None
     self.in_dni.returnPressed.connect(lambda: self.in_nombre.setFocus())
     self.in_nombre.returnPressed.connect(lambda: self.in_email.setFocus())
     self.in_email.returnPressed.connect(lambda: self.in_telefono.setFocus())
