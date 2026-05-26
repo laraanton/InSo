@@ -1,7 +1,7 @@
 """
 AnalisisDAO.py  –  Consultas de análisis y estadísticas de venta
 ================================================================
-Hereda de Conexion.  Solo lectura: no modifica ninguna tabla.
+Hereda de Conexion.
 
 Tablas consultadas:
     Pedidos_Viajes          (pv)
@@ -11,12 +11,12 @@ Tablas consultadas:
     Clientes_Perfiles       (cp)
     Usuarios                (u)
 
-Esquema real (extraído del CREATE TABLE):
+Esquema BD:
     Feedback_Clientes  → val_trato_operador, val_calidad_transporte,
                          val_satisfaccion_alojamiento, val_general
-                         (NO existe columna 'puntuacion')
-    Clientes_Perfiles  → PK: usuario_id  (NO existe columna 'perfil_id')
-                         presupuesto_promedio
+    Clientes_Perfiles  → PK: usuario_id, presupuesto_promedio
+    Usuarios           → preferencia IN ('General', 'Familiar', 'Jubilado',
+                                         'Movilidad Reducida', 'Escolar')
 """
 
 from __future__ import annotations
@@ -32,17 +32,17 @@ class AnalisisDAO(Conexion):
         """
         Devuelve un único dict con los cuatro KPI de cabecera:
 
-            ingresos_totales    float | None
-            total_pedidos       int
+            ingresos_totales (suma de todos los pedidos) float | None
+            total_pedidos (num) int
             satisfaccion_media  float | None   (media de val_general, escala 1-5)
-            total_reclamaciones int
+            total_reclamaciones (num) int
 
-        Tablas: Pedidos_Viajes, Feedback_Clientes, Reclamaciones
+        Tablas: Pedidos_Viajes (1 y 2), Feedback_Clientes, Reclamaciones
         """
         try:
             cursor = self.getCursor()
 
-            # ── Ingresos y pedidos 
+            # ── Ingresos y pedidos
             params1 = []
             where1  = self._where_fecha("fecha_pedido", fecha_desde, params1)
             cursor.execute(f"""
@@ -53,7 +53,7 @@ class AnalisisDAO(Conexion):
             """, params1)
             row_pv = cursor.fetchone()
 
-            # ── Satisfacción media (val_general de Feedback_Clientes) 
+            # ── Satisfacción media (val_general de Feedback_Clientes)
             # JOIN con Pedidos_Viajes para aplicar el filtro de fecha
             params2 = []
             join2   = "JOIN Pedidos_Viajes pv ON fc.pedido_id = pv.pedido_id"
@@ -66,7 +66,7 @@ class AnalisisDAO(Conexion):
             """, params2)
             row_fc = cursor.fetchone()
 
-            # ── Reclamaciones 
+            # ── Reclamaciones
             params3 = []
             join3   = "JOIN Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id"
             where3  = self._where_fecha("pv.fecha_pedido", fecha_desde, params3)
@@ -79,9 +79,9 @@ class AnalisisDAO(Conexion):
             row_rc = cursor.fetchone()
 
             return {
-                "ingresos_totales": float(row_pv[0]) if row_pv and row_pv[0] is not None else None,
-                "total_pedidos": int(row_pv[1])   if row_pv and row_pv[1] is not None else 0,
-                "satisfaccion_media": float(row_fc[0]) if row_fc and row_fc[0] is not None else None,
+                "ingresos_totales":    float(row_pv[0]) if row_pv and row_pv[0] is not None else None,
+                "total_pedidos":       int(row_pv[1])   if row_pv and row_pv[1] is not None else 0,
+                "satisfaccion_media":  float(row_fc[0]) if row_fc and row_fc[0] is not None else None,
                 "total_reclamaciones": int(row_rc[0])   if row_rc and row_rc[0] is not None else 0,
             }
         except Exception as e:
@@ -98,7 +98,7 @@ class AnalisisDAO(Conexion):
         """
         Número de pedidos agrupado por nombre de paquete, de mayor a menor.
 
-        Retorna: [{"paquete": str, "ventas": int}, ...]
+        Retorna: [{"paquete" (nombre): str, "ventas"(num): int}, ...]
         """
         try:
             cursor = self.getCursor()
@@ -123,7 +123,6 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en ventas_por_paquete: {e}")
             return []
 
-
     # GRAFICO 2: Ingresos por mes (línea)
     # Tabla: Pedidos_Viajes.fecha_pedido + monto_total
 
@@ -135,9 +134,8 @@ class AnalisisDAO(Conexion):
         Retorna: [{"mes": str, "total": float}, ...]
         """
         _MESES = {
-            1: "Ene", 2: "Feb", 3: "Mar", 4: "Abr",
-            5: "May", 6: "Jun", 7: "Jul", 8: "Ago",
-            9: "Sep", 10: "Oct", 11: "Nov", 12: "Dic",
+            1: "Ene", 2: "Feb", 3: "Mar", 4: "Abr", 5: "May", 6: "Jun",
+            7: "Jul", 8: "Ago", 9: "Sep", 10: "Oct", 11: "Nov", 12: "Dic",
         }
         try:
             cursor = self.getCursor()
@@ -198,12 +196,10 @@ class AnalisisDAO(Conexion):
 
     # GRAFICO 4: Satisfacción media por paquete (barras horizontales)
     # Tablas: Feedback_Clientes JOIN Pedidos_Viajes JOIN Paquetes_Turisticos
-    # Columnas usadas: val_trato_operador, val_calidad_transporte, val_satisfaccion_alojamiento, val_general
 
     def satisfaccion_por_paquete(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Media de val_general agrupada por nombre de paquete, de mayor a menor.
-        Se usa val_general como puntuación global del viaje.
 
         Retorna: [{"paquete": str, "media": float}, ...]
         """
@@ -267,45 +263,59 @@ class AnalisisDAO(Conexion):
             print(f"[AnalisisDAO] Error en reclamaciones_por_categoria: {e}")
             return []
 
-    # GRAFICO 6:  Perfil de viajero más común (tarta)
-    # Tabla: Clientes_Perfiles  –  PK: usuario_id  (no perfil_id)
-    # Sin filtro de fecha (dato de perfil, no transaccional)
+    # GRAFICO 6:  Presupuesto medio por preferencia de viajero (barras horizontales)
+    # Tablas: Clientes_Perfiles JOIN Usuarios
+    # Agrupa por Usuarios.preferencia y calcula la media de presupuesto_promedio
+    # Sin filtro de fecha: el perfil es un atributo estático del cliente
 
     def distribucion_perfiles(self) -> list[dict]:
         """
-        Cuenta de clientes por Clientes_Perfiles.presupuesto_promedio.
+        Media de presupuesto_promedio agrupada por Usuarios.preferencia,
+        de mayor a menor presupuesto.
         No filtra por fecha: el perfil es un atributo estático del cliente.
 
-        Retorna: [{"perfil": str, "cantidad": int}, ...]
+        Valores posibles de preferencia:
+            'General', 'Familiar', 'Jubilado', 'Movilidad Reducida', 'Escolar'
+
+        Retorna: [
+            {
+                "perfil":            str,    # valor de preferencia
+                "media_presupuesto": float,  # media del presupuesto_promedio
+                "cantidad":          int,    # número de clientes en ese grupo
+            },
+            ...
+        ]
         """
         try:
             cursor = self.getCursor()
             cursor.execute("""
-                SELECT   presupuesto_promedio,
-                        COUNT(usuario_id) AS cantidad
-                FROM     Clientes_Perfiles
-                GROUP BY presupuesto_promedio
-                ORDER BY cantidad DESC
+                SELECT   u.preferencia,
+                         AVG(CAST(cp.presupuesto_promedio AS FLOAT)) AS media_presupuesto,
+                         COUNT(cp.usuario_id)                        AS cantidad
+                FROM     Clientes_Perfiles cp
+                JOIN     Usuarios          u  ON cp.usuario_id = u.usuario_id
+                WHERE    u.preferencia IS NOT NULL
+                GROUP BY u.preferencia
+                ORDER BY media_presupuesto DESC
             """)
 
             return [
-                {"perfil": str(row[0]) if row[0] is not None else "Sin presupuesto", "cantidad": int(row[1])}
+                {
+                    "perfil":            row[0] or "General",
+                    "media_presupuesto": round(float(row[1]), 2) if row[1] is not None else 0.0,
+                    "cantidad":          int(row[2]),
+                }
                 for row in cursor.fetchall()
             ]
         except Exception as e:
             print(f"[AnalisisDAO] Error en distribucion_perfiles: {e}")
             return []
-        
 
     # Exportación CSV  –  usado por ControladorOperador.exportar_analisis()
 
     def exportar_resumen(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Una fila por pedido con datos del pedido + valoración + reclamación.
-
-        Columnas de Feedback_Clientes usadas:
-            val_trato_operador, val_calidad_transporte,
-            val_satisfaccion_alojamiento, val_general
 
         Retorna: [
             {
@@ -381,10 +391,6 @@ class AnalisisDAO(Conexion):
         """
         Devuelve "WHERE <columna> >= ?" y añade la fecha a params,
         o cadena vacía si fecha_desde es None.
-
-        La columna debe incluir alias de tabla cuando sea necesario
-        para evitar ambigüedad en queries con JOINs,
-        p.ej. "pv.fecha_pedido" en lugar de solo "fecha_pedido".
         """
         if fecha_desde is None:
             return ""
