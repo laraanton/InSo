@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>VentanaDetallePedido</class>
+ <widget class="QMainWindow" name="VentanaDetallePedido">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>1280</width><height>720</height></rect>
+  </property>
+  <property name="minimumSize"><size><width>1280</width><height>720</height></size></property>
+  <property name="maximumSize"><size><width>1280</width><height>720</height></size></property>
+  <property name="windowTitle"><string>Detalle del viaje</string></property>
+  <property name="styleSheet">
+   <string>
+QMainWindow, QWidget#centralwidget { background-color: #F5F3EF; font-family: "Segoe UI", sans-serif; }
+QWidget#panel_izquierdo { background-color: #FFFFFF; border-right: 1px solid #E0DDD7; }
+QWidget#panel_derecho { background-color: #FAF9F6; }
+QWidget#topbar { background-color: #FFFFFF; border-bottom: 1px solid #E0DDD7; }
+QPushButton#btn_volver {
+    background-color: #FFFFFF; border: 1px solid #D4D0C8;
+    border-radius: 8px; padding: 6px 16px; font-size: 13px; color: #2C2A27;
+}
+QPushButton#btn_volver:hover { background-color: #F0EDE7; }
+QLabel#lbl_breadcrumb_sep { color: #C0BDB7; font-size: 13px; }
+QLabel#lbl_breadcrumb_actual { color: #2C2A27; font-size: 13px; font-weight: 600; }
+QWidget#icono_destino { background-color: #EBE8E1; border-radius: 12px; }
+QLabel#lbl_nombre_paquete { font-size: 26px; font-weight: 700; color: #1A1917; }
+QLabel#lbl_meta { font-size: 13px; color: #6B6860; }
+QWidget#chip_frame, QWidget#chip_frame_acc, QWidget#chip_frame_perfil {
+    background-color: #F0EDE7; border-radius: 16px; border: 1px solid #E0DDD7;
+}
+QLabel#chip_label { font-size: 12px; color: #4A4845; padding: 4px 10px; }
+QWidget#stats_box_noches, QWidget#stats_box_precio, QWidget#stats_box_total,
+QWidget#stats_box_estado, QWidget#stats_box_pago {
+    background-color: #F5F3EF; border-radius: 10px; border: 1px solid #E0DDD7;
+}
+QLabel#stat_valor { font-size: 18px; font-weight: 700; color: #1A1917; }
+QLabel#stat_label { font-size: 11px; color: #9A9690; }
+QLabel#lbl_desc_titulo { font-size: 10px; font-weight: 700; color: #9A9690; letter-spacing: 2px; }
+QLabel#lbl_descripcion { font-size: 13px; color: #4A4845; }
+QWidget#info_box {
+    background-color: #FFFFFF; border-radius: 10px; border: 1px solid #E0DDD7;
+}
+QLabel#info_titulo { font-size: 18px; font-weight: 700; color: #1A1917; }
+QLabel#info_campo { font-size: 12px; color: #6B6860; font-weight: 500; }
+QLabel#info_valor { font-size: 15px; color: #1A1917; font-weight: 600; }
+QLabel#lbl_estado_badge {
+    font-size: 12px; font-weight: 600; padding: 4px 14px;
+    border-radius: 12px; background-color: #E8F5E9; color: #2E7D32;
+}
+QFrame#sep_vertical { background-color: #E0DDD7; }
+   </string>
+  </property>
+
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QVBoxLayout" name="main_vbox">
+    <property name="spacing"><number>0</number></property>
+    <property name="leftMargin"><number>0</number></property>
+    <property name="topMargin"><number>0</number></property>
+    <property name="rightMargin"><number>0</number></property>
+    <property name="bottomMargin"><number>0</number></property>
+
+    <item>
+     <widget class="QWidget" name="topbar">
+      <property name="minimumHeight"><number>52</number></property>
+      <property name="maximumHeight"><number>52</number></property>
+      <layout class="QHBoxLayout" name="topbar_hbox">
+       <property name="leftMargin"><number>20</number></property>
+       <property name="rightMargin"><number>20</number></property>
+       <property name="topMargin"><number>0</number></property>
+       <property name="bottomMargin"><number>0</number></property>
+       <property name="spacing"><number>12</number></property>
+       <item>
+        <widget class="QPushButton" name="btn_volver">
+         <property name="text"><string>← Mis viajes</string></property>
+         <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_breadcrumb_sep">
+         <property name="text"><string>/</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QLabel" name="lbl_breadcrumb_actual">
+         <property name="text"><string>Detalle del viaje</string></property>
+        </widget>
+       </item>
+       <item>
+        <spacer>
+         <property name="orientation"><enum>Qt::Horizontal</enum></property>
+         <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+    <item>
+     <layout class="QHBoxLayout" name="body_hbox">
+      <property name="spacing"><number>0</number></property>
+      <property name="leftMargin"><number>0</number></property>
+      <property name="topMargin"><number>0</number></property>
+      <property name="rightMargin"><number>0</number></property>
+      <property name="bottomMargin"><number>0</number></property>
+
+      <item>
+       <widget class="QWidget" name="panel_izquierdo">
+        <property name="minimumWidth"><number>680</number></property>
+        <layout class="QVBoxLayout" name="izq_vbox">
+         <property name="leftMargin"><number>48</number></property>
+         <property name="topMargin"><number>36</number></property>
+         <property name="rightMargin"><number>48</number></property>
+         <property name="bottomMargin"><number>36</number></property>
+         <property name="spacing"><number>20</number></property>
+
+         <item>
+          <layout class="QHBoxLayout" name="header_hbox">
+           <property name="spacing"><number>16</number></property>
+           <item>
+            <widget class="QWidget" name="icono_destino">
+             <property name="minimumSize"><size><width>60</width><height>60</height></size></property>
+             <property name="maximumSize"><size><width>60</width><height>60</height></size></property>
+            </widget>
+           </item>
+           <item>
+            <layout class="QVBoxLayout" name="titulo_vbox">
+             <property name="spacing"><number>4</number></property>
+             <item>
+              <widget class="QLabel" name="lbl_nombre_paquete">
+               <property name="text"><string>Destino · Nombre</string></property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QLabel" name="lbl_meta">
+               <property name="text"><string>Pedido #– · –</string></property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+
+         <item>
+          <layout class="QHBoxLayout" name="chips_hbox">
+           <property name="spacing"><number>8</number></property>
+           <item>
+            <widget class="QWidget" name="chip_frame">
+             <property name="maximumHeight"><number>32</number></property>
+             <layout class="QHBoxLayout">
+              <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QLabel" name="chip_servicios">
+                <property name="text"><string>Servicios</string></property>
+                <property name="objectName"><string>chip_label</string></property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="chip_frame_acc">
+             <property name="maximumHeight"><number>32</number></property>
+             <layout class="QHBoxLayout">
+              <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QLabel" name="chip_metodo_pago">
+                <property name="text"><string>Pago</string></property>
+                <property name="objectName"><string>chip_label</string></property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="chip_frame_perfil">
+             <property name="maximumHeight"><number>32</number></property>
+             <layout class="QHBoxLayout">
+              <property name="leftMargin"><number>0</number></property><property name="topMargin"><number>0</number></property>
+              <property name="rightMargin"><number>0</number></property><property name="bottomMargin"><number>0</number></property>
+              <item>
+               <widget class="QLabel" name="chip_estado">
+                <property name="text"><string>Estado</string></property>
+                <property name="objectName"><string>chip_label</string></property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+
+         <item>
+          <layout class="QHBoxLayout" name="stats_hbox">
+           <property name="spacing"><number>12</number></property>
+           <item>
+            <widget class="QWidget" name="stats_box_noches">
+             <property name="minimumHeight"><number>72</number></property>
+             <layout class="QVBoxLayout">
+              <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>12</number></property>
+              <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>12</number></property>
+              <property name="spacing"><number>2</number></property>
+              <item><widget class="QLabel" name="stat_duracion_val"><property name="text"><string>–</string></property><property name="objectName"><string>stat_valor</string></property></widget></item>
+              <item><widget class="QLabel" name="stat_duracion_lbl"><property name="text"><string>Noches</string></property><property name="objectName"><string>stat_label</string></property></widget></item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="stats_box_precio">
+             <property name="minimumHeight"><number>72</number></property>
+             <layout class="QVBoxLayout">
+              <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>12</number></property>
+              <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>12</number></property>
+              <property name="spacing"><number>2</number></property>
+              <item><widget class="QLabel" name="stat_precio_val"><property name="text"><string>– €</string></property><property name="objectName"><string>stat_valor</string></property></widget></item>
+              <item><widget class="QLabel" name="stat_precio_lbl"><property name="text"><string>Total pagado</string></property><property name="objectName"><string>stat_label</string></property></widget></item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <widget class="QWidget" name="stats_box_total">
+             <property name="minimumHeight"><number>72</number></property>
+             <layout class="QVBoxLayout">
+              <property name="leftMargin"><number>16</number></property><property name="topMargin"><number>12</number></property>
+              <property name="rightMargin"><number>16</number></property><property name="bottomMargin"><number>12</number></property>
+              <property name="spacing"><number>2</number></property>
+              <item><widget class="QLabel" name="stat_total_val"><property name="text"><string>–</string></property><property name="objectName"><string>stat_valor</string></property></widget></item>
+              <item><widget class="QLabel" name="stat_total_lbl"><property name="text"><string>Noches reservadas</string></property><property name="objectName"><string>stat_label</string></property></widget></item>
+             </layout>
+            </widget>
+           </item>
+           <item>
+            <spacer>
+             <property name="orientation"><enum>Qt::Horizontal</enum></property>
+             <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
+            </spacer>
+           </item>
+          </layout>
+         </item>
+
+         <item>
+          <layout class="QVBoxLayout" name="desc_vbox">
+           <property name="spacing"><number>8</number></property>
+           <item><widget class="QLabel" name="lbl_desc_titulo"><property name="text"><string>DESCRIPCIÓN</string></property></widget></item>
+           <item>
+            <widget class="QLabel" name="lbl_descripcion">
+             <property name="text"><string>–</string></property>
+             <property name="wordWrap"><bool>true</bool></property>
+             <property name="alignment"><set>Qt::AlignTop|Qt::AlignLeft</set></property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Vertical</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+          </spacer>
+         </item>
+
+        </layout>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QFrame" name="sep_vertical">
+        <property name="minimumWidth"><number>1</number></property>
+        <property name="maximumWidth"><number>1</number></property>
+        <property name="frameShape"><enum>QFrame::VLine</enum></property>
+       </widget>
+      </item>
+
+      <item>
+       <widget class="QWidget" name="panel_derecho">
+        <layout class="QVBoxLayout" name="der_vbox">
+         <property name="leftMargin"><number>40</number></property>
+         <property name="topMargin"><number>40</number></property>
+         <property name="rightMargin"><number>40</number></property>
+         <property name="bottomMargin"><number>40</number></property>
+         <property name="spacing"><number>20</number></property>
+
+         <item><widget class="QLabel" name="info_titulo"><property name="text"><string>Resumen de tu reserva</string></property></widget></item>
+
+         <item>
+          <widget class="QWidget" name="info_box">
+           <layout class="QVBoxLayout" name="info_vbox">
+            <property name="leftMargin"><number>24</number></property>
+            <property name="topMargin"><number>20</number></property>
+            <property name="rightMargin"><number>24</number></property>
+            <property name="bottomMargin"><number>20</number></property>
+            <property name="spacing"><number>16</number></property>
+
+            <item>
+             <layout class="QHBoxLayout">
+              <item>
+               <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+                <item><widget class="QLabel" name="lbl_campo_inicio"><property name="text"><string>Fecha inicio</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+                <item><widget class="QLabel" name="lbl_val_inicio"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+                <item><widget class="QLabel" name="lbl_campo_fin"><property name="text"><string>Fecha fin</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+                <item><widget class="QLabel" name="lbl_val_fin"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+               </layout>
+              </item>
+             </layout>
+            </item>
+
+            <item>
+             <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+              <item><widget class="QLabel" name="lbl_campo_pago"><property name="text"><string>Método de pago</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+              <item><widget class="QLabel" name="lbl_val_pago"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+             </layout>
+            </item>
+
+            <item>
+             <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+              <item><widget class="QLabel" name="lbl_campo_total"><property name="text"><string>Total pagado</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+              <item><widget class="QLabel" name="lbl_val_total"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+             </layout>
+            </item>
+
+            <item>
+             <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+              <item><widget class="QLabel" name="lbl_campo_estado"><property name="text"><string>Estado del pedido</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+              <item><widget class="QLabel" name="lbl_val_estado"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+             </layout>
+            </item>
+
+            <item>
+             <layout class="QVBoxLayout"><property name="spacing"><number>4</number></property>
+              <item><widget class="QLabel" name="lbl_campo_pedido"><property name="text"><string>Número de pedido</string></property><property name="objectName"><string>info_campo</string></property></widget></item>
+              <item><widget class="QLabel" name="lbl_val_pedido"><property name="text"><string>–</string></property><property name="objectName"><string>info_valor</string></property></widget></item>
+             </layout>
+            </item>
+
+           </layout>
+          </widget>
+         </item>
+
+         <item>
+          <spacer>
+           <property name="orientation"><enum>Qt::Vertical</enum></property>
+           <property name="sizeHint" stdset="0"><size><width>20</width><height>40</height></size></property>
+          </spacer>
+         </item>
+
+        </layout>
+       </widget>
+      </item>
+
+     </layout>
+    </item>
+
+   </layout>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
