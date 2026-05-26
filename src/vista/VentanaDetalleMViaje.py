@@ -1,201 +1,64 @@
-from datetime import date
-
 from PyQt5 import uic
-from PyQt5.QtCore import QDate
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
+from PyQt5.QtWidgets import QMainWindow
 from src.controlador.ControladorCliente import ControladorCliente
 
-Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePaquete.ui")
+Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePedido.ui")
 
 
 class VentanaDetalleMViaje(QMainWindow, Form):
     def __init__(self, user, pedido: dict):
         super().__init__()
-
         self.setupUi(self)
-
         self.user = user
         self.pedido = pedido
         self.controlador = ControladorCliente(user)
         self.controlador.ventana_detalle = self
-
         self._rellenar_datos()
         self._conectar_señales()
 
     def _rellenar_datos(self):
         p = self.pedido
 
-        destino = p.get("destino", "Destino")
+        destino  = p.get("destino", "Destino")
         duracion = p.get("duracion", 0)
-        perfil = p.get("perfil", "General")
-        accesible = "Sí" if p.get("accesibilidad") else "No"
+        servicios   = p.get("servicios", "") or "—"
         descripcion = p.get("descripcion", "Sin descripción")
-        servicios = p.get("servicios", "Servicios incluidos")
-        precio = float(p.get("precio", 0))
+        monto_total = float(p.get("monto_total", 0))
+        metodo_pago = p.get("metodo_pago", "—")
+        estado      = p.get("estado", "—")
+        pedido_id   = p.get("pedido_id", "—")
 
-        self.setWindowTitle(f"Detalle · {destino}")
+        fecha_ini = str(p.get("fecha_inicio", ""))[:10]
+        fecha_fin = str(p.get("fecha_fin", ""))[:10]
 
-        self.lbl_nombre_paquete.setText(
-            f"{destino} · {duracion} noches"
-        )
+        # Formatear fechas DD/MM/YYYY si vienen como YYYY-MM-DD
+        def fmt(f):
+            try:
+                y, m, d = f.split("-")
+                return f"{d}/{m}/{y}"
+            except Exception:
+                return f or "—"
 
-        self.lbl_meta.setText(
-            f"Perfil: {perfil} · Accesible: {accesible}"
-        )
+        self.setWindowTitle(f"Viaje · {destino}")
+        self.lbl_nombre_paquete.setText(f"{destino} · {duracion} noches")
+        self.lbl_meta.setText(f"Pedido #{pedido_id} · {estado}")
 
         self.chip_servicios.setText(servicios)
-        self.chip_accesibilidad.setText(
-            "Accesible" if p.get("accesibilidad") else "No accesible"
-        )
-        self.chip_perfil.setText(perfil)
+        self.chip_metodo_pago.setText(metodo_pago)
+        self.chip_estado.setText(estado)
 
         self.stat_duracion_val.setText(str(duracion))
-        self.stat_precio_val.setText(f"{precio:,.2f} €")
-        self.stat_total_val.setText(f"{precio:,.2f} €")
+        self.stat_precio_val.setText(f"{monto_total:,.2f} €")
+        self.stat_total_val.setText(f"{duracion} noches")
 
-        # ── Descripción
         self.lbl_descripcion.setText(descripcion)
 
-        # ── Fechas por defecto
-        hoy = QDate.currentDate()
-
-        self.dt_inicio.setDate(hoy)
-        self.dt_fin.setDate(hoy.addDays(int(duracion)))
-
-        self._actualizar_total()
+        self.lbl_val_inicio.setText(fmt(fecha_ini))
+        self.lbl_val_fin.setText(fmt(fecha_fin))
+        self.lbl_val_pago.setText(metodo_pago)
+        self.lbl_val_total.setText(f"{monto_total:,.2f} €")
+        self.lbl_val_estado.setText(estado)
+        self.lbl_val_pedido.setText(f"#{pedido_id}")
 
     def _conectar_señales(self):
-        self.dt_inicio.dateChanged.connect(self._actualizar_fecha_fin)
-        self.dt_fin.dateChanged.connect(self._actualizar_total)
-        self.spin_personas.valueChanged.connect(self._actualizar_total)
-        self.btn_confirmar.clicked.connect(self._confirmar)
-        self.btn_volver.clicked.connect(self.controlador.volver_a_principal)
-
-    def _actualizar_fecha_fin(self):
-        duracion = int(self.pedido.get("duracion", 0))
-        nueva_fin = self.dt_inicio.date().addDays(duracion)
-        # Bloquear señal para no disparar _actualizar_total dos veces
-        self.dt_fin.blockSignals(True)
-        self.dt_fin.setDate(nueva_fin)
-        self.dt_fin.blockSignals(False)
-        self._actualizar_total()
-  
-    def _actualizar_total(self):
-
-        try:
-            precio = float(self.pedido.get("precio", 0))
-        except (ValueError, TypeError):
-            precio = 0.0
-
-        personas = self.spin_personas.value()
-
-        total = precio * personas
-
-        self.lbl_total_valor.setText(
-            f"{total:,.2f} €"
-        )
-
-        self.lbl_total_sub.setText(
-            f"{precio:,.2f} € × {personas} persona(s)"
-        )
-
-        self.stat_total_val.setText(
-            f"{total:,.2f} €"
-        )
-
-    def _confirmar(self):
-
-        fecha_ini = self.dt_inicio.date().toPyDate()
-        fecha_fin = self.dt_fin.date().toPyDate()
-        dias_exactos = (fecha_fin - fecha_ini).days
-
-
-        personas = self.spin_personas.value()
-        metodo = self.combo_pago.currentText()
-
-        # ── Validaciones
-
-        if fecha_ini < date.today():
-            QMessageBox.warning(
-                self,
-                "Fecha inválida",
-                "La fecha de inicio no puede ser anterior a hoy.",
-            )
-
-            self.dt_inicio.setFocus()
-            return
-        
-        if dias_exactos != int(self.pedido.get("duracion", 0)):
-            QMessageBox.warning(
-                self,
-                "Duracion",
-                "La duración del paquete no es flexible",
-            )
-            return
-
-        if fecha_fin <= fecha_ini:
-            QMessageBox.warning(
-                self,
-                "Fechas incorrectas",
-                "La fecha de fin debe ser posterior a la de inicio.",
-            )
-
-            self.dt_fin.setFocus()
-            return
-
-        if personas < 1:
-            QMessageBox.warning(
-                self,
-                "Personas",
-                "Debe haber al menos 1 persona.",
-            )
-            return
-
-        try:
-            precio = float(self.pedido.get("precio", 0))
-        except (ValueError, TypeError):
-            precio = 0.0
-        total = precio * personas
-
-        resp = QMessageBox.question(
-            self,
-            "Confirmar reserva",
-            (
-                f"<b>{self.pedido.get('destino')}</b><br><br>"
-                f"Fechas: "
-                f"{fecha_ini.strftime('%d/%m/%Y')} → "
-                f"{fecha_fin.strftime('%d/%m/%Y')}<br>"
-                f"Personas: {personas}<br>"
-                f"Método de pago: {metodo}<br><br>"
-                f"<b>Total: {total:,.2f} €</b><br><br>"
-                f"¿Confirmas la reserva?"
-            ),
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
-        )
-
-        if resp != QMessageBox.Yes:
-            return
-
-        exito, mensaje = self.controlador.comprar_paquete(
-            self.pedido,
-            fecha_ini,
-            fecha_fin,
-            personas,
-            metodo
-        )
-
-        if exito:
-            QMessageBox.information(
-                self,
-                "Reserva confirmada",
-                mensaje
-            )
-            self.close()
-
-        else:
-            QMessageBox.warning(
-                self,
-                "Error en la reserva",
-                mensaje
-            )
+        self.btn_volver.clicked.connect(self.controlador.ir_a_mis_viajes)
