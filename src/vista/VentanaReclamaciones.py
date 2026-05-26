@@ -12,9 +12,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-# El DAO es la capa que habla con la base de datos.
-# Esta clase no sabe SQL; le pide datos al DAO y ya.
-from src.modelo.dao.ReclamacionDAO import ReclamacionDAO
+from src.controlador.ControladorOperador import ControladorOperador
 
 # Ruta absoluta al .ui para que funcione sin importar desde dónde
 # se ejecute el programa (evita el clásico "fichero no encontrado").
@@ -46,7 +44,7 @@ class VentanaReclamaciones(QWidget):
         uic.loadUi(UI_FILE, self)
 
         self.user = user                        # usuario logueado (por si hace falta en el futuro)
-        self._dao = ReclamacionDAO()            # objeto que accede a la BD
+        self._ctrl = ControladorOperador()      # controlador que centraliza la lógica de negocio
         self._reclamaciones: list[dict] = []   # caché local de las reclamaciones cargadas
         self._id_seleccionado: int | None = None  # ID de la fila que el operador tiene seleccionada
 
@@ -88,7 +86,7 @@ class VentanaReclamaciones(QWidget):
         # Avisamos mientras se carga (en BD lentas o remotas esto se nota).
         self._set_estado("Cargando…")
         try:
-            self._reclamaciones = self._dao.obtener_todas()
+            self._reclamaciones = self._ctrl.obtener_reclamaciones()
             self._poblar_tabla(self._reclamaciones)
             self._set_estado(f"{len(self._reclamaciones)} reclamaciones encontradas")
         except Exception as e:
@@ -111,7 +109,7 @@ class VentanaReclamaciones(QWidget):
             estado = ""
 
         try:
-            resultados = self._dao.buscar(texto=texto, categoria=categoria, estado=estado)
+            resultados = self._ctrl.buscar_reclamaciones(texto=texto, categoria=categoria, estado=estado)
             self._poblar_tabla(resultados)
             self._set_estado(f"{len(resultados)} resultado(s)")
         except Exception as e:
@@ -237,17 +235,16 @@ class VentanaReclamaciones(QWidget):
 
         nuevo_estado = self.comboEstadoDetalle.currentText()
 
-        # El DAO devuelve True si la actualización fue bien, False si no.
-        ok = self._dao.actualizar_estado(self._id_seleccionado, nuevo_estado)
+        # El controlador devuelve (True, msg) si la actualización fue bien, (False, msg) si no.
+        ok, msg = self._ctrl.cambiar_estado_reclamacion(self._id_seleccionado, nuevo_estado)
 
         if ok:
-            self._set_estado(f"Estado actualizado a '{nuevo_estado}'")
+            self._set_estado(msg)
             # Recargamos la tabla para que el cambio se refleje de inmediato.
             self._cargar_datos()
         else:
             QMessageBox.warning(
-                self, "Error",
-                "No se pudo actualizar el estado. Inténtalo de nuevo."
+                self, "Error", "No se pudo actualizar el estado. Inténtalo de nuevo."
             )
 
     # ── Helpers 
