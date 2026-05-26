@@ -15,7 +15,7 @@ Gráficos y tablas origen:
     3. Estado de pedidos   (tarta)    → Pedidos_Viajes.estado_pedido
     4. Satisfacción media  (barras h) → Feedback_Clientes + Pedidos_Viajes
     5. Reclamaciones cat.  (barras)   → Reclamaciones.categoria
-    6. Perfil de viajero   (tarta)    → Clientes_Perfiles.perfil_viajero
+    6. Presupuesto por preferencia (barras h) → Clientes_Perfiles + Usuarios.preferencia
 """
 
 import os
@@ -60,13 +60,13 @@ class VentanaAnalisis(QWidget):
         self._conectar_senales()
         self._cargar_datos()
 
-    # ── Señales ────────────────────────────────────────────────────────────
+    # ── Señales 
 
     def _conectar_senales(self):
         self.cbPeriodo.currentIndexChanged.connect(self._cargar_datos)
         self.btnExportar.clicked.connect(self._exportar)
 
-    # ── Carga principal ────────────────────────────────────────────────────
+    # ── Carga principal 
 
     def _cargar_datos(self):
         """Pide los datos al controlador y refresca todos los gráficos."""
@@ -83,7 +83,7 @@ class VentanaAnalisis(QWidget):
         self._poblar_graficos(datos)
         self._set_estado("")
 
-    # ── KPIs ───────────────────────────────────────────────────────────────
+    # ── KPIs 
 
     def _poblar_kpis(self, datos: dict):
         """
@@ -98,7 +98,7 @@ class VentanaAnalisis(QWidget):
         self.kpiValue3.setText(datos.get("kpi_satisf",   "—"))
         self.kpiValue4.setText(datos.get("kpi_reclam",   "—"))
 
-    # ── Gráficos ───────────────────────────────────────────────────────────
+    # ── Gráficos 
 
     def _poblar_graficos(self, datos: dict):
         self._embed_chart(self.chartArea1, self._fig_ventas_paquete, datos)
@@ -127,7 +127,7 @@ class VentanaAnalisis(QWidget):
         layout.addWidget(canvas)
         self._canvases.append(canvas)
 
-    # ── Builders de figuras ────────────────────────────────────────────────
+    # ── Builders de figuras 
 
     @staticmethod
     def _base_fig(nrows=1, ncols=1, height=2.4):
@@ -253,29 +253,51 @@ class VentanaAnalisis(QWidget):
 
     def _fig_perfil_viajero(self, datos: dict) -> Figure:
         """
-        Tarta: distribución de perfiles de viajero.
-        datos["perfil_viajero"] → list[dict] con claves 'perfil', 'cantidad'
+        Barras horizontales: presupuesto medio por preferencia de viajero.
+        datos["perfil_viajero"] → list[dict] con claves:
+            'perfil'            → str   (valor de Usuarios.preferencia)
+            'media_presupuesto' → float (media de Clientes_Perfiles.presupuesto_promedio)
+            'cantidad'          → int   (número de clientes en ese grupo)
+
+        Preferencias posibles: General, Familiar, Jubilado, Movilidad Reducida, Escolar
+        Las barras muestran el presupuesto medio en € y la etiqueta incluye
+        el número de clientes entre paréntesis para dar contexto.
         """
-        fig = Figure(figsize=(4, 2.4), dpi=96, facecolor=_BG)
-        ax  = fig.add_subplot(111)
+        fig = self._base_fig(height=2.4)
+        # Más margen izquierdo para las etiquetas largas ("Movilidad Reducida")
+        fig.subplots_adjust(left=0.28, right=0.95, top=0.88, bottom=0.12)
+        ax = fig.add_subplot(111)
+
         filas = datos.get("perfil_viajero", [])
         if filas:
-            perfiles   = [r["perfil"]   for r in filas]
-            cantidades = [r["cantidad"] for r in filas]
-            wedges, texts, autotexts = ax.pie(
-                cantidades, labels=perfiles, colors=_PALETTE[:len(perfiles)],
-                autopct="%1.0f%%", startangle=140,
-                textprops={"fontsize": 7, "color": _TEXT},
-                wedgeprops={"linewidth": 1, "edgecolor": "white"}
+            preferencias = [r["perfil"]            for r in filas]
+            medias       = [r["media_presupuesto"]  for r in filas]
+            cantidades   = [r["cantidad"]           for r in filas]
+
+            y    = range(len(preferencias))
+            bars = ax.barh(
+                y, medias,
+                color=_PALETTE[:len(preferencias)],
+                height=0.5,
+                zorder=3,
             )
-            for at in autotexts:
-                at.set_fontsize(7)
-                at.set_color("white")
+            ax.set_yticks(y)
+            ax.set_yticklabels(preferencias, fontsize=7)
+
+            # Etiqueta al final de cada barra: "1.250 € (32 clientes)"
+            for bar, media, cantidad in zip(bars, medias, cantidades):
+                ax.text(
+                    bar.get_width() + (max(medias) * 0.02),  # pequeño offset
+                    bar.get_y() + bar.get_height() / 2,
+                    f"{media:,.0f} € ({cantidad})",
+                    va="center", ha="left",
+                    fontsize=6.5, color=_TEXT,
+                )
         else:
             ax.text(0.5, 0.5, "Sin datos", ha="center", va="center",
                     transform=ax.transAxes, color=_GRAY)
-        ax.set_title("Perfil de viajero", fontsize=8, color=_TEXT, pad=6)
-        fig.tight_layout(pad=0.4)
+
+        self._estilizar_ax(ax, "Presupuesto medio por preferencia (€)")
         return fig
 
     # ── Helpers visuales ───────────────────────────────────────────────────
