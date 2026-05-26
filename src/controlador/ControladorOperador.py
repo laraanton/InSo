@@ -89,9 +89,11 @@ class ControladorOperador:
             return False, f"Estado '{nuevo_estado}' no reconocido."
 
         #Evitar problemas en la BD
-        estado_actual = self._res.obtener_estado(id_pedido)
-        if estado_actual == "Finalizado":
-            return False, f"Pedido {id_pedido} ya está finalizado y no se puede modificar."
+        resultados = self._res.buscar(texto=str(id_pedido), estado="")
+        if resultados:
+            estado_actual = resultados[0].get("estado") or resultados[0].get("Estado")
+            if estado_actual == "Finalizado":
+                return False, f"Pedido {id_pedido} ya está finalizado y no se puede modificar."
         
         ok = self._res.actualizar_estado(
             id_pedido, nuevo_estado, usuario_id=self._usuario_id
