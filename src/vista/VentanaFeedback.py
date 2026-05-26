@@ -11,8 +11,7 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-# El DAO es quien sabe hablar con la BD; esta clase solo le pide datos.
-from src.modelo.dao.FeedbackDAO import FeedbackDAO
+from src.controlador.ControladorOperador import ControladorOperador
 
 # Ruta absoluta al .ui para que no falle si se ejecuta desde otro directorio.
 UI_FILE = os.path.join(
@@ -41,7 +40,7 @@ class VentanaFeedback(QWidget):
         uic.loadUi(UI_FILE, self)
 
         self.user = user                        # usuario logueado (reservado para uso futuro)
-        self._dao = FeedbackDAO()               # acceso a la base de datos
+        self._ctrl = ControladorOperador()      # controlador que centraliza la lógica de negocio
         self._feedbacks: list[dict] = []        # caché local con todos los feedbacks cargados
         self._seleccionado: dict | None = None  # dict del feedback que tiene el foco ahora mismo
 
@@ -75,7 +74,7 @@ class VentanaFeedback(QWidget):
         """Rellena el combo de paquetes con los que tienen feedback."""
         # Solo mostramos paquetes que ya tienen alguna valoración,
         # para no llenar el combo con opciones que no devolverían resultados.
-        paquetes = self._dao.obtener_paquetes_con_feedback()
+        paquetes = self._ctrl.obtener_paquetes_con_feedback()
         self.comboPaquete.clear()
         self.comboPaquete.addItem("Todos los paquetes")   # opción por defecto = sin filtro
         for p in paquetes:
@@ -98,7 +97,7 @@ class VentanaFeedback(QWidget):
         # Avisamos mientras se carga (útil si la BD tarda un momento).
         self._set_estado("Cargando…")
         try:
-            self._feedbacks = self._dao.obtener_todos()
+            self._feedbacks = self._ctrl.obtener_feedbacks()
             self._poblar_tabla(self._feedbacks)
             self._set_estado(f"{len(self._feedbacks)} valoraciones encontradas")
         except Exception as e:
@@ -116,7 +115,7 @@ class VentanaFeedback(QWidget):
             paquete = ""
 
         try:
-            resultados = self._dao.buscar(texto=texto, paquete=paquete)
+            resultados = self._ctrl.buscar_feedbacks(texto=texto, paquete=paquete)
             self._poblar_tabla(resultados)
             self._set_estado(f"{len(resultados)} resultado(s)")
         except Exception as e:
