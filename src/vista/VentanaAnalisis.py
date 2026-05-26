@@ -8,8 +8,7 @@ acceso directo a la base de datos.
 Widgets del .ui que usa esta vista:
     cbPeriodo, btnExportar, lblEstado
     kpiValue1..4                          ← totales KPI
-    chartArea1..6                         ← QFrame donde se inyectan
-                                            los canvas de Matplotlib
+    chartArea1..6                         ← QFrame donde se inyectan los canvas de Matplotlib
 Gráficos y tablas origen:
     1. Ventas por paquete  (barras)   → Pedidos_Viajes + Paquetes_Turisticos
     2. Ingresos por mes    (línea)    → Pedidos_Viajes.fecha_pedido + monto_total
