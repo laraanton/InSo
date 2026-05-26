@@ -74,8 +74,8 @@ class VentanaMisViajes(QMainWindow, Form):
             precio_fmt = f"Desde {viaje['monto_total']} €"
         contenedor.card_precio.setText(precio_fmt)
 
-        pid = viaje["paquete_id"]
-        contenedor.card_btn.clicked.connect(lambda _checked, p=pid: self.controlador.ver_paquete(p))
+        pid = viaje["pedido_id"]
+        contenedor.card_btn.clicked.connect(lambda _checked, p=pid: self.controlador.ver_pedido(p))
 
         contenedor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
         contenedor.setFixedHeight(155)
