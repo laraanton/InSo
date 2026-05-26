@@ -61,12 +61,9 @@ class ControladorCliente:
 
     def ver_pedido(self, pedido_id: int):
         from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje
-        pedidos = PedidoDAO().obtener_por_cliente(self.user.usuario_id)
-
-        pedido = next((p for p in pedidos if p["pedido_id"] == pedido_id), None)
+        pedido = PedidoDAO().obtener_por_paquete(pedido_id)
         if not pedido:
             return
-        
         self.ventana_detalle = VentanaDetalleMViaje(self.user, pedido)
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
