@@ -26,11 +26,12 @@
        <widget class="QWidget" name="widget" native="true">
         <widget class="QWidget" name="widget_2" native="true">
          <property name="geometry">
+         <!-- Medidas para recuadro con formulario-->
           <rect>
            <x>9</x>
-           <y>100</y>
+           <y>130</y>
            <width>531</width>
-           <height>700</height>
+           <height>680</height>
           </rect>
          </property>
          <property name="styleSheet">
