@@ -2,25 +2,45 @@ import bcrypt
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.UsuariosVO import UsuarioVO
 
+# ── Queries ──────────────────────────────────────────────────────────────────
+
+_COLS_USUARIO = (
+    "usuario_id, dni_nie, nombre_completo, email, telefono, "
+    "tipo_usuario, estado, preferencia, "
+    "cuenta_bloqueada, fecha_registro, preferencia_accesibilidad"
+)
+
+_Q_LOGIN = f"""
+    SELECT {_COLS_USUARIO}, password_hash
+    FROM Usuarios
+    WHERE email = ?
+"""
+_Q_SELECT_POR_ID = f"SELECT {_COLS_USUARIO} FROM Usuarios WHERE usuario_id = ?"
+_Q_SELECT_POR_EMAIL = f"SELECT {_COLS_USUARIO} FROM Usuarios WHERE email = ?"
+_Q_SELECT_TODOS = f"SELECT {_COLS_USUARIO} FROM Usuarios"
+
+_Q_INSERT_USUARIO = """
+    INSERT INTO Usuarios 
+    (dni_nie, nombre_completo, email, telefono, tipo_usuario, preferencia, preferencia_accesibilidad, password_hash)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+"""
+_Q_UPDATE_CONTRASENA = "UPDATE Usuarios SET password_hash = ? WHERE usuario_id = ?"
+_Q_BLOQUEAR_CUENTA = "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?"
+_Q_DESBLOQUEAR_CUENTA = "UPDATE Usuarios SET cuenta_bloqueada = 0 WHERE usuario_id = ?"
+
+# ── DAO ───────────────────────────────────────────────────────────────────────
+
 class UserDAO(Conexion):
 
     def consultaLogin(self, loginVO):
-        try:          
+        try:
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                        tipo_usuario, estado, preferencia, 
-                        cuenta_bloqueada, fecha_registro, preferencia_accesibilidad,
-                        password_hash
-                FROM Usuarios
-                WHERE email = ?""",  
-                [loginVO.email]
-            )
+            cursor.execute(_Q_LOGIN, [loginVO.email])
             row = cursor.fetchone()
             if not row:
                 return None
 
-            password_hash_guardado = row[-1]  
+            password_hash_guardado = row[-1]
             print(f"DEBUG hash leído: {repr(password_hash_guardado)}")
 
             if isinstance(password_hash_guardado, str) and password_hash_guardado.startswith("b'"):
@@ -40,13 +60,7 @@ class UserDAO(Conexion):
     def obtenerUsuarioPorId(self, usuario_id):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, 
-                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
-                   FROM Usuarios WHERE usuario_id = ?""",
-                [usuario_id]
-            )
+            cursor.execute(_Q_SELECT_POR_ID, [usuario_id])
             row = cursor.fetchone()
             return UsuarioVO(*row) if row else None
         except Exception as e:
@@ -56,13 +70,7 @@ class UserDAO(Conexion):
     def obtenerUsuarioPorEmail(self, email):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, 
-                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
-                   FROM Usuarios WHERE email = ?""",
-                [email]
-            )
+            cursor.execute(_Q_SELECT_POR_EMAIL, [email])
             row = cursor.fetchone()
             return UsuarioVO(*row) if row else None
         except Exception as e:
@@ -72,12 +80,7 @@ class UserDAO(Conexion):
     def obtenerTodosLosUsuarios(self):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, 
-                          cuenta_bloqueada, fecha_registro, preferencia_accesibilidad
-                   FROM Usuarios"""
-            )
+            cursor.execute(_Q_SELECT_TODOS)
             rows = cursor.fetchall()
             return [UsuarioVO(*row) for row in rows]
         except Exception as e:
@@ -89,26 +92,24 @@ class UserDAO(Conexion):
             password_hash = bcrypt.hashpw(
                 registroVO.password_hash.encode('utf-8'),
                 bcrypt.gensalt()
-            ).decode('utf-8')  #convierte bytes a str limpio
-                
+            ).decode('utf-8')  # convierte bytes a str limpio
+
             cursor = self.getCursor()
             cursor.execute(
-                """INSERT INTO Usuarios 
-                (dni_nie, nombre_completo, email, telefono, tipo_usuario, preferencia, preferencia_accesibilidad, password_hash)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
+                _Q_INSERT_USUARIO,
                 [
-                    registroVO.dni_nie, 
+                    registroVO.dni_nie,
                     registroVO.nombre_completo,
-                    registroVO.email, 
+                    registroVO.email,
                     registroVO.telefono,
-                    registroVO.tipo_usuario, 
-                    registroVO.preferencia, 
+                    registroVO.tipo_usuario,
+                    registroVO.preferencia,
                     registroVO.preferencia_accesibilidad,
                     password_hash
                 ]
             )
             # Asegura que los cambios se guarden de inmediato en la base de datos
-            if hasattr(self, 'commit'): self.commit() 
+            if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
             print(f"Error en insertarUsuario: {e}")
@@ -119,12 +120,9 @@ class UserDAO(Conexion):
             nuevo_hash = bcrypt.hashpw(
                 nueva_contrasena_plana.encode('utf-8'),
                 bcrypt.gensalt()
-            ).decode('utf-8')  
+            ).decode('utf-8')
             cursor = self.getCursor()
-            cursor.execute(
-                "UPDATE Usuarios SET password_hash = ? WHERE usuario_id = ?",
-                [nuevo_hash, usuario_id]
-            )
+            cursor.execute(_Q_UPDATE_CONTRASENA, [nuevo_hash, usuario_id])
             if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
@@ -134,10 +132,7 @@ class UserDAO(Conexion):
     def bloquearCuenta(self, usuario_id):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?",
-                [usuario_id]
-            )
+            cursor.execute(_Q_BLOQUEAR_CUENTA, [usuario_id])
             if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:
@@ -147,10 +142,7 @@ class UserDAO(Conexion):
     def desbloquearCuenta(self, usuario_id):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                "UPDATE Usuarios SET cuenta_bloqueada = 0 WHERE usuario_id = ?",
-                [usuario_id]
-            )
+            cursor.execute(_Q_DESBLOQUEAR_CUENTA, [usuario_id])
             if hasattr(self, 'commit'): self.commit()
             return True
         except Exception as e:

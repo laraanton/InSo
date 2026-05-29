@@ -8,6 +8,59 @@ Solo lectura — el cambio de estado se hace desde aquí también.
 
 from src.modelo.conexion.Conexion import Conexion
 
+# ── Queries ──────────────────────────────────────────────────────────────────
+
+_COLS_RECLAMACION = [
+    "reclamacion_id", "ref_reclamacion", "ref_pedido", "cliente",
+    "paquete", "categoria", "descripcion_incidente",
+    "fecha_incidente", "fecha_registro", "estado_reclamacion"
+]
+
+_Q_SELECT_TODAS = """
+    SELECT
+        rc.reclamacion_id,
+        rc.identificador_reclamacion  AS ref_reclamacion,
+        pv.identificador_unico        AS ref_pedido,
+        u.nombre_completo             AS cliente,
+        pt.nombre_paquete             AS paquete,
+        rc.categoria,
+        rc.descripcion_incidente,
+        CONVERT(NVARCHAR(10), rc.fecha_incidente, 23)  AS fecha_incidente,
+        CONVERT(NVARCHAR(16), rc.fecha_registro,  120) AS fecha_registro,
+        rc.estado_reclamacion
+    FROM  Reclamaciones        rc
+    JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
+    JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
+    JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
+    ORDER BY rc.fecha_registro DESC
+"""
+# Base para buscar() — se le añade WHERE dinámico
+_Q_BASE_BUSCAR = """
+    SELECT
+        rc.reclamacion_id,
+        rc.identificador_reclamacion,
+        pv.identificador_unico,
+        u.nombre_completo,
+        pt.nombre_paquete,
+        rc.categoria,
+        rc.descripcion_incidente,
+        CONVERT(NVARCHAR(10), rc.fecha_incidente, 23),
+        CONVERT(NVARCHAR(16), rc.fecha_registro,  120),
+        rc.estado_reclamacion
+    FROM  Reclamaciones        rc
+    JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
+    JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
+    JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
+    {where}
+    ORDER BY rc.fecha_registro DESC
+"""
+_Q_UPDATE_ESTADO = """
+    UPDATE Reclamaciones
+    SET    estado_reclamacion = ?
+    WHERE  reclamacion_id = ?
+"""
+
+# ── DAO ───────────────────────────────────────────────────────────────────────
 
 class ReclamacionDAO(Conexion):
 
@@ -17,30 +70,8 @@ class ReclamacionDAO(Conexion):
         """
         try:
             cursor = self.getCursor()
-            cursor.execute("""
-                SELECT
-                    rc.reclamacion_id,
-                    rc.identificador_reclamacion  AS ref_reclamacion,
-                    pv.identificador_unico        AS ref_pedido,
-                    u.nombre_completo             AS cliente,
-                    pt.nombre_paquete             AS paquete,
-                    rc.categoria,
-                    rc.descripcion_incidente,
-                    CONVERT(NVARCHAR(10), rc.fecha_incidente, 23)  AS fecha_incidente,
-                    CONVERT(NVARCHAR(16), rc.fecha_registro,  120) AS fecha_registro,
-                    rc.estado_reclamacion
-                FROM  Reclamaciones        rc
-                JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
-                JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
-                JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
-                ORDER BY rc.fecha_registro DESC
-            """)
-            cols = [
-                "reclamacion_id", "ref_reclamacion", "ref_pedido", "cliente",
-                "paquete", "categoria", "descripcion_incidente",
-                "fecha_incidente", "fecha_registro", "estado_reclamacion"
-            ]
-            return [dict(zip(cols, row)) for row in cursor.fetchall()]
+            cursor.execute(_Q_SELECT_TODAS)
+            return [dict(zip(_COLS_RECLAMACION, row)) for row in cursor.fetchall()]
         except Exception as e:
             print(f"[ReclamacionDAO] Error en obtener_todas: {e}")
             return []
@@ -67,33 +98,8 @@ class ReclamacionDAO(Conexion):
                 params.append(estado)
 
             where = ("WHERE " + " AND ".join(filtros)) if filtros else ""
-
-            cursor.execute(f"""
-                SELECT
-                    rc.reclamacion_id,
-                    rc.identificador_reclamacion,
-                    pv.identificador_unico,
-                    u.nombre_completo,
-                    pt.nombre_paquete,
-                    rc.categoria,
-                    rc.descripcion_incidente,
-                    CONVERT(NVARCHAR(10), rc.fecha_incidente, 23),
-                    CONVERT(NVARCHAR(16), rc.fecha_registro,  120),
-                    rc.estado_reclamacion
-                FROM  Reclamaciones        rc
-                JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
-                JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
-                JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
-                {where}
-                ORDER BY rc.fecha_registro DESC
-            """, params)
-
-            cols = [
-                "reclamacion_id", "ref_reclamacion", "ref_pedido", "cliente",
-                "paquete", "categoria", "descripcion_incidente",
-                "fecha_incidente", "fecha_registro", "estado_reclamacion"
-            ]
-            return [dict(zip(cols, row)) for row in cursor.fetchall()]
+            cursor.execute(_Q_BASE_BUSCAR.format(where=where), params)
+            return [dict(zip(_COLS_RECLAMACION, row)) for row in cursor.fetchall()]
         except Exception as e:
             print(f"[ReclamacionDAO] Error en buscar: {e}")
             return []
@@ -102,11 +108,7 @@ class ReclamacionDAO(Conexion):
         """Actualiza el estado de una reclamación."""
         try:
             cursor = self.getCursor()
-            cursor.execute("""
-                UPDATE Reclamaciones
-                SET    estado_reclamacion = ?
-                WHERE  reclamacion_id = ?
-            """, [nuevo_estado, reclamacion_id])
+            cursor.execute(_Q_UPDATE_ESTADO, [nuevo_estado, reclamacion_id])
             return True
         except Exception as e:
             print(f"[ReclamacionDAO] Error en actualizar_estado: {e}")
