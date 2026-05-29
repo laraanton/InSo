@@ -15,7 +15,7 @@ from datetime import date, timedelta
 
 from src.modelo.dao.AnalisisDAO  import AnalisisDAO
 from src.modelo.vo.AnalisisVO    import AnalisisVO, KpiVO
-from src.modelo.vo.OperadorVO    import OperacionResultadoVO
+from src.modelo.vo.OperacionResultadoVO   import OperacionResultadoVO
 
 
 class AnalisisBO:
