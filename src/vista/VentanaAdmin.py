@@ -1,8 +1,19 @@
+"""
+VentanaAdmin.py  –  Vista principal del módulo Administrador
+============================================================
+Responsabilidad: instanciar las subvistas, inyectarlas en el
+QStackedWidget y conectar los botones de navegación con el
+ControladorAdmin. No contiene lógica de negocio.
+"""
+
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
 from PyQt5 import uic
 
-from src.controlador.ControladorAdmin import ControladorAdmin
+from src.controlador.ControladorAdmin import (
+    ControladorAdmin, PAG_DASHBOARD, PAG_OPERADORES,
+    PAG_USUARIOS, PAG_ACTIVIDAD, PAG_SISTEMA
+)
 from src.vista.VentanaDashboard_admin  import VentanaDashboard_admin
 from src.vista.VentanaOperadores_admin import VentanaOperadores_admin
 from src.vista.VentanaUsuarios_admin   import VentanaUsuarios_admin
@@ -10,20 +21,6 @@ from src.vista.VentanaActividad_admin  import VentanaActividad_admin
 from src.vista.VentanaSistema_admin    import VentanaSistema_admin
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAdmin.ui")
-
-PAGE_DASHBOARD  = 0
-PAGE_OPERADORES = 1
-PAGE_USUARIOS   = 2
-PAGE_ACTIVIDAD  = 3
-PAGE_SISTEMA    = 4
-
-_TITULOS = {
-    PAGE_DASHBOARD:  ("Dashboard",             "Softrip › Administración"),
-    PAGE_OPERADORES: ("Gestión de Operadores", "Softrip › Administración › Operadores"),
-    PAGE_USUARIOS:   ("Todos los Usuarios",    "Softrip › Administración › Usuarios"),
-    PAGE_ACTIVIDAD:  ("Registro de Actividad", "Softrip › Administración › Actividad"),
-    PAGE_SISTEMA:    ("Sistema y Backups",     "Softrip › Administración › Sistema"),
-}
 
 
 class VentanaAdmin(QMainWindow, Form):
@@ -33,61 +30,70 @@ class VentanaAdmin(QMainWindow, Form):
         self.setupUi(self)
         self.usuario_actual = usuario_actual
 
-        # El controlador centraliza el acceso al DAO
-        self.controlador = ControladorAdmin(usuario_actual)
+        self._ctrl = ControladorAdmin(usuario_actual=usuario_actual, ventana=self)
 
-        self._pages = {
-            PAGE_DASHBOARD:  VentanaDashboard_admin(self.controlador),
-            PAGE_OPERADORES: VentanaOperadores_admin(self.controlador),
-            PAGE_USUARIOS:   VentanaUsuarios_admin(self.controlador),
-            PAGE_ACTIVIDAD:  VentanaActividad_admin(self.controlador),
-            PAGE_SISTEMA:    VentanaSistema_admin(self.controlador),
+        self.paginas = {
+            PAG_DASHBOARD:  VentanaDashboard_admin(self._ctrl),
+            PAG_OPERADORES: VentanaOperadores_admin(self._ctrl),
+            PAG_USUARIOS:   VentanaUsuarios_admin(self._ctrl),
+            PAG_ACTIVIDAD:  VentanaActividad_admin(self._ctrl),
+            PAG_SISTEMA:    VentanaSistema_admin(self._ctrl),
         }
 
-        for idx in sorted(self._pages.keys()):
-            self.stackedWidget.addWidget(self._pages[idx])
+        # Mapa página → botón de navegación (para marcar el activo)
+        self._nav_botones = {
+            PAG_DASHBOARD:  self.btnNavDashboard,
+            PAG_OPERADORES: self.btnNavOperadores,
+            PAG_USUARIOS:   self.btnNavUsuarios,
+            PAG_ACTIVIDAD:  self.btnNavActividad,
+            PAG_SISTEMA:    self.btnNavSistema,
+        }
+
+        for idx in sorted(self.paginas.keys()):
+            self.stackedWidget.addWidget(self.paginas[idx])
 
         self._configurar_topbar()
         self._conectar_senales()
-        self._navegar(PAGE_DASHBOARD)
+        self._ctrl.navegar_dashboard()
+
+    # ── Topbar ────────────────────────────────────────────────────────────────
 
     def _configurar_topbar(self):
         nombre  = self.usuario_actual.nombre_completo or "Admin"
         inicial = nombre[0].upper()
         self.avatarLabel.setText(inicial)
         self.adminNameLabel.setText(nombre)
-
-    def _conectar_senales(self):
-        self.btnNavDashboard.clicked.connect(lambda: self._navegar(PAGE_DASHBOARD))
-        self.btnNavOperadores.clicked.connect(lambda: self._navegar(PAGE_OPERADORES))
-        self.btnNavUsuarios.clicked.connect(lambda: self._navegar(PAGE_USUARIOS))
-        self.btnNavActividad.clicked.connect(lambda: self._navegar(PAGE_ACTIVIDAD))
-        self.btnNavSistema.clicked.connect(lambda: self._navegar(PAGE_SISTEMA))
-        self.btnLogout.clicked.connect(self._cerrar_sesion)
-
-        # El dashboard tiene un botón "Ver todos" que salta a actividad
-        self._pages[PAGE_DASHBOARD].ir_a_actividad.connect(
-            lambda: self._navegar(PAGE_ACTIVIDAD)
+        # Forzar border-radius redondeado en el avatar
+        self.avatarLabel.setStyleSheet(
+            "background-color: #5e8d8d; color: #FFFFFF; border-radius: 18px;"
+            "min-width: 36px; max-width: 36px; min-height: 36px; max-height: 36px;"
+            "font-weight: 700; font-size: 14px; qproperty-alignment: AlignCenter;"
         )
 
-    def _navegar(self, pagina):
-        self.stackedWidget.setCurrentWidget(self._pages[pagina])
-        self.pageTitle.setText(_TITULOS[pagina][0])
-        self.pageBreadcrumb.setText(_TITULOS[pagina][1])
+    # ── Marcar botón activo ───────────────────────────────────────────────────
 
-        _botones = {
-            PAGE_DASHBOARD:  self.btnNavDashboard,
-            PAGE_OPERADORES: self.btnNavOperadores,
-            PAGE_USUARIOS:   self.btnNavUsuarios,
-            PAGE_ACTIVIDAD:  self.btnNavActividad,
-            PAGE_SISTEMA:    self.btnNavSistema,
-        }
-        for p, btn in _botones.items():
-            btn.setProperty("active", p == pagina)
+    def marcar_activo(self, pagina: int):
+        """Actualiza el estado visual del botón de navegación activo."""
+        for pag, btn in self._nav_botones.items():
+            btn.setProperty("active", pag == pagina)
             btn.style().unpolish(btn)
             btn.style().polish(btn)
 
-        self._pages[pagina].cargar()
+    # ── Señales ───────────────────────────────────────────────────────────────
+
+    def _conectar_senales(self):
+        self.btnNavDashboard.clicked.connect(self._ctrl.navegar_dashboard)
+        self.btnNavOperadores.clicked.connect(self._ctrl.navegar_operadores)
+        self.btnNavUsuarios.clicked.connect(self._ctrl.navegar_usuarios)
+        self.btnNavActividad.clicked.connect(self._ctrl.navegar_actividad)
+        self.btnNavSistema.clicked.connect(self._ctrl.navegar_sistema)
+        self.btnLogout.clicked.connect(self._cerrar_sesion)
+
+        self.paginas[PAG_DASHBOARD].ir_a_actividad.connect(
+            self._ctrl.navegar_actividad
+        )
+
+    # ── Cerrar sesión ─────────────────────────────────────────────────────────
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
