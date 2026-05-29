@@ -1,7 +1,7 @@
 """
 AnalisisDAO.py  –  Consultas de análisis y estadísticas de venta
 ================================================================
-Hereda de Conexion.
+Hereda de Conexion.  Solo lectura: no modifica ninguna tabla.
 
 Tablas consultadas:
     Pedidos_Viajes          (pv)
@@ -24,6 +24,104 @@ from datetime import date
 
 from src.modelo.conexion.Conexion import Conexion
 
+# ── Queries ──────────────────────────────────────────────────────────────────
+
+_Q_KPI_PEDIDOS = """
+    SELECT SUM(monto_total)  AS ingresos_totales,
+           COUNT(pedido_id)  AS total_pedidos
+    FROM   Pedidos_Viajes
+    {where}
+"""
+_Q_KPI_SATISFACCION = """
+    SELECT AVG(CAST(fc.val_general AS FLOAT))
+    FROM   Feedback_Clientes fc
+    JOIN Pedidos_Viajes pv ON fc.pedido_id = pv.pedido_id
+    {where}
+"""
+_Q_KPI_RECLAMACIONES = """
+    SELECT COUNT(rc.reclamacion_id)
+    FROM   Reclamaciones rc
+    JOIN Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id
+    {where}
+"""
+_Q_VENTAS_POR_PAQUETE = """
+    SELECT   pt.nombre_paquete,
+             COUNT(pv.pedido_id) AS ventas
+    FROM     Pedidos_Viajes      pv
+    JOIN     Paquetes_Turisticos pt ON pv.paquete_id = pt.paquete_id
+    {where}
+    GROUP BY pt.nombre_paquete
+    ORDER BY ventas DESC
+"""
+_Q_INGRESOS_POR_MES = """
+    SELECT   YEAR(fecha_pedido)  AS anio,
+             MONTH(fecha_pedido) AS mes,
+             SUM(monto_total)    AS total
+    FROM     Pedidos_Viajes
+    {where}
+    GROUP BY YEAR(fecha_pedido), MONTH(fecha_pedido)
+    ORDER BY anio, mes
+"""
+_Q_DISTRIBUCION_ESTADOS = """
+    SELECT   estado_pedido,
+             COUNT(*) AS cantidad
+    FROM     Pedidos_Viajes
+    {where}
+    GROUP BY estado_pedido
+    ORDER BY cantidad DESC
+"""
+_Q_SATISFACCION_POR_PAQUETE = """
+    SELECT   pt.nombre_paquete,
+             AVG(CAST(fc.val_general AS FLOAT)) AS media
+    FROM     Feedback_Clientes     fc
+    JOIN     Pedidos_Viajes        pv ON fc.pedido_id  = pv.pedido_id
+    JOIN     Paquetes_Turisticos   pt ON pv.paquete_id = pt.paquete_id
+    {where}
+    GROUP BY pt.nombre_paquete
+    ORDER BY media DESC
+"""
+_Q_RECLAMACIONES_POR_CATEGORIA = """
+    SELECT   rc.categoria,
+             COUNT(rc.reclamacion_id) AS cantidad
+    FROM     Reclamaciones  rc
+    JOIN     Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id
+    {where}
+    GROUP BY rc.categoria
+    ORDER BY cantidad DESC
+"""
+_Q_DISTRIBUCION_PERFILES = """
+    SELECT   u.preferencia,
+             AVG(CAST(cp.presupuesto_promedio AS FLOAT)) AS media_presupuesto,
+             COUNT(cp.usuario_id)                        AS cantidad
+    FROM     Clientes_Perfiles cp
+    JOIN     Usuarios          u  ON cp.usuario_id = u.usuario_id
+    WHERE    u.preferencia IS NOT NULL
+    GROUP BY u.preferencia
+    ORDER BY media_presupuesto DESC
+"""
+_Q_EXPORTAR_RESUMEN = """
+    SELECT
+        pv.identificador_unico,
+        u.nombre_completo,
+        pt.nombre_paquete,
+        CONVERT(NVARCHAR(10), pv.fecha_pedido, 23) AS fecha,
+        pv.monto_total,
+        pv.estado_pedido,
+        fc.val_trato_operador,
+        fc.val_calidad_transporte,
+        fc.val_satisfaccion_alojamiento,
+        fc.val_general,
+        rc.categoria
+    FROM      Pedidos_Viajes       pv
+    JOIN      Usuarios             u  ON pv.cliente_id  = u.usuario_id
+    JOIN      Paquetes_Turisticos  pt ON pv.paquete_id  = pt.paquete_id
+    LEFT JOIN Feedback_Clientes    fc ON fc.pedido_id   = pv.pedido_id
+    LEFT JOIN Reclamaciones        rc ON rc.pedido_id   = pv.pedido_id
+    {where}
+    ORDER BY pv.fecha_pedido DESC
+"""
+
+# ── DAO ───────────────────────────────────────────────────────────────────────
 
 class AnalisisDAO(Conexion):
 
@@ -45,37 +143,19 @@ class AnalisisDAO(Conexion):
             # ── Ingresos y pedidos
             params1 = []
             where1  = self._where_fecha("fecha_pedido", fecha_desde, params1)
-            cursor.execute(f"""
-                SELECT SUM(monto_total)  AS ingresos_totales,
-                       COUNT(pedido_id)  AS total_pedidos
-                FROM   Pedidos_Viajes
-                {where1}
-            """, params1)
+            cursor.execute(_Q_KPI_PEDIDOS.format(where=where1), params1)
             row_pv = cursor.fetchone()
 
             # ── Satisfacción media (val_general de Feedback_Clientes)
-            # JOIN con Pedidos_Viajes para aplicar el filtro de fecha
             params2 = []
-            join2   = "JOIN Pedidos_Viajes pv ON fc.pedido_id = pv.pedido_id"
             where2  = self._where_fecha("pv.fecha_pedido", fecha_desde, params2)
-            cursor.execute(f"""
-                SELECT AVG(CAST(fc.val_general AS FLOAT))
-                FROM   Feedback_Clientes fc
-                {join2}
-                {where2}
-            """, params2)
+            cursor.execute(_Q_KPI_SATISFACCION.format(where=where2), params2)
             row_fc = cursor.fetchone()
 
             # ── Reclamaciones
             params3 = []
-            join3   = "JOIN Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id"
             where3  = self._where_fecha("pv.fecha_pedido", fecha_desde, params3)
-            cursor.execute(f"""
-                SELECT COUNT(rc.reclamacion_id)
-                FROM   Reclamaciones rc
-                {join3}
-                {where3}
-            """, params3)
+            cursor.execute(_Q_KPI_RECLAMACIONES.format(where=where3), params3)
             row_rc = cursor.fetchone()
 
             return {
@@ -92,8 +172,6 @@ class AnalisisDAO(Conexion):
             }
 
     # GRAFICO 1:  Ventas por paquete (barras)
-    # Tablas: Pedidos_Viajes JOIN Paquetes_Turisticos
-
     def ventas_por_paquete(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Número de pedidos agrupado por nombre de paquete, de mayor a menor.
@@ -104,17 +182,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("pv.fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT   pt.nombre_paquete,
-                         COUNT(pv.pedido_id) AS ventas
-                FROM     Pedidos_Viajes      pv
-                JOIN     Paquetes_Turisticos pt ON pv.paquete_id = pt.paquete_id
-                {where}
-                GROUP BY pt.nombre_paquete
-                ORDER BY ventas DESC
-            """, params)
-
+            cursor.execute(_Q_VENTAS_POR_PAQUETE.format(where=where), params)
             return [
                 {"paquete": row[0] or "Desconocido", "ventas": int(row[1])}
                 for row in cursor.fetchall()
@@ -124,8 +192,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # GRAFICO 2: Ingresos por mes (línea)
-    # Tabla: Pedidos_Viajes.fecha_pedido + monto_total
-
     def ingresos_por_mes(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Suma de monto_total agrupada por año-mes, orden cronológico.
@@ -141,17 +207,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT   YEAR(fecha_pedido)  AS anio,
-                         MONTH(fecha_pedido) AS mes,
-                         SUM(monto_total)    AS total
-                FROM     Pedidos_Viajes
-                {where}
-                GROUP BY YEAR(fecha_pedido), MONTH(fecha_pedido)
-                ORDER BY anio, mes
-            """, params)
-
+            cursor.execute(_Q_INGRESOS_POR_MES.format(where=where), params)
             return [
                 {
                     "mes":   _MESES.get(int(row[1]), str(row[1])),
@@ -164,8 +220,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # GRAFICO 3: Distribución de estados de pedido (tarta)
-    # Tabla: Pedidos_Viajes.estado_pedido
-
     def distribucion_estados(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Cuenta de pedidos por estado_pedido.
@@ -176,16 +230,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT   estado_pedido,
-                         COUNT(*) AS cantidad
-                FROM     Pedidos_Viajes
-                {where}
-                GROUP BY estado_pedido
-                ORDER BY cantidad DESC
-            """, params)
-
+            cursor.execute(_Q_DISTRIBUCION_ESTADOS.format(where=where), params)
             return [
                 {"estado": row[0] or "Sin estado", "cantidad": int(row[1])}
                 for row in cursor.fetchall()
@@ -195,8 +240,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # GRAFICO 4: Satisfacción media por paquete (barras horizontales)
-    # Tablas: Feedback_Clientes JOIN Pedidos_Viajes JOIN Paquetes_Turisticos
-
     def satisfaccion_por_paquete(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Media de val_general agrupada por nombre de paquete, de mayor a menor.
@@ -207,18 +250,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("pv.fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT   pt.nombre_paquete,
-                         AVG(CAST(fc.val_general AS FLOAT)) AS media
-                FROM     Feedback_Clientes     fc
-                JOIN     Pedidos_Viajes        pv ON fc.pedido_id  = pv.pedido_id
-                JOIN     Paquetes_Turisticos   pt ON pv.paquete_id = pt.paquete_id
-                {where}
-                GROUP BY pt.nombre_paquete
-                ORDER BY media DESC
-            """, params)
-
+            cursor.execute(_Q_SATISFACCION_POR_PAQUETE.format(where=where), params)
             return [
                 {
                     "paquete": row[0] or "Desconocido",
@@ -232,8 +264,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # GRAFICO 5:  Reclamaciones por categoría (barras)
-    # Tabla: Reclamaciones.categoria JOIN Pedidos_Viajes (filtro fecha)
-
     def reclamaciones_por_categoria(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Cuenta de reclamaciones agrupadas por Reclamaciones.categoria.
@@ -244,17 +274,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("pv.fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT   rc.categoria,
-                         COUNT(rc.reclamacion_id) AS cantidad
-                FROM     Reclamaciones  rc
-                JOIN     Pedidos_Viajes pv ON rc.pedido_id = pv.pedido_id
-                {where}
-                GROUP BY rc.categoria
-                ORDER BY cantidad DESC
-            """, params)
-
+            cursor.execute(_Q_RECLAMACIONES_POR_CATEGORIA.format(where=where), params)
             return [
                 {"categoria": row[0] or "Sin categoría", "cantidad": int(row[1])}
                 for row in cursor.fetchall()
@@ -264,10 +284,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # GRAFICO 6:  Presupuesto medio por preferencia de viajero (barras horizontales)
-    # Tablas: Clientes_Perfiles JOIN Usuarios
-    # Agrupa por Usuarios.preferencia y calcula la media de presupuesto_promedio
-    # Sin filtro de fecha: el perfil es un atributo estático del cliente
-
     def distribucion_perfiles(self) -> list[dict]:
         """
         Media de presupuesto_promedio agrupada por Usuarios.preferencia,
@@ -288,17 +304,7 @@ class AnalisisDAO(Conexion):
         """
         try:
             cursor = self.getCursor()
-            cursor.execute("""
-                SELECT   u.preferencia,
-                         AVG(CAST(cp.presupuesto_promedio AS FLOAT)) AS media_presupuesto,
-                         COUNT(cp.usuario_id)                        AS cantidad
-                FROM     Clientes_Perfiles cp
-                JOIN     Usuarios          u  ON cp.usuario_id = u.usuario_id
-                WHERE    u.preferencia IS NOT NULL
-                GROUP BY u.preferencia
-                ORDER BY media_presupuesto DESC
-            """)
-
+            cursor.execute(_Q_DISTRIBUCION_PERFILES)
             return [
                 {
                     "perfil":            row[0] or "General",
@@ -312,7 +318,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # Exportación CSV  –  usado por ControladorOperador.exportar_analisis()
-
     def exportar_resumen(self, fecha_desde: date | None = None) -> list[dict]:
         """
         Una fila por pedido con datos del pedido + valoración + reclamación.
@@ -338,28 +343,7 @@ class AnalisisDAO(Conexion):
             cursor = self.getCursor()
             params = []
             where  = self._where_fecha("pv.fecha_pedido", fecha_desde, params)
-
-            cursor.execute(f"""
-                SELECT
-                    pv.identificador_unico,
-                    u.nombre_completo,
-                    pt.nombre_paquete,
-                    CONVERT(NVARCHAR(10), pv.fecha_pedido, 23) AS fecha,
-                    pv.monto_total,
-                    pv.estado_pedido,
-                    fc.val_trato_operador,
-                    fc.val_calidad_transporte,
-                    fc.val_satisfaccion_alojamiento,
-                    fc.val_general,
-                    rc.categoria
-                FROM      Pedidos_Viajes       pv
-                JOIN      Usuarios             u  ON pv.cliente_id  = u.usuario_id
-                JOIN      Paquetes_Turisticos  pt ON pv.paquete_id  = pt.paquete_id
-                LEFT JOIN Feedback_Clientes    fc ON fc.pedido_id   = pv.pedido_id
-                LEFT JOIN Reclamaciones        rc ON rc.pedido_id   = pv.pedido_id
-                {where}
-                ORDER BY pv.fecha_pedido DESC
-            """, params)
+            cursor.execute(_Q_EXPORTAR_RESUMEN.format(where=where), params)
 
             filas = []
             for row in cursor.fetchall():
@@ -384,7 +368,6 @@ class AnalisisDAO(Conexion):
             return []
 
     # Helper privado para filtrar por fecha
-
     @staticmethod
     def _where_fecha(columna: str, fecha_desde: date | None,
                      params: list) -> str:
