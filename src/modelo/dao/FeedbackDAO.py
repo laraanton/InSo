@@ -1,7 +1,12 @@
+"""
+FeedbackDAO.py
+==============
+Consultas de solo lectura sobre Feedback_Clientes.
+El operador puede consultar todos los feedbacks con datos del cliente y paquete.
+"""
+
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.FeedbackVO import FeedbackVO
-
-# ── Queries ──────────────────────────────────────────────────────────────────
 
 _Q_SELECT_TODOS = """
     SELECT
@@ -75,8 +80,6 @@ _Q_BASE_BUSCAR = """
     {where}
     ORDER BY pv.fecha_pedido DESC
 """
-
-# ── DAO ───────────────────────────────────────────────────────────────────────
 
 class FeedbackDAO(Conexion):
 
