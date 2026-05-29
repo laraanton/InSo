@@ -44,7 +44,7 @@ class VentanaOperador(QMainWindow):
         self._conectar_senales()
         self._ctrl.navegar_hub()   # página inicial
 
-    # ── Señales 
+    # ── Señales ────────────────────────────────────────────────────────────────
     # La Vista solo sabe "qué botón se pulsó" y delega en el controlador.
     # No tiene ni índices de página ni lógica de carga de subvistas.
 
@@ -70,7 +70,7 @@ class VentanaOperador(QMainWindow):
 
         self.btnLogout.clicked.connect(self._cerrar_sesion)
 
-    # CERRAR SESIÓN
+    # ── Logout ─────────────────────────────────────────────────────────────────
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
@@ -80,7 +80,7 @@ class VentanaOperador(QMainWindow):
             QMessageBox.No,
         )
         if resp == QMessageBox.Yes:
+            from src.controlador.ControladorPrincipal import ControladorPrincipal
             self.close()
-            from src.vista.Login import MiVentana
-            self.login = MiVentana()
-            self.login.show()
+            ctrl = ControladorPrincipal()
+            ctrl.abrirIniciarSesion()
