@@ -21,13 +21,14 @@ from __future__ import annotations
 from src.modelo.LogicaOperador import OperadorBO
 from src.modelo.LogicaAnalisis import AnalisisBO
 
+from src.modelo.vo.OperacionResultadoVO import  OperacionResultadoVO
 from src.modelo.vo.PaqueteVO import PaqueteVO
 from src.modelo.vo.ReservaVO import ReservaVO
-from src.modelo.vo.OperacionResultadoVO   import OperacionResultadoVO
 from src.modelo.vo.AnalisisVO    import AnalisisVO
 from src.modelo.vo.FeedbackVO    import FeedbackVO
 from src.modelo.vo.ReclamacionVO import ReclamacionVO
 
+# Índices del QStackedWidget (deben coincidir con vistaOperador.ui)
 PAG_HUB           = 0
 PAG_DISENO        = 1
 PAG_COMPRA        = 2
@@ -82,7 +83,6 @@ class ControladorOperador:
 
     
     #  NAVEGACIÓN
-
     def navegar_hub(self):
         self._ir_a(PAG_HUB)
 
@@ -168,7 +168,6 @@ class ControladorOperador:
         layout.addWidget(widget)
         return widget
 
-    
     #  PAQUETES
 
     def obtener_todos(self) -> list[PaqueteVO]:
@@ -187,7 +186,6 @@ class ControladorOperador:
         return self._operador_bo.eliminar_paquete(id_paquete)
 
     #  RESERVAS
-
     def obtener_reservas(self) -> list[ReservaVO]:
         return self._operador_bo.obtener_reservas()
 
@@ -203,7 +201,6 @@ class ControladorOperador:
     def exportar_csv(self, ruta: str) -> OperacionResultadoVO:
         return self._operador_bo.exportar_reservas_csv(ruta)
 
-    
     #  ANÁLISIS
     def get_datos_analisis(self, periodo: str) -> AnalisisVO:
         return self._analisis_bo.get_analisis(periodo)
@@ -221,17 +218,14 @@ class ControladorOperador:
     def obtener_paquetes_con_feedback(self) -> list[str]:
         return self._operador_bo.obtener_paquetes_con_feedback()
 
-    
     #  RECLAMACIONES
+
     def obtener_reclamaciones(self) -> list[ReclamacionVO]:
         return self._operador_bo.obtener_reclamaciones()
 
     def buscar_reclamaciones(self, texto: str = "", categoria: str = "",
                               estado: str = "") -> list[ReclamacionVO]:
-        return self._operador_bo.buscar_reclamaciones(
-            texto=texto, categoria=categoria, estado=estado
-        )
+        return self._operador_bo.buscar_reclamaciones(texto=texto, categoria=categoria, estado=estado)
 
-    def cambiar_estado_reclamacion(self, reclamacion_id: int,
-                                    nuevo_estado: str) -> OperacionResultadoVO:
+    def cambiar_estado_reclamacion(self, reclamacion_id: int, nuevo_estado: str) -> OperacionResultadoVO:
         return self._operador_bo.cambiar_estado_reclamacion(reclamacion_id, nuevo_estado)
