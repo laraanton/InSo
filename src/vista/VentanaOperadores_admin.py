@@ -1,3 +1,11 @@
+"""
+VentanaOperadores_admin.py  –  Vista de Gestión de Operadores
+=============================================================
+Responsabilidad: mostrar la lista de operadores, filtrarla y
+delegar las acciones (crear, editar, bloquear) en el Controlador.
+No contiene validaciones de negocio ni acceso a datos.
+"""
+
 from PyQt5.QtWidgets import (
     QWidget, QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QLineEdit, QComboBox, QDialogButtonBox,
@@ -17,18 +25,25 @@ class VentanaOperadores_admin(VentanaBase, Form):
     def __init__(self, controlador, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.controlador = controlador
-        self._cache      = []
+        self._ctrl  = controlador
+        self._cache = []
 
         self._configurar_tabla()
         self._conectar_senales()
 
+    # ── Configuración inicial ─────────────────────────────────────────────────
+
     def _configurar_tabla(self):
-        anchos = [40, 180, 110, 200, 110, 90, 100, 150]
+        # [ID, Nombre, DNI, Email, Teléfono, Estado, Registro, Acción]
+        # None = Stretch
+        anchos = [50, 180, 110, 200, 110, 90, 100, None]
         header = self.tablaOperadores.horizontalHeader()
         for i, w in enumerate(anchos):
-            self.tablaOperadores.setColumnWidth(i, w)
-        header.setStretchLastSection(False)
+            if w is None:
+                header.setSectionResizeMode(i, header.Stretch)
+            else:
+                header.setSectionResizeMode(i, header.Fixed)
+                self.tablaOperadores.setColumnWidth(i, w)
         self.tablaOperadores.verticalHeader().setDefaultSectionSize(38)
         self.tablaOperadores.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tablaOperadores.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -39,9 +54,11 @@ class VentanaOperadores_admin(VentanaBase, Form):
         self.searchOperadores.textChanged.connect(self._filtrar)
         self.filtroEstadoOp.currentTextChanged.connect(self._filtrar)
 
+    # ── Carga de datos ────────────────────────────────────────────────────────
 
     def cargar(self):
-        self._cache = self.controlador.obtener_operadores()
+        """Llamado por el Controlador cada vez que se navega a esta página."""
+        self._cache = self._ctrl.obtener_operadores()
         self._poblar(self._cache)
 
     def _poblar(self, lista):
@@ -60,6 +77,8 @@ class VentanaOperadores_admin(VentanaBase, Form):
             tabla.setCellWidget(row, 5, self._badge_estado(u.estado, u.cuenta_bloqueada))
             tabla.setCellWidget(row, 7, self._acciones(u))
 
+    # ── Filtro ────────────────────────────────────────────────────────────────
+
     def _filtrar(self):
         txt    = self.searchOperadores.text().strip().lower()
         estado = self.filtroEstadoOp.currentText()
@@ -74,50 +93,50 @@ class VentanaOperadores_admin(VentanaBase, Form):
         ]
         self._poblar(filtrados)
 
+    # ── Acciones ──────────────────────────────────────────────────────────────
 
     def _nuevo_operador(self):
         dlg = _DialogoOperador(self)
         if dlg.exec_() != QDialog.Accepted:
             return
         d = dlg.datos()
-        if not all([d["dni_nie"], d["nombre_completo"], d["email"], d["password"]]):
-            QMessageBox.warning(self, "Campos incompletos", "Rellena todos los campos obligatorios.")
-            return
-        if len(d["password"]) < 6:
-            QMessageBox.warning(self, "Contraseña corta", "La contraseña debe tener al menos 6 caracteres.")
-            return
-        exito, msg = self.controlador.crear_operador(
-            d["dni_nie"], d["nombre_completo"], d["email"], d["telefono"], d["password"]
+        resultado = self._ctrl.crear_operador(
+            d["dni_nie"], d["nombre_completo"],
+            d["email"], d["telefono"], d["password"]
         )
-        if exito:
-            QMessageBox.information(self, "Operador creado", msg)
+        if resultado.ok:
+            QMessageBox.information(self, "Operador creado", resultado.mensaje)
             self.cargar()
         else:
-            QMessageBox.warning(self, "Error", msg)
+            QMessageBox.warning(self, "Error", resultado.mensaje)
 
     def _editar_operador(self, usuario):
         dlg = _DialogoOperador(self, usuario)
         if dlg.exec_() != QDialog.Accepted:
             return
         d = dlg.datos()
-        if d["password"] and len(d["password"]) < 6:
-            QMessageBox.warning(self, "Contraseña corta", "Mínimo 6 caracteres.")
-            return
-        self.controlador.actualizar_operador(
-            usuario, d["telefono"], d["estado"], d["password"] or None
+        resultado = self._ctrl.actualizar_operador(
+            usuario, d["telefono"], d["estado"],
+            d["password"] or None
         )
-        QMessageBox.information(self, "Actualizado", "Datos del operador actualizados.")
-        self.cargar()
+        if resultado.ok:
+            QMessageBox.information(self, "Actualizado", resultado.mensaje)
+            self.cargar()
+        else:
+            QMessageBox.warning(self, "Error", resultado.mensaje)
 
     def _toggle_bloqueo(self, usuario):
         if usuario.cuenta_bloqueada:
-            self.controlador.desbloquear_operador(usuario)
-            QMessageBox.information(self, "Desbloqueada",
-                                    f"Cuenta de {usuario.nombre_completo} desbloqueada.")
+            resultado = self._ctrl.desbloquear_operador(usuario)
+            titulo = "Desbloqueada"
         else:
-            self.controlador.bloquear_operador(usuario)
-            QMessageBox.warning(self, "Bloqueada",
-                                f"Cuenta de {usuario.nombre_completo} bloqueada.")
+            resultado = self._ctrl.bloquear_operador(usuario)
+            titulo = "Bloqueada"
+
+        if resultado.ok:
+            QMessageBox.information(self, titulo, resultado.mensaje)
+        else:
+            QMessageBox.warning(self, "Error", resultado.mensaje)
         self.cargar()
 
     def _exportar(self):
@@ -137,7 +156,7 @@ class VentanaOperadores_admin(VentanaBase, Form):
         except Exception as e:
             QMessageBox.critical(self, "Error al exportar", str(e))
 
-
+    # ── Widgets de celda ──────────────────────────────────────────────────────
 
     def _badge_estado(self, estado, bloqueada=False):
         if bloqueada:
@@ -176,10 +195,16 @@ class VentanaOperadores_admin(VentanaBase, Form):
         return contenedor
 
 
+# ── Diálogo de crear/editar operador ─────────────────────────────────────────
 
 _TEAL = "#5e8d8d"
 
 class _DialogoOperador(QDialog):
+    """
+    Diálogo modal para crear o editar un operador.
+    Solo recoge datos del formulario y los devuelve con datos().
+    Las validaciones las hace el Controlador/Lógica.
+    """
     STYLE = f"""
         QDialog {{ background-color: #F5F0E8; font-family: 'Segoe UI'; }}
         QLabel  {{ color: #333333; font-size: 12px; }}
@@ -256,7 +281,8 @@ class _DialogoOperador(QDialog):
         btns.rejected.connect(self.reject)
         lay.addWidget(btns)
 
-    def datos(self):
+    def datos(self) -> dict:
+        """Devuelve los datos del formulario. Sin validaciones."""
         return {
             "dni_nie":         self.in_dni.text().strip(),
             "nombre_completo": self.in_nombre.text().strip(),
