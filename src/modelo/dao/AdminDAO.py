@@ -1,6 +1,61 @@
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.RegistroVO import RegistroVO
 
+# ── Queries ──────────────────────────────────────────────────────────────────
+
+_Q_INSERT_OPERADOR = """
+    INSERT INTO Usuarios
+       (dni_nie, nombre_completo, email, telefono, password_hash,
+        tipo_usuario, preferencia, preferencia_accesibilidad)
+    VALUES (?, ?, ?, ?, ?, 'Operador', 'General', 'Ninguna')
+"""
+_Q_UPDATE_OPERADOR_CON_PASS = """
+    UPDATE Usuarios
+    SET telefono = ?, estado = ?, password_hash = ?
+    WHERE usuario_id = ?
+"""
+_Q_UPDATE_OPERADOR_SIN_PASS = """
+    UPDATE Usuarios
+    SET telefono = ?, estado = ?
+    WHERE usuario_id = ?
+"""
+_Q_BLOQUEAR_CUENTA = "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?"
+_Q_DESBLOQUEAR_CUENTA = "UPDATE Usuarios SET cuenta_bloqueada = 0 WHERE usuario_id = ?"
+
+_Q_SELECT_OPERADORES = """
+    SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
+           tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+    FROM Usuarios
+    WHERE tipo_usuario = 'Operador'
+"""
+_Q_SELECT_TODOS_USUARIOS = """
+    SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
+           tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
+    FROM Usuarios
+"""
+_Q_BACKUP_BD = "BACKUP DATABASE [{}] TO DISK = ? WITH FORMAT, INIT, STATS = 10"
+
+_Q_INSERT_ACTIVIDAD = """
+    INSERT INTO Registro_Actividad (usuario_id, tipo_accion, detalle, ip)
+    VALUES (?, ?, ?, ?)
+"""
+_Q_SELECT_ACTIVIDAD_FILTRADA = """
+    SELECT TOP (?) ra.actividad_id, ra.fecha, u.nombre_completo,
+           u.tipo_usuario, ra.tipo_accion, ra.detalle, ra.ip
+    FROM Registro_Actividad ra
+    JOIN Usuarios u ON ra.usuario_id = u.usuario_id
+    WHERE ra.tipo_accion = ?
+    ORDER BY ra.fecha DESC
+"""
+_Q_SELECT_ACTIVIDAD_TODAS = """
+    SELECT TOP (?) ra.actividad_id, ra.fecha, u.nombre_completo,
+           u.tipo_usuario, ra.tipo_accion, ra.detalle, ra.ip
+    FROM Registro_Actividad ra
+    JOIN Usuarios u ON ra.usuario_id = u.usuario_id
+    ORDER BY ra.fecha DESC
+"""
+
+# ── DAO ───────────────────────────────────────────────────────────────────────
 
 class AdminDAO(Conexion):
 
@@ -9,10 +64,7 @@ class AdminDAO(Conexion):
         try:
             cursor = self.getCursor()
             cursor.execute(
-                """INSERT INTO Usuarios
-                   (dni_nie, nombre_completo, email, telefono, password_hash,
-                    tipo_usuario, preferencia, preferencia_accesibilidad)
-                   VALUES (?, ?, ?, ?, ?, 'Operador', 'General', 'Ninguna')""",
+                _Q_INSERT_OPERADOR,
                 [dni_nie, nombre_completo, email, telefono, password_hash]
             )
             return True, "Operador creado correctamente"
@@ -26,16 +78,12 @@ class AdminDAO(Conexion):
             cursor = self.getCursor()
             if password_hash:
                 cursor.execute(
-                    """UPDATE Usuarios
-                       SET telefono = ?, estado = ?, password_hash = ?
-                       WHERE usuario_id = ?""",
+                    _Q_UPDATE_OPERADOR_CON_PASS,
                     [telefono, estado, password_hash, usuario_id]
                 )
             else:
                 cursor.execute(
-                    """UPDATE Usuarios
-                       SET telefono = ?, estado = ?
-                       WHERE usuario_id = ?""",
+                    _Q_UPDATE_OPERADOR_SIN_PASS,
                     [telefono, estado, usuario_id]
                 )
             return True
@@ -46,10 +94,7 @@ class AdminDAO(Conexion):
     def bloquearCuenta(self, usuario_id):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                "UPDATE Usuarios SET cuenta_bloqueada = 1 WHERE usuario_id = ?",
-                [usuario_id]
-            )
+            cursor.execute(_Q_BLOQUEAR_CUENTA, [usuario_id])
             return True
         except Exception as e:
             print(f"Error en bloquearCuenta: {e}")
@@ -58,10 +103,7 @@ class AdminDAO(Conexion):
     def desbloquearCuenta(self, usuario_id):
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                "UPDATE Usuarios SET cuenta_bloqueada = 0 WHERE usuario_id = ?",
-                [usuario_id]
-            )
+            cursor.execute(_Q_DESBLOQUEAR_CUENTA, [usuario_id])
             return True
         except Exception as e:
             print(f"Error en desbloquearCuenta: {e}")
@@ -72,12 +114,7 @@ class AdminDAO(Conexion):
         try:
             from src.modelo.vo.UsuariosVO import UsuarioVO
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
-                   FROM Usuarios
-                   WHERE tipo_usuario = 'Operador'"""
-            )
+            cursor.execute(_Q_SELECT_OPERADORES)
             return [UsuarioVO(*row) for row in cursor.fetchall()]
         except Exception as e:
             print(f"Error en obtenerOperadores: {e}")
@@ -87,11 +124,7 @@ class AdminDAO(Conexion):
         try:
             from src.modelo.vo.UsuariosVO import UsuarioVO
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT usuario_id, dni_nie, nombre_completo, email, telefono,
-                          tipo_usuario, estado, preferencia, cuenta_bloqueada, fecha_registro
-                   FROM Usuarios"""
-            )
+            cursor.execute(_Q_SELECT_TODOS_USUARIOS)
             return [UsuarioVO(*row) for row in cursor.fetchall()]
         except Exception as e:
             print(f"Error en obtenerTodosLosUsuarios: {e}")
@@ -112,12 +145,7 @@ class AdminDAO(Conexion):
 
         try:
             cursor = self.getCursor()
-            # NO_CHECKSUM y STATS=10 son opcionales pero útiles
-            cursor.execute(
-                f"BACKUP DATABASE [{nombre_bd}] TO DISK = ? WITH FORMAT, INIT, STATS = 10",
-                [ruta_completa]
-            )
-            # Consumir mensajes informativos de SQL Server
+            cursor.execute(_Q_BACKUP_BD.format(nombre_bd), [ruta_completa])
             try:
                 while cursor.nextset():
                     pass
@@ -128,17 +156,12 @@ class AdminDAO(Conexion):
             print(f"Error en hacerBackup: {e}")
             return False, str(e)
 
-
     def registrarActividad(self, usuario_id: int, tipo_accion: str,
                            detalle: str = None, ip: str = None):
         """Inserta una fila en Registro_Actividad."""
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                """INSERT INTO Registro_Actividad (usuario_id, tipo_accion, detalle, ip)
-                   VALUES (?, ?, ?, ?)""",
-                [usuario_id, tipo_accion, detalle, ip]
-            )
+            cursor.execute(_Q_INSERT_ACTIVIDAD, [usuario_id, tipo_accion, detalle, ip])
             return True
         except Exception as e:
             print(f"Error en registrarActividad: {e}")
@@ -152,24 +175,9 @@ class AdminDAO(Conexion):
         try:
             cursor = self.getCursor()
             if tipo_accion and tipo_accion != "Todas":
-                cursor.execute(
-                    """SELECT TOP (?) ra.actividad_id, ra.fecha, u.nombre_completo,
-                              u.tipo_usuario, ra.tipo_accion, ra.detalle, ra.ip
-                       FROM Registro_Actividad ra
-                       JOIN Usuarios u ON ra.usuario_id = u.usuario_id
-                       WHERE ra.tipo_accion = ?
-                       ORDER BY ra.fecha DESC""",
-                    [limite, tipo_accion]
-                )
+                cursor.execute(_Q_SELECT_ACTIVIDAD_FILTRADA, [limite, tipo_accion])
             else:
-                cursor.execute(
-                    """SELECT TOP (?) ra.actividad_id, ra.fecha, u.nombre_completo,
-                              u.tipo_usuario, ra.tipo_accion, ra.detalle, ra.ip
-                       FROM Registro_Actividad ra
-                       JOIN Usuarios u ON ra.usuario_id = u.usuario_id
-                       ORDER BY ra.fecha DESC""",
-                    [limite]
-                )
+                cursor.execute(_Q_SELECT_ACTIVIDAD_TODAS, [limite])
             return cursor.fetchall()
         except Exception as e:
             print(f"Error en obtenerActividad: {e}")
