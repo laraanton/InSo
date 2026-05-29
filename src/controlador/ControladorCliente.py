@@ -45,10 +45,10 @@ class ControladorCliente:
         self.abrir_principal()
 
     def cerrar_sesion(self):
-        from src.vista.Login import MiVentana
+        from src.controlador.ControladorPrincipal import ControladorPrincipal
         self._cerrar_todo()
-        self.ventana_login = MiVentana()
-        self.ventana_login.show()
+        ctrl = ControladorPrincipal()
+        ctrl.abrirIniciarSesion()
 
     def _ocultar_todas_menos(self, excepcion):
         for v in [self.ventana_principal, self.ventana_ajustes,
