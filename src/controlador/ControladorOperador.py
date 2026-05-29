@@ -21,7 +21,9 @@ from __future__ import annotations
 from src.modelo.LogicaOperador import OperadorBO
 from src.modelo.LogicaAnalisis import AnalisisBO
 
-from src.modelo.vo.OperadorVO    import PaqueteVO, ReservaVO, OperacionResultadoVO
+from src.modelo.vo.PaqueteVO import PaqueteVO
+from src.modelo.vo.ReservaVO import ReservaVO
+from src.modelo.vo.OperacionResultadoVO   import OperacionResultadoVO
 from src.modelo.vo.AnalisisVO    import AnalisisVO
 from src.modelo.vo.FeedbackVO    import FeedbackVO
 from src.modelo.vo.ReclamacionVO import ReclamacionVO
