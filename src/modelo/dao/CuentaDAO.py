@@ -1,15 +1,12 @@
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.UsuariosVO import UsuarioVO
 
-# ── Queries ──────────────────────────────────────────────────────────────────
-
 _Q_UPDATE_TELEFONO = "UPDATE Usuarios SET telefono = ? WHERE usuario_id = ?"
 _Q_UPDATE_PREFERENCIA = "UPDATE Usuarios SET preferencia = ? WHERE usuario_id = ?"
 _Q_UPDATE_PREFERENCIA_ACCESIBILIDAD = (
     "UPDATE Usuarios SET preferencia_accesibilidad = ? WHERE usuario_id = ?"
 )
 
-# ── DAO ───────────────────────────────────────────────────────────────────────
 
 class CuentaDAO(Conexion):
 
