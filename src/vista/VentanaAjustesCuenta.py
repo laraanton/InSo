@@ -4,7 +4,8 @@ import pyttsx3
 from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAjustesCuenta.ui")
- 
+
+
 class VentanaAjustesCuenta(QMainWindow, Form):
     def __init__(self, user):
         super().__init__()
@@ -29,15 +30,15 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         if index >= 0:
             self.in_preferencia_edit.setCurrentIndex(index)
 
-        index1 = self.in_preferencia_accesibilidad_edit.findText(self.user.preferencia_accesibilidad or "Ninguna")
+        index1 = self.in_preferencia_accesibilidad_edit.findText(
+            self.user.preferencia_accesibilidad or "Ninguna"
+        )
         if index1 >= 0:
             self.in_preferencia_accesibilidad_edit.setCurrentIndex(index1)
 
-        # Mostrar botón leer pantalla solo si tiene dificultad de lectura
-        tiene_dificultad_lectura = (
-            getattr(self.user, 'preferencia_accesibilidad', '') == 'Dificultad lectura'
+        self.btnLeerPantalla.setVisible(
+            getattr(self.user, "preferencia_accesibilidad", "") == "Dificultad lectura"
         )
-        self.btnLeerPantalla.setVisible(tiene_dificultad_lectura)
 
     def _connect_signals(self):
         self.logoBtn.clicked.connect(self.controlador.volver_a_principal)
@@ -61,68 +62,49 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         self.in_telefono_edit.setFocus()
 
     def _guardar_perfil(self):
-        telefono = self.in_telefono_edit.text().strip()
-        preferencia = self.in_preferencia_edit.currentText()
+        telefono       = self.in_telefono_edit.text().strip()
+        preferencia    = self.in_preferencia_edit.currentText()
         preferencia_acc = self.in_preferencia_accesibilidad_edit.currentText()
 
-        exito = self.controlador.guardar_perfil(telefono, preferencia, preferencia_acc)
+        ok, msg = self.controlador.guardar_perfil(telefono, preferencia, preferencia_acc)
 
-        if exito:
-            QMessageBox.information(self, "Éxito", "Perfil actualizado correctamente")
-            # Vuelve a modo lectura
+        if ok:
+            QMessageBox.information(self, "Éxito", msg)
             self.in_telefono_edit.setReadOnly(True)
             self.in_preferencia_edit.setEnabled(False)
             self.in_preferencia_accesibilidad_edit.setEnabled(False)
             self.btnGuardarPerfil.setVisible(False)
             self.btnEditarPerfil.setVisible(True)
-            # Actualizar visibilidad del botón de lectura según nueva preferencia
-            tiene_dificultad_lectura = (
-                getattr(self.user, 'preferencia_accesibilidad', '') == 'Dificultad lectura'
+            # Actualiza el user local con el VO refrescado del controlador
+            self.user = self.controlador.user
+            self.btnLeerPantalla.setVisible(
+                getattr(self.user, "preferencia_accesibilidad", "") == "Dificultad lectura"
             )
-            self.btnLeerPantalla.setVisible(tiene_dificultad_lectura)
         else:
-            QMessageBox.information(self, "Error", "No se pudo actualizar el perfil")
+            QMessageBox.warning(self, "Error", msg)
 
     def _cambiar_contrasena(self):
-        pass_actual = self.in_pass_actual.text().strip()
-        pass_nueva = self.in_pass_nueva.text().strip()
+        pass_actual   = self.in_pass_actual.text().strip()
+        pass_nueva    = self.in_pass_nueva.text().strip()
         pass_confirmar = self.in_pass_confirmar.text().strip()
 
-        if not all([pass_actual, pass_nueva, pass_confirmar]):
-            QMessageBox.warning(self, "Error", "Todos los campos de contraseña son obligatorios")
-            return
-        
-        if pass_nueva != pass_confirmar:
-            QMessageBox.warning(self, "Error", "Las constraseñas no coinciden")
-            return
-        
-        if len(pass_nueva) < 6:
-            QMessageBox.warning(self, "Error", "La nueva contraseña debe tener al menos 6 caracteres")
-            return
-        
-        if pass_actual == pass_nueva:
-            QMessageBox.warning(self, "Error", "La nueva contraseña no puede ser igual a la actual")
-            return
+        # La vista solo recoge los campos y llama al controlador
+        ok, msg = self.controlador.cambiar_contrasena(
+            pass_actual, pass_nueva, pass_confirmar
+        )
 
-        exito = self.controlador.cambiar_contrasena(pass_actual, pass_nueva, pass_confirmar)
-        if exito == (False, 'contraseña incorrecta'):
-            QMessageBox.warning(self, "Error", "La contraseña actual es incorrecta")
-        
-        elif exito:
-            QMessageBox.information(self, "Éxito", "Contraseña actualizada correctamente")
+        if ok:
+            QMessageBox.information(self, "Éxito", msg)
             self.in_pass_actual.clear()
             self.in_pass_nueva.clear()
             self.in_pass_confirmar.clear()
-
         else:
-            QMessageBox.warning(self, "Error", "No se pudo actualizar la contraseña")
-    
+            QMessageBox.warning(self, "Error", msg)
+
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
-            self, "Cerrar sesion",
-            "Deseas cerrar la sesion actual?",
-            QMessageBox.Yes | QMessageBox.No,
-            QMessageBox.No,
+            self, "Cerrar sesión", "¿Deseas cerrar la sesión actual?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
         )
         if resp == QMessageBox.Yes:
             self.controlador.cerrar_sesion()
@@ -135,15 +117,15 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             f"Email: {self.user.email}. "
             f"Teléfono: {self.user.telefono or 'No indicado'}. "
             f"Preferencia: {self.user.preferencia or 'General'}. "
-            f"Miembro desde: {str(self.user.fecha_registro)[:10] if self.user.fecha_registro else 'desconocido'}."
+            f"Miembro desde: "
+            f"{str(self.user.fecha_registro)[:10] if self.user.fecha_registro else 'desconocido'}."
         )
         engine = pyttsx3.init()
-        voices = engine.getProperty('voices')
-        for voice in voices:
+        for voice in engine.getProperty("voices"):
             if "spanish" in voice.name.lower():
-                engine.setProperty('voice', voice.id)
+                engine.setProperty("voice", voice.id)
                 break
-        engine.setProperty('rate', 150)
-        engine.setProperty('volume', 1.0)
+        engine.setProperty("rate", 150)
+        engine.setProperty("volume", 1.0)
         engine.say(texto)
         engine.runAndWait()
