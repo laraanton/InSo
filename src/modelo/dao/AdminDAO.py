@@ -114,7 +114,7 @@ class AdminDAO(Conexion):
             from src.modelo.vo.UsuariosVO import UsuarioVO
             cursor = self.getCursor()
             cursor.execute(_Q_SELECT_OPERADORES)
-            return [UsuarioVO(*row) for row in cursor.fetchall()]
+            return [UsuarioVO.from_row(row) for row in cursor.fetchall()]
         except Exception as e:
             print(f"Error en obtenerOperadores: {e}")
             return []
@@ -124,7 +124,7 @@ class AdminDAO(Conexion):
             from src.modelo.vo.UsuariosVO import UsuarioVO
             cursor = self.getCursor()
             cursor.execute(_Q_SELECT_TODOS_USUARIOS)
-            return [UsuarioVO(*row) for row in cursor.fetchall()]
+            return [UsuarioVO.from_row(row) for row in cursor.fetchall()]
         except Exception as e:
             print(f"Error en obtenerTodosLosUsuarios: {e}")
             return []
