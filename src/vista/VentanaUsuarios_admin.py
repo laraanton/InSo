@@ -1,6 +1,14 @@
+"""
+VentanaUsuarios_admin.py  –  Vista de Todos los Usuarios
+========================================================
+Responsabilidad: mostrar la lista de todos los usuarios y
+delegar las acciones de bloqueo en el Controlador.
+No contiene lógica de negocio.
+"""
+
 from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QPushButton, QLabel,
-    QMessageBox, QFileDialog, QAbstractItemView
+    QMessageBox, QAbstractItemView
 )
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -15,16 +23,25 @@ class VentanaUsuarios_admin(VentanaBase, Form):
     def __init__(self, controlador, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.controlador = controlador
-        self._cache      = []
+        self._ctrl  = controlador
+        self._cache = []
 
         self._configurar_tabla()
         self._conectar_senales()
 
+    # ── Configuración inicial ─────────────────────────────────────────────────
+
     def _configurar_tabla(self):
-        anchos = [40, 170, 110, 190, 100, 90, 110, 130]
+        # [ID, Nombre, DNI, Email, Tipo, Estado, Registro, Acción]
+        # None = Stretch (la columna ocupa el espacio restante)
+        anchos = [50, 170, 110, 190, 100, 90, 110, None]
+        header = self.tablaUsuarios.horizontalHeader()
         for i, w in enumerate(anchos):
-            self.tablaUsuarios.setColumnWidth(i, w)
+            if w is None:
+                header.setSectionResizeMode(i, header.Stretch)
+            else:
+                header.setSectionResizeMode(i, header.Fixed)
+                self.tablaUsuarios.setColumnWidth(i, w)
         self.tablaUsuarios.verticalHeader().setDefaultSectionSize(38)
         self.tablaUsuarios.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tablaUsuarios.setEditTriggers(QAbstractItemView.NoEditTriggers)
@@ -34,8 +51,11 @@ class VentanaUsuarios_admin(VentanaBase, Form):
         self.filtroTipoUs.currentTextChanged.connect(self._filtrar)
         self.filtroEstadoUs.currentTextChanged.connect(self._filtrar)
 
+    # ── Carga de datos ────────────────────────────────────────────────────────
+
     def cargar(self):
-        self._cache = self.controlador.obtener_todos_los_usuarios()
+        """Llamado por el Controlador cada vez que se navega a esta página."""
+        self._cache = self._ctrl.obtener_todos_usuarios()
         self._poblar(self._cache)
 
     def _poblar(self, lista):
@@ -54,6 +74,8 @@ class VentanaUsuarios_admin(VentanaBase, Form):
             tabla.setCellWidget(row, 5, self._badge_estado(u.estado, u.cuenta_bloqueada))
             tabla.setCellWidget(row, 7, self._acciones(u))
 
+    # ── Filtro ────────────────────────────────────────────────────────────────
+
     def _filtrar(self):
         txt    = self.searchUsuarios.text().strip().lower()
         tipo   = self.filtroTipoUs.currentText()
@@ -70,14 +92,21 @@ class VentanaUsuarios_admin(VentanaBase, Form):
         ]
         self._poblar(filtrados)
 
+    # ── Acciones ──────────────────────────────────────────────────────────────
 
     def _toggle_bloqueo(self, usuario):
         if usuario.cuenta_bloqueada:
-            self.controlador.desbloquear_cuenta(usuario)
+            resultado = self._ctrl.desbloquear_cuenta(usuario)
         else:
-            self.controlador.bloquear_cuenta(usuario)
+            resultado = self._ctrl.bloquear_cuenta(usuario)
+
+        if resultado.ok:
+            QMessageBox.information(self, "Estado actualizado", resultado.mensaje)
+        else:
+            QMessageBox.warning(self, "Error", resultado.mensaje)
         self.cargar()
 
+    # ── Widgets de celda ──────────────────────────────────────────────────────
 
     def _badge_estado(self, estado, bloqueada=False):
         if bloqueada:
