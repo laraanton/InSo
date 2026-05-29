@@ -1,115 +1,158 @@
 """
-ReclamacionDAO.py
-=================
-Consultas sobre Reclamaciones.
-El operador puede consultar y filtrar todas las reclamaciones.
-Solo lectura — el cambio de estado se hace desde aquí también.
+FeedbackDAO.py
+==============
+Consultas de solo lectura sobre Feedback_Clientes.
+El operador puede consultar todos los feedbacks con datos del cliente y paquete.
 """
 
 from src.modelo.conexion.Conexion import Conexion
+from src.modelo.vo.FeedbackVO import FeedbackVO
 
-# ── Queries ──────────────────────────────────────────────────────────────────
-
-_COLS_RECLAMACION = [
-    "reclamacion_id", "ref_reclamacion", "ref_pedido", "cliente",
-    "paquete", "categoria", "descripcion_incidente",
-    "fecha_incidente", "fecha_registro", "estado_reclamacion"
-]
-
-_Q_SELECT_TODAS = """
+_Q_SELECT_TODOS = """
     SELECT
-        rc.reclamacion_id,
-        rc.identificador_reclamacion  AS ref_reclamacion,
-        pv.identificador_unico        AS ref_pedido,
-        u.nombre_completo             AS cliente,
-        pt.nombre_paquete             AS paquete,
-        rc.categoria,
-        rc.descripcion_incidente,
-        CONVERT(NVARCHAR(10), rc.fecha_incidente, 23)  AS fecha_incidente,
-        CONVERT(NVARCHAR(16), rc.fecha_registro,  120) AS fecha_registro,
-        rc.estado_reclamacion
-    FROM  Reclamaciones        rc
-    JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
+        fc.feedback_id,
+        fc.pedido_id,
+        pv.cliente_id,
+        pv.identificador_unico          AS pedido_ref,
+        u.nombre_completo               AS cliente,
+        pt.nombre_paquete               AS paquete,
+        pt.destino                      AS destino,
+        CONVERT(NVARCHAR(10), pv.fecha_pedido, 23) AS fecha_viaje,
+        fc.val_general,
+        fc.val_trato_operador,
+        fc.val_calidad_transporte,
+        fc.val_satisfaccion_alojamiento,
+        fc.comentarios
+    FROM  Feedback_Clientes    fc
+    JOIN  Pedidos_Viajes       pv ON fc.pedido_id  = pv.pedido_id
     JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
     JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
-    ORDER BY rc.fecha_registro DESC
+    ORDER BY pv.fecha_pedido DESC
+"""
+_Q_SELECT_POR_ID = """
+    SELECT
+        fc.feedback_id,
+        fc.pedido_id,
+        pv.cliente_id,
+        pv.identificador_unico,
+        u.nombre_completo,
+        pt.nombre_paquete,
+        pt.destino,
+        CONVERT(NVARCHAR(10), pv.fecha_pedido, 23),
+        fc.val_general,
+        fc.val_trato_operador,
+        fc.val_calidad_transporte,
+        fc.val_satisfaccion_alojamiento,
+        fc.comentarios
+    FROM  Feedback_Clientes    fc
+    JOIN  Pedidos_Viajes       pv ON fc.pedido_id  = pv.pedido_id
+    JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
+    JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
+    WHERE fc.feedback_id = ?
+"""
+_Q_SELECT_PAQUETES_CON_FEEDBACK = """
+    SELECT DISTINCT pt.nombre_paquete
+    FROM  Feedback_Clientes   fc
+    JOIN  Pedidos_Viajes      pv ON fc.pedido_id  = pv.pedido_id
+    JOIN  Paquetes_Turisticos pt ON pv.paquete_id = pt.paquete_id
+    ORDER BY pt.nombre_paquete
 """
 # Base para buscar() — se le añade WHERE dinámico
 _Q_BASE_BUSCAR = """
     SELECT
-        rc.reclamacion_id,
-        rc.identificador_reclamacion,
+        fc.feedback_id,
+        fc.pedido_id,
+        pv.cliente_id,
         pv.identificador_unico,
         u.nombre_completo,
         pt.nombre_paquete,
-        rc.categoria,
-        rc.descripcion_incidente,
-        CONVERT(NVARCHAR(10), rc.fecha_incidente, 23),
-        CONVERT(NVARCHAR(16), rc.fecha_registro,  120),
-        rc.estado_reclamacion
-    FROM  Reclamaciones        rc
-    JOIN  Pedidos_Viajes       pv ON rc.pedido_id  = pv.pedido_id
+        pt.destino,
+        CONVERT(NVARCHAR(10), pv.fecha_pedido, 23),
+        fc.val_general,
+        fc.val_trato_operador,
+        fc.val_calidad_transporte,
+        fc.val_satisfaccion_alojamiento,
+        fc.comentarios
+    FROM  Feedback_Clientes    fc
+    JOIN  Pedidos_Viajes       pv ON fc.pedido_id  = pv.pedido_id
     JOIN  Usuarios             u  ON pv.cliente_id = u.usuario_id
     JOIN  Paquetes_Turisticos  pt ON pv.paquete_id = pt.paquete_id
     {where}
-    ORDER BY rc.fecha_registro DESC
-"""
-_Q_UPDATE_ESTADO = """
-    UPDATE Reclamaciones
-    SET    estado_reclamacion = ?
-    WHERE  reclamacion_id = ?
+    ORDER BY pv.fecha_pedido DESC
 """
 
-# ── DAO ───────────────────────────────────────────────────────────────────────
+class FeedbackDAO(Conexion):
 
-class ReclamacionDAO(Conexion):
+    @staticmethod
+    def _row_a_vo(row) -> FeedbackVO:
+        # Orden columnas: 0 feedback_id, 1 pedido_id, 2 cliente_id,
+        # 3 pedido_ref, 4 cliente, 5 paquete, 6 destino, 7 fecha_viaje,
+        # 8 val_general, 9 val_trato_operador, 10 val_calidad_transporte,
+        # 11 val_satisfaccion_alojamiento, 12 comentarios
+        return FeedbackVO(
+            feedback_id                  = row[0],
+            pedido_id                    = row[1],
+            cliente_id                   = row[2],
+            pedido_ref                   = row[3]  or "",
+            cliente                      = row[4]  or "",
+            paquete                      = row[5]  or "",
+            destino                      = row[6]  or "",
+            fecha_viaje                  = row[7]  or "",
+            val_general                  = row[8],
+            val_trato_operador           = row[9],
+            val_calidad_transporte       = row[10],
+            val_satisfaccion_alojamiento = row[11],
+            comentarios                  = row[12] or "",
+        )
 
-    def obtener_todas(self) -> list[dict]:
-        """
-        Devuelve todas las reclamaciones con datos del cliente y paquete.
-        """
+    def obtener_todos(self) -> list[FeedbackVO]:
+        """Devuelve todos los feedbacks como lista de FeedbackVO."""
         try:
             cursor = self.getCursor()
-            cursor.execute(_Q_SELECT_TODAS)
-            return [dict(zip(_COLS_RECLAMACION, row)) for row in cursor.fetchall()]
+            cursor.execute(_Q_SELECT_TODOS)
+            return [self._row_a_vo(row) for row in cursor.fetchall()]
         except Exception as e:
-            print(f"[ReclamacionDAO] Error en obtener_todas: {e}")
+            print(f"[FeedbackDAO] Error en obtener_todos: {e}")
             return []
 
-    def buscar(self, texto: str = "", categoria: str = "",
-               estado: str = "") -> list[dict]:
-        """Filtra reclamaciones por texto, categoría y/o estado."""
+    def obtener_por_id(self, feedback_id: int) -> FeedbackVO | None:
+        """Devuelve un FeedbackVO concreto o None."""
+        try:
+            cursor = self.getCursor()
+            cursor.execute(_Q_SELECT_POR_ID, [feedback_id])
+            row = cursor.fetchone()
+            return self._row_a_vo(row) if row else None
+        except Exception as e:
+            print(f"[FeedbackDAO] Error en obtener_por_id: {e}")
+            return None
+
+    def buscar(self, texto: str = "", paquete: str = "") -> list[FeedbackVO]:
+        """Filtra feedbacks por texto libre en cliente/comentarios y/o paquete."""
         try:
             cursor = self.getCursor()
             params = []
             filtros = []
 
             if texto:
-                filtros.append(
-                    "(u.nombre_completo LIKE ? OR rc.descripcion_incidente LIKE ? "
-                    "OR pt.nombre_paquete LIKE ?)"
-                )
-                params += [f"%{texto}%", f"%{texto}%", f"%{texto}%"]
-            if categoria and categoria != "Todas":
-                filtros.append("rc.categoria = ?")
-                params.append(categoria)
-            if estado and estado != "Todos":
-                filtros.append("rc.estado_reclamacion = ?")
-                params.append(estado)
+                filtros.append("(u.nombre_completo LIKE ? OR fc.comentarios LIKE ?)")
+                params += [f"%{texto}%", f"%{texto}%"]
+            if paquete and paquete != "Todos":
+                filtros.append("pt.nombre_paquete = ?")
+                params.append(paquete)
 
             where = ("WHERE " + " AND ".join(filtros)) if filtros else ""
             cursor.execute(_Q_BASE_BUSCAR.format(where=where), params)
-            return [dict(zip(_COLS_RECLAMACION, row)) for row in cursor.fetchall()]
+            return [self._row_a_vo(row) for row in cursor.fetchall()]
         except Exception as e:
-            print(f"[ReclamacionDAO] Error en buscar: {e}")
+            print(f"[FeedbackDAO] Error en buscar: {e}")
             return []
 
-    def actualizar_estado(self, reclamacion_id: int, nuevo_estado: str) -> bool:
-        """Actualiza el estado de una reclamación."""
+    def obtener_paquetes_con_feedback(self) -> list[str]:
+        """Devuelve lista de nombres de paquetes que tienen feedback (para el filtro)."""
         try:
             cursor = self.getCursor()
-            cursor.execute(_Q_UPDATE_ESTADO, [nuevo_estado, reclamacion_id])
-            return True
+            cursor.execute(_Q_SELECT_PAQUETES_CON_FEEDBACK)
+            return [row[0] for row in cursor.fetchall()]
         except Exception as e:
-            print(f"[ReclamacionDAO] Error en actualizar_estado: {e}")
-            return False
+            print(f"[FeedbackDAO] Error en obtener_paquetes_con_feedback: {e}")
+            return []
