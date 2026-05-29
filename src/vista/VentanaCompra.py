@@ -14,7 +14,6 @@ UI_FILE = os.path.join(
     "vistaCompra.ui"
 )
 
-# Estados válidos según Req_26 / sección 2.2.3 ERS
 ESTADOS = [
     "Pendiente confirmacion",
     "Confirmado",
@@ -25,7 +24,6 @@ ESTADOS = [
     "Reembolsado",
 ]
 
-# Colores de badge por estado (Req_6)
 _COLOR_ESTADO = {
     "Pendiente confirmacion": ("#fff3cd", "#856404"),
     "Confirmado":             ("#d4edda", "#155724"),
@@ -49,7 +47,7 @@ class VentanaCompra(QWidget):
 
         self._configurar_tabla()
         self._conectar_senales()
-        self.refrescar()          # carga inicial
+        self.refrescar()
 
     # ── Configuración ──────────────────────────────────────────────────────
 
@@ -73,11 +71,9 @@ class VentanaCompra(QWidget):
     # ── Carga / filtrado ───────────────────────────────────────────────────
 
     def refrescar(self):
-        """Recarga la tabla completa desde el controlador."""
         self._filtrar()
 
     def _filtrar(self):
-        """Filtra reservas según búsqueda y estado, y repinta la tabla."""
         texto  = self.inputBuscar.text().strip()
         estado = self.comboEstado.currentText()
         reservas = self._ctrl.buscar_reservas(texto=texto, estado=estado)
@@ -85,20 +81,21 @@ class VentanaCompra(QWidget):
 
     # ── Tabla ──────────────────────────────────────────────────────────────
 
-    def _poblar_tabla(self, reservas: list[dict]):
+    def _poblar_tabla(self, reservas: list):
         t = self.tablaReservas
         t.setRowCount(0)
 
         for fila, r in enumerate(reservas):
             t.insertRow(fila)
 
-            for col, clave in enumerate(["id", "cliente", "paquete", "fecha", "precio"]):
-                item = QTableWidgetItem(str(r.get(clave, "")))
+            # r es un ReservaVO → acceso por atributos
+            for col, attr in enumerate(["identificador_unico", "cliente", "paquete", "fecha", "precio"]):
+                valor = getattr(r, attr, "") or ""
+                item = QTableWidgetItem(str(valor))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 t.setItem(fila, col, item)
 
-            # Badge de estado con color (Req_6)
-            estado = r.get("estado", "")
+            estado = r.estado or ""
             item_e = QTableWidgetItem(estado)
             item_e.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item_e.setTextAlignment(Qt.AlignCenter)
@@ -107,12 +104,11 @@ class VentanaCompra(QWidget):
             item_e.setForeground(QColor(fg))
             t.setItem(fila, COL_ESTADO, item_e)
 
-            self._insertar_combo_estado(t, fila, r["id"], estado)
+            self._insertar_combo_estado(t, fila, r.identificador_unico, estado)
 
         t.resizeRowsToContents()
 
-    def _insertar_combo_estado(self, tabla, fila: int, id_pedido: str, estado_actual: str):
-        """Inserta el combo desplegable de cambio de estado en la columna Acciones."""
+    def _insertar_combo_estado(self, tabla, fila: int, id_pedido, estado_actual: str):
         w = QWidget()
         lay = QHBoxLayout(w)
         lay.setContentsMargins(4, 2, 4, 2)
@@ -133,12 +129,10 @@ class VentanaCompra(QWidget):
 
     # ── Acciones ───────────────────────────────────────────────────────────
 
-    def _cambiar_estado(self, id_pedido: str, nuevo_estado: str, fila: int):
-        """Delega el cambio de estado en el controlador (Req_26) y actualiza el badge."""
-        ok, msg = self._ctrl.cambiar_estado_reserva(id_pedido, nuevo_estado)
-        self._set_estado(msg, error=not ok)
-        if ok:
-            # Actualizar el badge sin repintar toda la tabla
+    def _cambiar_estado(self, id_pedido, nuevo_estado: str, fila: int):
+        resultado = self._ctrl.cambiar_estado_reserva(id_pedido, nuevo_estado)
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
+        if resultado.ok:
             item = self.tablaReservas.item(fila, COL_ESTADO)
             if item:
                 item.setText(nuevo_estado)
@@ -147,30 +141,24 @@ class VentanaCompra(QWidget):
                 item.setForeground(QColor(fg))
 
     def _nueva_reserva(self):
-        """
-        Punto de entrada para crear una reserva nueva (Req_25).
-        Aquí se abriría un diálogo; por ahora inserta un ejemplo.
-        Sustituir por: dialogo = DialogoNuevaReserva(self); dialogo.exec_()
-        """
         datos = {
-            "cliente": "Cliente Ejemplo",
-            "paquete": "Escapada Paris",
-            "precio":  "1.200 EUR",
+            "cliente":  "Cliente Ejemplo",
+            "paquete":  "Escapada Paris",
+            "precio":   "1.200 EUR",
         }
-        ok, msg = self._ctrl.registrar_reserva(datos)
-        self._set_estado(msg, error=not ok)
-        if ok:
+        resultado = self._ctrl.registrar_reserva(datos)
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
+        if resultado.ok:
             self.refrescar()
 
     def _exportar_csv(self):
-        """Exporta las reservas a CSV (Req_19)."""
         ruta, _ = QFileDialog.getSaveFileName(
             self, "Exportar reservas", "reservas.csv", "CSV (*.csv)"
         )
         if not ruta:
             return
-        ok, msg = self._ctrl.exportar_csv(ruta)
-        self._set_estado(msg, error=not ok)
+        resultado = self._ctrl.exportar_csv(ruta)
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
 
     # ── Helpers ────────────────────────────────────────────────────────────
 
