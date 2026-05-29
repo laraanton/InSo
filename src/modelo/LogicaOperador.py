@@ -1,9 +1,11 @@
 """
-OperadorBO.py  –  Lógica de negocio del Operador
-=================================================
-Orquesta los DAOs y construye VOs.
-El Controlador NUNCA llama a los DAOs directamente;
-siempre pasa por este BO (o por AnalisisBO para los gráficos).
+LogicaOperador.py  –  Lógica de negocio del Operador
+=====================================================
+Orquesta los DAOs y aplica reglas de negocio.
+El Controlador NUNCA llama a los DAOs directamente.
+
+Los DAOs ya devuelven VOs; este BO los recibe y los pasa
+directamente sin re-construirlos ni convertir dicts.
 
 Reglas de negocio aquí:
     - Validación de campos obligatorios del paquete
@@ -20,12 +22,14 @@ from src.modelo.dao.ReservaDAO     import ReservaDAO
 from src.modelo.dao.FeedbackDAO    import FeedbackDAO
 from src.modelo.dao.ReclamacionDAO import ReclamacionDAO
 
-from src.modelo.vo.OperadorVO    import PaqueteVO, ReservaVO, OperacionResultadoVO
+from src.modelo.vo.PaqueteVO     import PaqueteVO
+from src.modelo.vo.ReservaVO     import ReservaVO
 from src.modelo.vo.FeedbackVO    import FeedbackVO
 from src.modelo.vo.ReclamacionVO import ReclamacionVO
+from src.modelo.vo.OperadorVO    import OperacionResultadoVO
 
 
-# ── Estados permitidos ────────────────────────────────────────────────────────
+# ── Estados permitidos 
 
 _ESTADOS_RESERVA = {
     "Pendiente confirmacion", "Confirmado", "Pagado",
@@ -47,79 +51,15 @@ class OperadorBO:
         self._feed = FeedbackDAO()
         self._rec  = ReclamacionDAO()
 
-    # ── Helpers de conversión dict → VO ──────────────────────────────────────
+    # ── Validación de paquete 
 
     @staticmethod
-    def _a_paquete_vo(d: dict) -> PaqueteVO:
-        return PaqueteVO(
-            id          = d.get("id"),
-            nombre      = d.get("nombre", ""),
-            destino     = d.get("destino", ""),
-            duracion    = d.get("duracion"),
-            precio      = d.get("precio"),
-            servicios   = d.get("servicios", ""),
-            descripcion = d.get("descripcion", ""),
-            perfil      = d.get("perfil", "General"),
-            emoji       = d.get("emoji", "✈️"),
-            fecha_ini   = d.get("fecha_ini", ""),
-            fecha_fin   = d.get("fecha_fin", ""),
-        )
-
-    @staticmethod
-    def _a_reserva_vo(d: dict) -> ReservaVO:
-        return ReservaVO(
-            id                  = d.get("id"),
-            identificador_unico = d.get("identificador_unico", ""),
-            cliente             = d.get("cliente", ""),
-            cliente_id          = d.get("cliente_id"),
-            paquete             = d.get("paquete", ""),
-            paquete_id          = d.get("paquete_id"),
-            fecha               = d.get("fecha", ""),
-            precio              = d.get("precio"),
-            estado              = d.get("estado", ""),
-            metodo_pago         = d.get("metodo_pago", ""),
-        )
-
-    @staticmethod
-    def _a_feedback_vo(d: dict) -> FeedbackVO:
-        return FeedbackVO(
-            feedback_id                  = d.get("feedback_id"),
-            pedido_ref                   = d.get("pedido_ref", ""),
-            cliente                      = d.get("cliente", ""),
-            paquete                      = d.get("paquete", ""),
-            destino                      = d.get("destino", ""),
-            fecha_viaje                  = d.get("fecha_viaje", ""),
-            val_trato_operador           = d.get("val_trato_operador"),
-            val_calidad_transporte       = d.get("val_calidad_transporte"),
-            val_satisfaccion_alojamiento = d.get("val_satisfaccion_alojamiento"),
-            val_general                  = d.get("val_general"),
-            comentarios                  = d.get("comentarios", ""),
-        )
-
-    @staticmethod
-    def _a_reclamacion_vo(d: dict) -> ReclamacionVO:
-        return ReclamacionVO(
-            reclamacion_id        = d.get("reclamacion_id"),
-            ref_reclamacion       = d.get("ref_reclamacion", ""),
-            ref_pedido            = d.get("ref_pedido", ""),
-            cliente               = d.get("cliente", ""),
-            paquete               = d.get("paquete", ""),
-            categoria             = d.get("categoria", ""),
-            descripcion_incidente = d.get("descripcion_incidente", ""),
-            fecha_incidente       = d.get("fecha_incidente", ""),
-            fecha_registro        = d.get("fecha_registro", ""),
-            estado_reclamacion    = d.get("estado_reclamacion", "Registrada"),
-        )
-
-    # ── Validación de paquete ─────────────────────────────────────────────────
-
-    @staticmethod
-    def _validar_paquete(datos: dict) -> OperacionResultadoVO:
-        if not datos.get("nombre", "").strip():
+    def _validar_paquete(paquete: PaqueteVO) -> OperacionResultadoVO:
+        if not (paquete.nombre or "").strip():
             return OperacionResultadoVO(False, "El campo 'Nombre del paquete' es obligatorio.")
-        if not datos.get("destino", "").strip():
+        if not (paquete.destino or "").strip():
             return OperacionResultadoVO(False, "El campo 'Destino' es obligatorio.")
-        precio_str = datos.get("precio", "").strip()
+        precio_str = str(paquete.precio or "").strip()
         if not precio_str:
             return OperacionResultadoVO(False, "El campo 'Precio' es obligatorio.")
         try:
@@ -129,72 +69,70 @@ class OperadorBO:
             return OperacionResultadoVO(False, "El precio debe ser un número positivo (ej: 1200.00).")
         return OperacionResultadoVO(True, "")
 
-    # ── PAQUETES ──────────────────────────────────────────────────────────────
+    # ── PAQUETES 
 
     def obtener_todos_paquetes(self) -> list[PaqueteVO]:
-        return [self._a_paquete_vo(d) for d in self._paq.obtener_todos()]
+        return self._paq.obtener_todos()
 
     def obtener_paquete_por_id(self, id_paquete: int) -> PaqueteVO | None:
-        d = self._paq.obtener_por_id(id_paquete)
-        return self._a_paquete_vo(d) if d else None
+        return self._paq.obtener_por_id(id_paquete)
 
-    def crear_paquete(self, datos: dict) -> OperacionResultadoVO:
-        resultado = self._validar_paquete(datos)
+    def crear_paquete(self, paquete: PaqueteVO) -> OperacionResultadoVO:
+        resultado = self._validar_paquete(paquete)
         if not resultado.ok:
             return resultado
-        nuevo_id = self._paq.insertar(datos, operador_id=self._usuario_id)
+        nuevo_id = self._paq.insertar(paquete, operador_id=self._usuario_id)
         if nuevo_id is None:
             return OperacionResultadoVO(False, "Error al guardar el paquete en la base de datos.")
         self._paq.registrar_historial(
             nuevo_id, self._usuario_id,
-            f"Paquete '{datos['nombre']}' creado."
+            f"Paquete '{paquete.nombre}' creado."
         )
         return OperacionResultadoVO(
-            True, f"Paquete '{datos['nombre']}' guardado correctamente (ID {nuevo_id})."
+            True, f"Paquete '{paquete.nombre}' guardado correctamente (ID {nuevo_id})."
         )
 
-    def editar_paquete(self, id_paquete: int, datos: dict) -> OperacionResultadoVO:
-        resultado = self._validar_paquete(datos)
+    def editar_paquete(self, id_paquete: int, paquete: PaqueteVO) -> OperacionResultadoVO:
+        resultado = self._validar_paquete(paquete)
         if not resultado.ok:
             return resultado
-        if not self._paq.actualizar(id_paquete, datos):
+        if not self._paq.actualizar(id_paquete, paquete):
             return OperacionResultadoVO(False, "Error al actualizar el paquete en la base de datos.")
         self._paq.registrar_historial(
             id_paquete, self._usuario_id,
-            f"Paquete actualizado: {datos['nombre']}."
+            f"Paquete actualizado: {paquete.nombre}."
         )
-        return OperacionResultadoVO(True, f"Paquete '{datos['nombre']}' actualizado correctamente.")
+        return OperacionResultadoVO(True, f"Paquete '{paquete.nombre}' actualizado correctamente.")
 
     def eliminar_paquete(self, id_paquete: int) -> OperacionResultadoVO:
         if self._paq.tiene_reservas_activas(id_paquete):
             return OperacionResultadoVO(
                 False, "No se puede eliminar: el paquete tiene reservas activas."
             )
-        paq = self._paq.obtener_por_id(id_paquete)
-        if paq is None:
+        paquete = self._paq.obtener_por_id(id_paquete)
+        if paquete is None:
             return OperacionResultadoVO(False, "Paquete no encontrado.")
         if not self._paq.eliminar(id_paquete):
             return OperacionResultadoVO(False, "Error al eliminar el paquete en la base de datos.")
         self._paq.registrar_historial(
             id_paquete, self._usuario_id,
-            f"Paquete '{paq['nombre']}' marcado como Inactivo (eliminado)."
+            f"Paquete '{paquete.nombre}' marcado como Inactivo (eliminado)."
         )
-        return OperacionResultadoVO(True, f"Paquete '{paq['nombre']}' eliminado correctamente.")
+        return OperacionResultadoVO(True, f"Paquete '{paquete.nombre}' eliminado correctamente.")
 
-    # ── RESERVAS ──────────────────────────────────────────────────────────────
+    # ── RESERVAS 
 
     def obtener_reservas(self) -> list[ReservaVO]:
-        return [self._a_reserva_vo(d) for d in self._res.obtener_todas()]
+        return self._res.obtener_todas()
 
     def buscar_reservas(self, texto: str = "", estado: str = "") -> list[ReservaVO]:
-        return [self._a_reserva_vo(d)
-                for d in self._res.buscar(texto=texto, estado=estado)]
+        return self._res.buscar(texto=texto, estado=estado)
 
-    def cambiar_estado_reserva(self, id_pedido, nuevo_estado: str) -> OperacionResultadoVO:
+    def cambiar_estado_reserva(self, id_pedido: str, nuevo_estado: str) -> OperacionResultadoVO:
         if nuevo_estado not in _ESTADOS_RESERVA:
             return OperacionResultadoVO(False, f"Estado '{nuevo_estado}' no reconocido.")
         reserva = self._res.obtener_por_identificador(id_pedido)
-        if reserva and reserva.get("estado") == "Finalizado":
+        if reserva and reserva.estado == "Finalizado":
             return OperacionResultadoVO(
                 False, f"Pedido {id_pedido} ya está finalizado y no se puede modificar."
             )
@@ -204,6 +142,13 @@ class OperadorBO:
         return OperacionResultadoVO(True, f"Pedido {id_pedido} → '{nuevo_estado}'.")
 
     def registrar_reserva(self, datos: dict) -> OperacionResultadoVO:
+        """
+        Crea una reserva nueva. Recibe un dict con:
+            cliente_id, paquete_id, monto_total, metodo_pago,
+            fecha_inicio, fecha_fin
+        (el DAO.insertar sigue esperando dict para este caso concreto de
+        creación manual, donde aún no existe un ReservaVO completo)
+        """
         if not datos.get("cliente_id"):
             return OperacionResultadoVO(False, "El campo 'cliente_id' es obligatorio.")
         if not datos.get("paquete_id"):
@@ -216,7 +161,7 @@ class OperadorBO:
 
     def exportar_reservas_csv(self, ruta: str) -> OperacionResultadoVO:
         try:
-            reservas = self._res.exportar_todas()
+            reservas = self._res.exportar_todas()   # list[dict] vía ReservaVO.to_export_dict()
             cabecera = ["ID Pedido", "Cliente", "Paquete", "Fecha", "Precio", "Estado", "Método Pago"]
             campos   = ["id", "cliente", "paquete", "fecha", "precio", "estado", "metodo_pago"]
             with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
@@ -226,27 +171,25 @@ class OperadorBO:
         except Exception as e:
             return OperacionResultadoVO(False, f"Error al exportar: {e}")
 
-    # ── FEEDBACK ──────────────────────────────────────────────────────────────
+    # ── FEEDBACK 
 
     def obtener_feedbacks(self) -> list[FeedbackVO]:
-        return [self._a_feedback_vo(d) for d in self._feed.obtener_todos()]
+        return self._feed.obtener_todos()
 
     def buscar_feedbacks(self, texto: str = "", paquete: str = "") -> list[FeedbackVO]:
-        return [self._a_feedback_vo(d)
-                for d in self._feed.buscar(texto=texto, paquete=paquete)]
+        return self._feed.buscar(texto=texto, paquete=paquete)
 
     def obtener_paquetes_con_feedback(self) -> list[str]:
         return self._feed.obtener_paquetes_con_feedback()
 
-    # ── RECLAMACIONES ─────────────────────────────────────────────────────────
+    # ── RECLAMACIONES 
 
     def obtener_reclamaciones(self) -> list[ReclamacionVO]:
-        return [self._a_reclamacion_vo(d) for d in self._rec.obtener_todas()]
+        return self._rec.obtener_todas()
 
     def buscar_reclamaciones(self, texto: str = "", categoria: str = "",
                               estado: str = "") -> list[ReclamacionVO]:
-        return [self._a_reclamacion_vo(d)
-                for d in self._rec.buscar(texto=texto, categoria=categoria, estado=estado)]
+        return self._rec.buscar(texto=texto, categoria=categoria, estado=estado)
 
     def cambiar_estado_reclamacion(self, reclamacion_id: int,
                                     nuevo_estado: str) -> OperacionResultadoVO:
