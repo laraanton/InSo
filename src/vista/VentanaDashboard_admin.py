@@ -1,3 +1,10 @@
+"""
+VentanaDashboard_admin.py  –  Vista del Dashboard del Administrador
+===================================================================
+Responsabilidad: pedir datos al ControladorAdmin y pintarlos.
+No contiene lógica de negocio.
+"""
+
 from PyQt5.QtWidgets import QAbstractItemView
 from PyQt5.QtCore import pyqtSignal
 from PyQt5 import uic
@@ -9,15 +16,18 @@ Form, _ = uic.loadUiType("./src/vista/ui/vistadashboardadmin.ui")
 
 class VentanaDashboard_admin(VentanaBase, Form):
 
+    # Señal que VentanaAdmin escucha para saltar a la página de actividad
     ir_a_actividad = pyqtSignal()
 
     def __init__(self, controlador, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.controlador = controlador
+        self._ctrl = controlador
 
         self._configurar_tabla()
         self.btnVerTodosDash.clicked.connect(self.ir_a_actividad.emit)
+
+    # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
         header = self.tablaDashActividad.horizontalHeader()
@@ -31,8 +41,11 @@ class VentanaDashboard_admin(VentanaBase, Form):
         self.tablaDashActividad.setSelectionMode(QAbstractItemView.NoSelection)
         self.tablaDashActividad.setEditTriggers(QAbstractItemView.NoEditTriggers)
 
+    # ── Carga de datos ────────────────────────────────────────────────────────
+
     def cargar(self):
-        todos      = self.controlador.obtener_todos_los_usuarios()
+        """Llamado por el Controlador cada vez que se navega a esta página."""
+        todos      = self._ctrl.obtener_todos_usuarios()
         operadores = [u for u in todos if u.tipo_usuario == "Operador"]
         clientes   = [u for u in todos if u.tipo_usuario == "Cliente"]
         bloqueados = [u for u in todos if u.cuenta_bloqueada]
@@ -47,12 +60,13 @@ class VentanaDashboard_admin(VentanaBase, Form):
     def _poblar_actividad_reciente(self):
         tabla = self.tablaDashActividad
         tabla.setRowCount(0)
-        filas = self.controlador.obtener_actividad(limite=8)
-        for fila in filas:
+
+        registros = self._ctrl.obtener_actividad(limite=8)
+        for r in registros:
             row = tabla.rowCount()
             tabla.insertRow(row)
-            fecha = str(fila[1])[:19] if fila[1] else "—"
-            tabla.setItem(row, 0, self._item(fecha, center=True, selectable=False))
-            tabla.setItem(row, 1, self._item(fila[2] or "",       selectable=False))
-            tabla.setItem(row, 2, self._item(fila[4] or "",       selectable=False))
-            tabla.setItem(row, 3, self._item(fila[5] or "",       selectable=False))
+            fecha = str(r.fecha)[:19] if r.fecha else "—"
+            tabla.setItem(row, 0, self._item(fecha,           selectable=False, center=True))
+            tabla.setItem(row, 1, self._item(r.nombre_usuario or "", selectable=False))
+            tabla.setItem(row, 2, self._item(r.tipo_accion   or "", selectable=False))
+            tabla.setItem(row, 3, self._item(r.detalle       or "", selectable=False))
