@@ -68,7 +68,7 @@ class ControladorCliente:
         return self.logica_cliente.obtener_todos_paquetes()
 
     def ver_paquete(self, paquete_id: int):
-        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete  # ✅
+        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete 
         paquete = self.logica_cliente.obtener_paquete_por_id(paquete_id)
         if not paquete:
             return
@@ -77,7 +77,7 @@ class ControladorCliente:
         self._ocultar_todas_menos(self.ventana_detalle)
 
     def ver_pedido(self, pedido_id: int):
-        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje    # ✅
+        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje 
         pedido = self.logica_cliente.obtener_pedido(pedido_id)
         if not pedido:
             return
