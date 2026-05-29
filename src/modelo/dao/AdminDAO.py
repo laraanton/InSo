@@ -1,7 +1,6 @@
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.RegistroVO import RegistroVO
 
-# ── Queries ──────────────────────────────────────────────────────────────────
 
 _Q_INSERT_OPERADOR = """
     INSERT INTO Usuarios
