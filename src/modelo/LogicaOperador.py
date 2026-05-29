@@ -26,7 +26,7 @@ from src.modelo.vo.PaqueteVO     import PaqueteVO
 from src.modelo.vo.ReservaVO     import ReservaVO
 from src.modelo.vo.FeedbackVO    import FeedbackVO
 from src.modelo.vo.ReclamacionVO import ReclamacionVO
-from src.modelo.vo.OperadorVO    import OperacionResultadoVO
+from src.modelo.vo.OperacionResultadoVO   import OperacionResultadoVO
 
 
 # ── Estados permitidos 
