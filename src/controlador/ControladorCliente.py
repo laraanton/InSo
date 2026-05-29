@@ -1,20 +1,25 @@
 from src.modelo.Logica_login import BussinessObject
-from src.modelo.dao.UserDAO import UserDAO
-from src.modelo.dao.CuentaDAO import CuentaDAO
-from src.modelo.dao.PedidoDAO import PedidoDAO
-from src.modelo.vo.LoginVO import LoginVO
-from src.modelo.vo.PedidoVO import PedidoVO
+from src.modelo.Logica_cliente import BusinessCliente
 
+# Se importan también las ventanas siguientes:
+# from src.vista.VentanaCliente import VentanaCliente
+# from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
+# from src.vista.VentanaMisViajes import VentanaMisViajes
+# from src.vista.Login import MiVentana
+
+# Se importan localmente en las funciones donde las vaya a usar porque si no
+# se me genera un circular import y provoca fallos.
 
 class ControladorCliente:
     def __init__(self, user):
         self.user = user
         self.logica = BussinessObject()
+        self.logica_cliente = BusinessCliente()
         self.ventana_principal = None
-        self.ventana_ajustes = None
-        self.ventana_viajes = None
-        self.ventana_detalle = None
-        self.ventana_compra = None
+        self.ventana_ajustes   = None
+        self.ventana_viajes    = None
+        self.ventana_detalle   = None
+        self.ventana_compra    = None
 
     # ── Navegación ───────────────────────────────────────────────────────────
 
@@ -59,91 +64,95 @@ class ControladorCliente:
 
     # ── Paquetes ─────────────────────────────────────────────────────────────
 
+    def obtener_paquetes(self) -> list:
+        return self.logica_cliente.obtener_todos_paquetes()
+
+    def ver_paquete(self, paquete_id: int):
+        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete  # ✅
+        paquete = self.logica_cliente.obtener_paquete_por_id(paquete_id)
+        if not paquete:
+            return
+        self.ventana_detalle = VentanaDetallePaquete(self.user, paquete)
+        self.ventana_detalle.show()
+        self._ocultar_todas_menos(self.ventana_detalle)
+
     def ver_pedido(self, pedido_id: int):
-        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje
-        pedido = PedidoDAO().obtener_por_paquete(pedido_id)
+        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje    # ✅
+        pedido = self.logica_cliente.obtener_pedido(pedido_id)
         if not pedido:
             return
         self.ventana_detalle = VentanaDetalleMViaje(self.user, pedido)
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
-    
-    
-    def ver_paquete(self, paquete_id: int):
-        from src.modelo.dao.PaqueteDAO import PaqueteDAO
-        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
-
-        paquete = PaqueteDAO().obtener_por_id(paquete_id)
-        if not paquete:
-            return
-
-        self.ventana_detalle = VentanaDetallePaquete(self.user, paquete)
-        self.ventana_detalle.show()
-        self._ocultar_todas_menos(self.ventana_detalle)
-
-    def abrir_ventana_compra(self, paquete: dict):
-        from src.vista.VentanaCompra import VentanaCompra
-        self.ventana_compra = VentanaCompra(paquete, self.user)
-        self.ventana_compra.show()
 
     # ── Pedidos ──────────────────────────────────────────────────────────────
 
     def obtener_viajes_cliente(self) -> list[dict]:
-        """Devuelve todos los pedidos del usuario actual."""
-        return PedidoDAO().obtener_por_cliente(self.user.usuario_id)
+        return self.logica_cliente.obtener_viajes_cliente(self.user.usuario_id)
 
-    def comprar_paquete(self, paquete: dict, fecha_inicio, fecha_fin,
-                        personas: int, metodo_pago: str) -> tuple[bool, str]:
-        if fecha_fin <= fecha_inicio:
-            return False, "La fecha de fin debe ser posterior a la de inicio."
+    def validar_compra(self, paquete, fecha_ini, fecha_fin,
+                       personas, metodo) -> tuple[bool, str]:
+        from datetime import date
+        if fecha_ini < date.today():
+            return False, "La fecha de inicio no puede ser anterior a hoy."
+        dias = (fecha_fin - fecha_ini).days
+        if dias != int(paquete.get("duracion", 0)):
+            return False, "La duración del paquete no es flexible."
+        if not metodo:
+            return False, "Selecciona un método de pago."
         if personas < 1:
             return False, "Debe haber al menos 1 persona."
-        if not metodo_pago:
-            return False, "Selecciona un método de pago."
+        return True, ""
 
+    def calcular_total(self, paquete: dict, personas: int) -> float:
         try:
-            precio_unitario = float(paquete.get("precio", 0))
-        except ValueError:
-            return False, "El paquete no tiene un precio válido."
+            return float(paquete.get("precio", 0)) * personas
+        except (ValueError, TypeError):
+            return 0.0
 
-        monto_total = precio_unitario * personas
-
-        vo = PedidoVO(
-            cliente_id=self.user.usuario_id,
-            paquete_id=paquete.get("id") or paquete.get("paquete_id"),
-            monto_total=monto_total,
-            metodo_pago=metodo_pago,
-            fecha_inicio=fecha_inicio,
-            fecha_fin=fecha_fin,
+    def comprar_paquete(self, paquete, fecha_inicio, fecha_fin,
+                        personas, metodo_pago) -> tuple[bool, str]:
+        return self.logica_cliente.comprar_paquete(
+            self.user.usuario_id, paquete,
+            fecha_inicio, fecha_fin, personas, metodo_pago
         )
 
-        pedido_id = PedidoDAO().insertar_pedido(vo)
-        if pedido_id is None:
-            return False, "No se pudo registrar el pedido. Inténtalo de nuevo."
-
-        return True, f"¡Reserva confirmada! Tu número de pedido es #{pedido_id}."
+    def formatear_pedido(self, pedido: dict) -> dict:
+        def fmt(f):
+            try:
+                y, m, d = str(f)[:10].split("-")
+                return f"{d}/{m}/{y}"
+            except Exception:
+                return str(f) if f else "—"
+        return {
+            **pedido,
+            "fecha_inicio_fmt": fmt(pedido.get("fecha_inicio", "")),
+            "fecha_fin_fmt":    fmt(pedido.get("fecha_fin", "")),
+            "monto_total":      float(pedido.get("monto_total", 0)),
+        }
 
     # ── Perfil ───────────────────────────────────────────────────────────────
 
-    def guardar_perfil(self, telefono: str, preferencia: str, preferencia_acc: str):
-        dao = CuentaDAO()
-        ok_tel  = dao.actualizarTelefono(self.user.usuario_id, telefono)
-        ok_pref = dao.actualizarPreferencia(self.user.usuario_id, preferencia)
-        ok_acc  = dao.actualizarPreferenciaAccesibilidad(
-                      self.user.usuario_id, preferencia_acc)
+    def guardar_perfil(self, telefono, preferencia,
+                       preferencia_acc) -> tuple[bool, str]:
+        ok, msg = self.logica_cliente.guardar_perfil(
+            self.user.usuario_id, telefono, preferencia, preferencia_acc
+        )
+        if ok:
+            self.user = self.logica_cliente.refrescar_usuario(self.user.usuario_id)
+        return ok, msg
 
-        if ok_tel and ok_pref and ok_acc:
-            self.user = UserDAO().obtenerUsuarioPorId(self.user.usuario_id)
-            return True
-        return False
-
-    def cambiar_contrasena(self, pass_actual: str, pass_nueva: str, pass_confirmar: str):        
-        loginVO = LoginVO(self.user.email, pass_actual)
-        user_check = UserDAO().consultaLogin(loginVO)
-        exito = False
-        if not user_check:
-            return False, 'contraseña incorrecta'
-        
-        exito = UserDAO().actualizarContrasena(self.user.usuario_id, pass_nueva)
-        return exito
-        
+    def cambiar_contrasena(self, pass_actual, pass_nueva,
+                           pass_confirmar) -> tuple[bool, str]:
+        if not pass_actual:
+            return False, "Introduce tu contraseña actual."
+        if not pass_nueva or len(pass_nueva) < 6:
+            return False, "La contraseña nueva debe tener al menos 6 caracteres."
+        if pass_nueva != pass_confirmar:
+            return False, "Las contraseñas nuevas no coinciden."
+        if pass_actual == pass_nueva:
+            return False, "La nueva contraseña no puede ser igual a la actual."
+        return self.logica_cliente.cambiar_contrasena(
+            self.user.usuario_id, self.user.email,
+            pass_actual, pass_nueva
+        )
