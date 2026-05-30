@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Form</class>
+ <widget class="QWidget" name="Form">
+  <property name="geometry">
+   <rect><x>0</x><y>0</y><width>980</width><height>120</height></rect>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+QWidget {
+    background-color: #ffffff;
+    border: 1px solid rgba(29, 147, 197, 0.15);
+    border-radius: 10px;
+}
+QWidget:hover {
+    border: 1px solid rgba(29, 147, 197, 0.5);
+    background-color: #f7fbfe;
+}
+   </string>
+  </property>
+
+  <!-- TÍTULO -->
+  <widget class="QLabel" name="card_titulo">
+   <property name="geometry"><rect><x>20</x><y>14</y><width>600</width><height>22</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 14px; font-weight: 600; color: #1a3a5c; background: transparent; border: none;</string>
+   </property>
+   <property name="text"><string>Destino · N noches</string></property>
+  </widget>
+
+  <!-- DESCRIPCIÓN -->
+  <widget class="QLabel" name="card_desc">
+   <property name="geometry"><rect><x>20</x><y>40</y><width>620</width><height>18</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 12px; color: #6b8cae; background: transparent; border: none;</string>
+   </property>
+   <property name="text"><string>Servicios incluidos</string></property>
+  </widget>
+
+  <!-- CHIP PERFIL -->
+  <widget class="QLabel" name="card_chip_perfil">
+   <property name="geometry"><rect><x>20</x><y>68</y><width>90</width><height>22</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">
+background-color: #eef5fc; color: #1d93c5;
+border-radius: 10px; font-size: 11px; padding: 2px 10px;
+border: none;
+    </string>
+   </property>
+   <property name="text"><string>General</string></property>
+   <property name="alignment"><set>Qt::AlignCenter</set></property>
+  </widget>
+
+  <!-- CHIP RECOMENDADO -->
+  <widget class="QLabel" name="card_chip_recomendado">
+   <property name="geometry"><rect><x>118</x><y>68</y><width>150</width><height>22</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">
+background-color: #e6f4ea; color: #137333;
+border-radius: 10px; font-size: 11px; padding: 2px 10px;
+border: none;
+    </string>
+   </property>
+   <property name="text"><string>★ Recomendado para ti</string></property>
+   <property name="alignment"><set>Qt::AlignCenter</set></property>
+   <property name="visible"><bool>false</bool></property>
+  </widget>
+
+  <!-- CHIP ACCESIBLE -->
+  <widget class="QLabel" name="card_chip_accesible">
+   <property name="geometry"><rect><x>276</x><y>68</y><width>80</width><height>22</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">
+background-color: #fce8e6; color: #c5221f;
+border-radius: 10px; font-size: 11px; padding: 2px 10px;
+border: none;
+    </string>
+   </property>
+   <property name="text"><string>Accesible</string></property>
+   <property name="alignment"><set>Qt::AlignCenter</set></property>
+   <property name="visible"><bool>false</bool></property>
+  </widget>
+
+  <!-- PRECIO -->
+  <widget class="QLabel" name="card_precio">
+   <property name="geometry"><rect><x>730</x><y>28</y><width>180</width><height>28</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">font-size: 15px; font-weight: 700; color: #1d93c5; background: transparent; border: none;</string>
+   </property>
+   <property name="text"><string>000,00 € / persona</string></property>
+   <property name="alignment"><set>Qt::AlignRight|Qt::AlignVCenter</set></property>
+  </widget>
+
+  <!-- BOTÓN VER DETALLES -->
+  <widget class="QPushButton" name="card_btn">
+   <property name="geometry"><rect><x>848</x><y>68</y><width>112</width><height>32</height></rect></property>
+   <property name="styleSheet">
+    <string notr="true">
+QPushButton {
+    background-color: #1d93c5; color: white;
+    border-radius: 8px; font-size: 12px;
+    font-weight: 500; border: none; letter-spacing: 0.5px;
+}
+QPushButton:hover { background-color: #185fa5; }
+QPushButton:pressed { background-color: #0c447c; }
+    </string>
+   </property>
+   <property name="text"><string>Ver detalles</string></property>
+  </widget>
+
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
