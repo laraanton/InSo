@@ -2,10 +2,14 @@
 VentanaDashboard_admin.py  –  Vista del Dashboard del Administrador
 ===================================================================
 Responsabilidad: pedir datos al ControladorAdmin y pintarlos.
-No contiene lógica de negocio.
+No contiene lógica de negocio ni estilos (el estilo está en el .ui / QSS global).
+
+CORRECCIÓN APLICADA:
+  - Columna "Tipo" de la tabla de actividad reciente ampliada con Stretch
+    para que textos como CREAR_OPERADOR no queden cortados.
 """
 
-from PyQt5.QtWidgets import QAbstractItemView
+from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
 from PyQt5.QtCore import pyqtSignal
 from PyQt5 import uic
 
@@ -31,11 +35,13 @@ class VentanaDashboard_admin(VentanaBase, Form):
 
     def _configurar_tabla(self):
         header = self.tablaDashActividad.horizontalHeader()
-        anchos = [130, 160, 100, None]
+        # Columna "Tipo" (índice 2) pasa a Stretch para no cortar CREAR_OPERADOR, etc.
+        anchos = [150, 170, None, None]
         for i, w in enumerate(anchos):
             if w is None:
-                header.setSectionResizeMode(i, header.Stretch)
+                header.setSectionResizeMode(i, QHeaderView.Stretch)
             else:
+                header.setSectionResizeMode(i, QHeaderView.Fixed)
                 self.tablaDashActividad.setColumnWidth(i, w)
         self.tablaDashActividad.verticalHeader().setDefaultSectionSize(38)
         self.tablaDashActividad.setSelectionMode(QAbstractItemView.NoSelection)
@@ -66,7 +72,7 @@ class VentanaDashboard_admin(VentanaBase, Form):
             row = tabla.rowCount()
             tabla.insertRow(row)
             fecha = str(r.fecha)[:19] if r.fecha else "—"
-            tabla.setItem(row, 0, self._item(fecha,           selectable=False, center=True))
-            tabla.setItem(row, 1, self._item(r.nombre_usuario or "", selectable=False))
-            tabla.setItem(row, 2, self._item(r.tipo_accion   or "", selectable=False))
-            tabla.setItem(row, 3, self._item(r.detalle       or "", selectable=False))
+            tabla.setItem(row, 0, self._item(fecha,                    selectable=False, center=True))
+            tabla.setItem(row, 1, self._item(r.nombre_usuario or "",   selectable=False))
+            tabla.setItem(row, 2, self._item(r.tipo_accion   or "",   selectable=False))
+            tabla.setItem(row, 3, self._item(r.detalle       or "",   selectable=False))
