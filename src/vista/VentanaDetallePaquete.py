@@ -102,6 +102,6 @@ class VentanaDetallePaquete(QMainWindow, Form):
         )
         if exito:
             QMessageBox.information(self, "Reserva confirmada", mensaje)
-            self.close()
+            self.controlador.ir_a_mis_viajes()
         else:
             QMessageBox.warning(self, "Error en la reserva", mensaje)
