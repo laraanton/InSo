@@ -66,6 +66,22 @@ class PaqueteVO:
             paquete_id,
         ]
 
+    def to_dict(self) -> dict:
+        return {
+            "id":            self.id,
+            "nombre":        self.nombre,
+            "destino":       self.destino,
+            "duracion":      self.duracion,
+            "precio":        self.precio,
+            "descripcion":   self.descripcion,
+            "servicios":     self.servicios,
+            "perfil":        self.perfil,
+            "accesibilidad": self.accesibilidad,
+            "fecha_ini":     self.fecha_ini,
+            "fecha_fin":     self.fecha_fin,
+            "estado_paquete": self.estado_paquete,
+        }
+
 
 def _to_int(valor, defecto=1):
     try:
