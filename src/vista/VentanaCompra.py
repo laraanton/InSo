@@ -1,7 +1,8 @@
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import (
-    QWidget, QTableWidgetItem, QComboBox, QHBoxLayout, QFileDialog
+    QWidget, QTableWidgetItem, QComboBox, QHBoxLayout, QFileDialog,
+    QDialog, QFormLayout, QLineEdit, QDialogButtonBox, QMessageBox  # [FIX-3] añadidos para el diálogo de nueva reserva
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
@@ -43,7 +44,10 @@ class VentanaCompra(QWidget):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        self._ctrl = ControladorOperador()
+        # [FIX-1] Se pasa usuario_id al controlador si el user está disponible,
+        #         evitando que OperadorBO reciba siempre None cuando hay sesión activa.
+        usuario_id = getattr(user, "usuario_id", None) if user else None
+        self._ctrl = ControladorOperador(usuario_id=usuario_id)
 
         self._configurar_tabla()
         self._conectar_senales()
@@ -76,6 +80,9 @@ class VentanaCompra(QWidget):
     def _filtrar(self):
         texto  = self.inputBuscar.text().strip()
         estado = self.comboEstado.currentText()
+        # [FIX-2] "Todos los estados" (u opción vacía) no debe filtrarse por estado.
+        if estado in ("", "Todos los estados"):
+            estado = ""
         reservas = self._ctrl.buscar_reservas(texto=texto, estado=estado)
         self._poblar_tabla(reservas)
 
@@ -88,14 +95,24 @@ class VentanaCompra(QWidget):
         for fila, r in enumerate(reservas):
             t.insertRow(fila)
 
-            # r es un ReservaVO → acceso por atributos
-            for col, attr in enumerate(["identificador_unico", "cliente", "paquete", "fecha", "precio"]):
-                valor = getattr(r, attr, "") or ""
+            # [FIX-3] El VO expone .precio como float; para mostrar en tabla
+            #         se usa precio_fmt() si existe, o se formatea aquí.
+            #         Las demás columnas usan el atributo correcto del ReservaVO.
+            valores_col = [
+                getattr(r, "identificador_unico", "") or "",   # COL_ID
+                getattr(r, "cliente",  "") or "",               # COL_CLIENTE
+                getattr(r, "paquete",  "") or "",               # COL_PAQUETE
+                getattr(r, "fecha",    "") or "",               # COL_FECHA
+                # precio: ReservaVO guarda float en .precio; se formatea para display
+                (r.precio_fmt() if callable(getattr(r, "precio_fmt", None))
+                 else str(getattr(r, "precio", ""))),           # COL_PRECIO
+            ]
+            for col, valor in enumerate(valores_col):
                 item = QTableWidgetItem(str(valor))
                 item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
                 t.setItem(fila, col, item)
 
-            estado = r.estado or ""
+            estado = getattr(r, "estado", "") or ""
             item_e = QTableWidgetItem(estado)
             item_e.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item_e.setTextAlignment(Qt.AlignCenter)
@@ -104,7 +121,13 @@ class VentanaCompra(QWidget):
             item_e.setForeground(QColor(fg))
             t.setItem(fila, COL_ESTADO, item_e)
 
-            self._insertar_combo_estado(t, fila, r.identificador_unico, estado)
+            # [FIX-4] Se usa .identificador_unico (alias de .id en ReservaVO)
+            #         como clave para cambiar estado — coherente con ReservaDAO.
+            self._insertar_combo_estado(
+                t, fila,
+                getattr(r, "identificador_unico", None) or getattr(r, "id", ""),
+                estado,
+            )
 
         t.resizeRowsToContents()
 
@@ -131,6 +154,9 @@ class VentanaCompra(QWidget):
 
     def _cambiar_estado(self, id_pedido, nuevo_estado: str, fila: int):
         resultado = self._ctrl.cambiar_estado_reserva(id_pedido, nuevo_estado)
+        # [FIX-5] OperacionResultadoVO tenía _init_ en vez de __init__,
+        #         por lo que .ok y .mensaje no existían → AttributeError en tiempo
+        #         de ejecución.  Corregido en OperacionResultadoVO.py.
         self._set_estado(resultado.mensaje, error=not resultado.ok)
         if resultado.ok:
             item = self.tablaReservas.item(fila, COL_ESTADO)
@@ -141,11 +167,23 @@ class VentanaCompra(QWidget):
                 item.setForeground(QColor(fg))
 
     def _nueva_reserva(self):
-        datos = {
-            "cliente":  "Cliente Ejemplo",
-            "paquete":  "Escapada Paris",
-            "precio":   "1.200 EUR",
-        }
+        """
+        [FIX-6] El código original enviaba datos de texto inventados
+        ('Cliente Ejemplo', 'Escapada Paris') al controlador, que los
+        pasa al DAO esperando cliente_id y paquete_id como enteros.
+        Esto siempre fallaba (TypeError en la INSERT) o insertaba basura.
+
+        Solución: pedir al operador los IDs reales mediante un pequeño
+        diálogo antes de llamar al controlador.
+        """
+        dialogo = _DialogoNuevaReserva(self)
+        if dialogo.exec_() != QDialog.Accepted:
+            return
+
+        datos = dialogo.datos()
+        if not datos:
+            return
+
         resultado = self._ctrl.registrar_reserva(datos)
         self._set_estado(resultado.mensaje, error=not resultado.ok)
         if resultado.ok:
@@ -166,3 +204,73 @@ class VentanaCompra(QWidget):
         self.lblEstado.setText(msg)
         color = "#e05252" if error else "#5e8d8d"
         self.lblEstado.setStyleSheet(f"color: {color}; font-weight: bold;")
+
+
+# ── Diálogo auxiliar para nueva reserva ───────────────────────────────────────
+
+class _DialogoNuevaReserva(QDialog):
+    """
+    Diálogo mínimo que pide los datos obligatorios para crear una reserva.
+    Sólo se valida que cliente_id y paquete_id sean enteros; el resto es
+    opcional (el DAO / BO aplican sus propios defaults).
+    """
+
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.setWindowTitle("Nueva reserva")
+        self.setMinimumWidth(320)
+
+        lay = QFormLayout(self)
+
+        self._cliente_id  = QLineEdit()
+        self._paquete_id  = QLineEdit()
+        self._monto       = QLineEdit()
+        self._metodo_pago = QLineEdit("PayPal")
+        self._fecha_ini   = QLineEdit()   # YYYY-MM-DD  (puede quedar vacío)
+        self._fecha_fin   = QLineEdit()
+
+        self._cliente_id.setPlaceholderText("Entero, p.ej. 12")
+        self._paquete_id.setPlaceholderText("Entero, p.ej. 3")
+        self._monto.setPlaceholderText("Decimal, p.ej. 1200.00")
+        self._fecha_ini.setPlaceholderText("YYYY-MM-DD  (opcional)")
+        self._fecha_fin.setPlaceholderText("YYYY-MM-DD  (opcional)")
+
+        lay.addRow("ID Cliente *",  self._cliente_id)
+        lay.addRow("ID Paquete *",  self._paquete_id)
+        lay.addRow("Monto total",   self._monto)
+        lay.addRow("Método pago",   self._metodo_pago)
+        lay.addRow("Fecha inicio",  self._fecha_ini)
+        lay.addRow("Fecha fin",     self._fecha_fin)
+
+        botones = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
+            parent=self,
+        )
+        botones.accepted.connect(self._validar_y_aceptar)
+        botones.rejected.connect(self.reject)
+        lay.addRow(botones)
+
+    def _validar_y_aceptar(self):
+        errores = []
+        if not self._cliente_id.text().strip().isdigit():
+            errores.append("• ID Cliente debe ser un número entero.")
+        if not self._paquete_id.text().strip().isdigit():
+            errores.append("• ID Paquete debe ser un número entero.")
+        if errores:
+            QMessageBox.warning(self, "Datos inválidos", "\n".join(errores))
+            return
+        self.accept()
+
+    def datos(self) -> dict | None:
+        """Devuelve el dict listo para pasarlo a ControladorOperador.registrar_reserva()."""
+        try:
+            return {
+                "cliente_id":  int(self._cliente_id.text().strip()),
+                "paquete_id":  int(self._paquete_id.text().strip()),
+                "monto_total": self._monto.text().strip() or "0",
+                "metodo_pago": self._metodo_pago.text().strip() or "PayPal",
+                "fecha_inicio": self._fecha_ini.text().strip() or None,
+                "fecha_fin":    self._fecha_fin.text().strip() or None,
+            }
+        except (ValueError, AttributeError):
+            return None
