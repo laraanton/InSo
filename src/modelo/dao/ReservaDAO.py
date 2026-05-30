@@ -2,23 +2,67 @@ from __future__ import annotations
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.ReservaVO import ReservaVO
 
+_SQL_SELECT_BASE = """
+    SELECT pv.pedido_id,
+           pv.identificador_unico,
+           u.nombre_completo,
+           pt.nombre_paquete,
+           CONVERT(NVARCHAR(10), pv.fecha_pedido, 23) AS fecha_pedido,
+           pv.monto_total,
+           pv.estado_pedido,
+           pv.metodo_pago,
+           pv.cliente_id,
+           pv.paquete_id
+    FROM   Pedidos_Viajes        pv
+    JOIN   Usuarios              u  ON pv.cliente_id  = u.usuario_id
+    JOIN   Paquetes_Turisticos   pt ON pv.paquete_id  = pt.paquete_id
+"""
+
+_SQL_SELECT_TODAS = _SQL_SELECT_BASE + """
+    ORDER BY pv.fecha_pedido DESC
+"""
+
+_SQL_SELECT_POR_ID = _SQL_SELECT_BASE + """
+    WHERE pv.identificador_unico = ?
+"""
+
+_SQL_INSERTAR_PEDIDO = """
+    INSERT INTO Pedidos_Viajes
+           (cliente_id, paquete_id, monto_total, metodo_pago,
+            estado_pedido, fecha_inicio, fecha_fin)
+    VALUES (?, ?, ?, ?, 'Pendiente confirmacion', ?, ?)
+"""
+
+_SQL_GET_IDENTITY = "SELECT @@IDENTITY"
+
+_SQL_INSERTAR_HISTORIAL = """
+    INSERT INTO Historial_Estados_Pedidos
+           (pedido_id, estado_anterior, estado_nuevo, usuario_responsable)
+    VALUES (?, 'Ninguno', 'Pendiente confirmacion', ?)
+"""
+
+_SQL_SELECT_ESTADO_ACTUAL = """
+    SELECT pedido_id, estado_pedido
+    FROM   Pedidos_Viajes
+    WHERE  identificador_unico = ?
+"""
+
+_SQL_ACTUALIZAR_ESTADO = """
+    UPDATE Pedidos_Viajes
+    SET    estado_pedido = ?
+    WHERE  pedido_id     = ?
+"""
+
+_SQL_INSERTAR_HISTORIAL_CAMBIO = """
+    INSERT INTO Historial_Estados_Pedidos
+           (pedido_id, estado_anterior, estado_nuevo, motivo, usuario_responsable)
+    VALUES (?, ?, ?, NULL, ?)
+"""
+
+
+# DAO
 
 class ReservaDAO(Conexion):
-    _SELECT = """
-        SELECT pv.pedido_id,
-               pv.identificador_unico,
-               u.nombre_completo,
-               pt.nombre_paquete,
-               CONVERT(NVARCHAR(10), pv.fecha_pedido, 23) AS fecha_pedido,
-               pv.monto_total,
-               pv.estado_pedido,
-               pv.metodo_pago,
-               pv.cliente_id,
-               pv.paquete_id
-        FROM   Pedidos_Viajes        pv
-        JOIN   Usuarios              u  ON pv.cliente_id  = u.usuario_id
-        JOIN   Paquetes_Turisticos   pt ON pv.paquete_id  = pt.paquete_id
-    """
 
     @staticmethod
     def _row_a_vo(row) -> ReservaVO:
@@ -40,7 +84,7 @@ class ReservaDAO(Conexion):
         """Devuelve todas las reservas en fecha descendente (Req_25)."""
         try:
             cursor = self.getCursor()
-            cursor.execute(self._SELECT + "ORDER BY pv.fecha_pedido DESC")
+            cursor.execute(_SQL_SELECT_TODAS)
             return [self._row_a_vo(r) for r in cursor.fetchall()]
         except Exception as e:
             print(f"[ReservaDAO] Error en obtener_todas: {e}")
@@ -56,8 +100,8 @@ class ReservaDAO(Conexion):
             if texto:
                 like = f"%{texto}%"
                 conds.append(
-                    "(u.nombre_completo        LIKE ? "
-                    " OR pt.nombre_paquete     LIKE ? "
+                    "(u.nombre_completo         LIKE ? "
+                    " OR pt.nombre_paquete      LIKE ? "
                     " OR pv.identificador_unico LIKE ?)"
                 )
                 params += [like, like, like]
@@ -67,7 +111,7 @@ class ReservaDAO(Conexion):
                 params.append(estado)
 
             where = ("WHERE " + " AND ".join(conds)) if conds else ""
-            query = f"{self._SELECT} {where} ORDER BY pv.fecha_pedido DESC"
+            query = f"{_SQL_SELECT_BASE} {where} ORDER BY pv.fecha_pedido DESC"
             cursor.execute(query, params)
             return [self._row_a_vo(r) for r in cursor.fetchall()]
         except Exception as e:
@@ -78,10 +122,7 @@ class ReservaDAO(Conexion):
         """Devuelve una reserva por su identificador_unico."""
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                self._SELECT + "WHERE pv.identificador_unico = ?",
-                [identificador]
-            )
+            cursor.execute(_SQL_SELECT_POR_ID, [identificador])
             row = cursor.fetchone()
             return self._row_a_vo(row) if row else None
         except Exception as e:
@@ -98,10 +139,7 @@ class ReservaDAO(Conexion):
         try:
             cursor = self.getCursor()
             cursor.execute(
-                """INSERT INTO Pedidos_Viajes
-                       (cliente_id, paquete_id, monto_total, metodo_pago,
-                        estado_pedido, fecha_inicio, fecha_fin)
-                   VALUES (?, ?, ?, ?, 'Pendiente confirmacion', ?, ?)""",
+                _SQL_INSERTAR_PEDIDO,
                 [
                     int(datos["cliente_id"]),
                     int(datos["paquete_id"]),
@@ -111,18 +149,13 @@ class ReservaDAO(Conexion):
                     datos.get("fecha_fin")    or None,
                 ]
             )
-            cursor.execute("SELECT @@IDENTITY")
+            cursor.execute(_SQL_GET_IDENTITY)
             row = cursor.fetchone()
             if not row or row[0] is None:
                 return None
             pedido_id = int(row[0])
 
-            cursor.execute(
-                """INSERT INTO Historial_Estados_Pedidos
-                       (pedido_id, estado_anterior, estado_nuevo, usuario_responsable)
-                   VALUES (?, 'Ninguno', 'Pendiente confirmacion', ?)""",
-                [pedido_id, datos.get("usuario_responsable")]
-            )
+            cursor.execute(_SQL_INSERTAR_HISTORIAL, [pedido_id, datos.get("usuario_responsable")])
             self.conexion.commit()
             return f"ORD-{pedido_id}"
         except Exception as e:
@@ -134,12 +167,7 @@ class ReservaDAO(Conexion):
         """Cambia el estado de un pedido y actualiza Historial_Estados_Pedidos (Req_26)."""
         try:
             cursor = self.getCursor()
-            cursor.execute(
-                """SELECT pedido_id, estado_pedido
-                   FROM   Pedidos_Viajes
-                   WHERE  identificador_unico = ?""",
-                [identificador]
-            )
+            cursor.execute(_SQL_SELECT_ESTADO_ACTUAL, [identificador])
             row = cursor.fetchone()
             if not row:
                 print(f"[ReservaDAO] Pedido '{identificador}' no encontrado.")
@@ -147,16 +175,9 @@ class ReservaDAO(Conexion):
 
             pedido_id, estado_anterior = row[0], row[1]
 
-            cursor.execute(
-                "UPDATE Pedidos_Viajes SET estado_pedido = ? WHERE pedido_id = ?",
-                [nuevo_estado, pedido_id]
-            )
-            cursor.execute(
-                """INSERT INTO Historial_Estados_Pedidos
-                       (pedido_id, estado_anterior, estado_nuevo, motivo, usuario_responsable)
-                   VALUES (?, ?, ?, NULL, ?)""",
-                [pedido_id, estado_anterior, nuevo_estado, usuario_id]
-            )
+            cursor.execute(_SQL_ACTUALIZAR_ESTADO, [nuevo_estado, pedido_id])
+            cursor.execute(_SQL_INSERTAR_HISTORIAL_CAMBIO,
+                           [pedido_id, estado_anterior, nuevo_estado, usuario_id])
             self.conexion.commit()
             return True
         except Exception as e:
@@ -171,7 +192,7 @@ class ReservaDAO(Conexion):
         return [vo.to_export_dict() for vo in self.obtener_todas()]
 
 
-# ── Función auxiliar ───────────────────────────────────────────────────────────
+# Función auxiliar
 
 def _to_float(valor, defecto: float = 0.0) -> float:
     try:
