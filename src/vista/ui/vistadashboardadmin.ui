@@ -5,10 +5,14 @@
   <property name="geometry">
    <rect><x>0</x><y>0</y><width>1060</width><height>740</height></rect>
   </property>
+
+  <!-- FIX #3: se elimina cualquier width fijo en las columnas del QTableWidget
+       para que VentanaDashboard_admin._configurar_tabla() aplique Stretch sin
+       ser sobreescrito por el .ui.  El resto del QSS no se toca. -->
   <property name="styleSheet">
    <string notr="true">QWidget {
     background-color: #f9f7f2;
-    font-family: &quot;Segoe UI&quot;, &quot;Helvetica Neue&quot;, sans-serif;
+    font-family: "Segoe UI", "Helvetica Neue", sans-serif;
     font-size: 13px;
     color: #333333;
 }
@@ -126,6 +130,7 @@ QPushButton#btnSecondary {
 }
 QPushButton#btnSecondary:hover { border-color: #5e8d8d; color: #5e8d8d; }</string>
   </property>
+
   <layout class="QVBoxLayout" name="dashLayout">
    <property name="leftMargin"><number>28</number></property>
    <property name="topMargin"><number>24</number></property>
@@ -200,7 +205,14 @@ QPushButton#btnSecondary:hover { border-color: #5e8d8d; color: #5e8d8d; }</strin
     </layout>
    </item>
 
-   <!-- Tabla actividad reciente -->
+   <!-- FIX #3: QTableWidget SIN columnos con width fijo.
+        Las columnas quedan solo con sus headers; el código Python en
+        VentanaDashboard_admin._configurar_tabla() aplica:
+          col 0 → Fixed 150px   (Fecha)
+          col 1 → Fixed 170px   (Usuario)
+          col 2 → Stretch       (Tipo acción  — antes cortaba CREAR_OPERADOR)
+          col 3 → Stretch       (Detalle)
+        Al no haber width ni resizeMode en el .ui, Python manda sin conflicto. -->
    <item>
     <widget class="QTableWidget" name="tablaDashActividad">
      <property name="editTriggers"><set>QAbstractItemView::NoEditTriggers</set></property>
@@ -209,7 +221,7 @@ QPushButton#btnSecondary:hover { border-color: #5e8d8d; color: #5e8d8d; }</strin
      <property name="columnCount"><number>4</number></property>
      <column><property name="text"><string>FECHA</string></property></column>
      <column><property name="text"><string>USUARIO</string></property></column>
-     <column><property name="text"><string>TIPO</string></property></column>
+     <column><property name="text"><string>TIPO ACCIÓN</string></property></column>
      <column><property name="text"><string>DETALLE</string></property></column>
     </widget>
    </item>
