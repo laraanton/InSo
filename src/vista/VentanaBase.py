@@ -1,8 +1,13 @@
 """
+VentanaBase.py  –  Base común para todas las subvistas del Administrador
+========================================================================
+Proporciona:
     - Construir celdas de tabla (_item)
     - Envolver widgets en contenedores centrados para celdas (_wrap)
     - Obtener la IP local de la máquina (_ip)
     - Centralizar los colores de badge de estado (ESTADO_COLORES)
+
+NOTA: Sin ningún setStyleSheet aquí. El estilo reside en los .ui / QSS global.
 """
 
 import socket
@@ -20,7 +25,6 @@ class VentanaBase(QWidget):
     }
 
     def _item(self, texto, center=False, selectable=True):
-
         item = QTableWidgetItem(str(texto))
         flags = Qt.ItemIsEnabled
         if selectable:
@@ -31,7 +35,6 @@ class VentanaBase(QWidget):
         return item
 
     def _wrap(self, widget):
-  
         contenedor = QWidget()
         lay = QHBoxLayout(contenedor)
         lay.setContentsMargins(6, 2, 6, 2)
@@ -40,7 +43,6 @@ class VentanaBase(QWidget):
         return contenedor
 
     def _ip(self):
-   
         try:
             return socket.gethostbyname(socket.gethostname())
         except Exception:
