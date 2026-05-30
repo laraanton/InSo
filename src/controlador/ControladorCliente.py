@@ -35,6 +35,13 @@ class ControladorCliente:
         self.ventana_ajustes.show()
         self._ocultar_todas_menos(self.ventana_ajustes)
 
+    def ir_a_resultados(self, paquetes, termino, fecha, n_personas):
+        from src.vista.VentanaResultados import VentanaResultados
+        self.ventana_resultados = VentanaResultados(self.user, paquetes, termino, fecha, n_personas)
+        self.ventana_resultados.show()
+        self._ocultar_todas_menos(self.ventana_resultados)
+
+
     def ir_a_mis_viajes(self):
         from src.vista.VentanaMisViajes import VentanaMisViajes
         self.ventana_viajes = VentanaMisViajes(self.user)
