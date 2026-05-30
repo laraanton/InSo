@@ -132,8 +132,6 @@ class VentanaResultados(QMainWindow, Form):
     def _ver_paquete(self, paquete_id: int):
         self.controlador.ventana_principal = self
         self.controlador.ver_paquete_buscado(paquete_id, self.fecha, self.personas)
-        self.hide()
 
     def _volver(self):
         self.controlador.volver_a_principal()
-        self.close()
