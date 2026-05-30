@@ -6,9 +6,6 @@ from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaCliente.ui")
 
-_COLS = 3
-
-
 class VentanaCliente(QMainWindow, Form):
     def __init__(self, user):
         super().__init__()
@@ -36,7 +33,8 @@ class VentanaCliente(QMainWindow, Form):
             card = self._crear_tarjeta(p)
             if card is None:
                 continue
-            self.gridPaquetes.addWidget(card, i // _COLS, i % _COLS)
+            # se dividen las tarjetas en 3 por fila
+            self.gridPaquetes.addWidget(card, i // 3, i % 3)
 
         self.scrollContent.adjustSize()
         self.scrollPaquetes.updateGeometry()
@@ -68,8 +66,8 @@ class VentanaCliente(QMainWindow, Form):
 
     def _connect_signals(self):
         self.btnCuenta.clicked.connect(self._abrir_cuenta)
-        self.btnAjustes.clicked.connect(self.controlador.ir_a_ajustes)       # ✅
-        self.btnMisViajes.clicked.connect(self.controlador.ir_a_mis_viajes)  # ✅
+        self.btnAjustes.clicked.connect(self.controlador.ir_a_ajustes)
+        self.btnMisViajes.clicked.connect(self.controlador.ir_a_mis_viajes)
         self.btnCerrarSesion.clicked.connect(self._cerrar_sesion)
         self.btnBuscar.clicked.connect(self._buscar_paquetes)
 
@@ -94,6 +92,17 @@ class VentanaCliente(QMainWindow, Form):
             QMessageBox.warning(self, "Fechas incorrectas",
                                 "La fecha de vuelta no puede ser anterior a la de ida.")
             return
+
+        resultados = self.controlador.buscar_paquetes(destino)
+        self._mostrar_resultados(resultados, destino)
+
+    def _mostrar_resultados(self, paquetes: list, termino: str):
+        from src.vista.VentanaResultados import VentanaResultados
+        fecha = self.in_fecha_ida.date()
+        n_personas = self.in_personas.value() 
+        self.ventana_resultados = VentanaResultados(self.user, paquetes, termino, fecha, n_personas)
+        self.ventana_resultados.show()
+        self.hide()
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
