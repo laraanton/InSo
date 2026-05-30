@@ -5,6 +5,7 @@ from src.modelo.dao.PaqueteDAO import PaqueteDAO
 from src.modelo.vo.LoginVO import LoginVO
 from src.modelo.vo.PedidoVO import PedidoVO
 from src.modelo.vo.PaqueteVO import PaqueteVO
+from src.modelo.EstrategiaPago import obtener_estrategia, nombres_disponibles
 
 
 class BusinessCliente:
@@ -34,7 +35,7 @@ class BusinessCliente:
     def comprar_paquete(self, usuario_id: int, paquete: dict,
                         fecha_inicio, fecha_fin,
                         personas: int, metodo_pago: str) -> tuple[bool, str]:
-        # ── Solo validaciones de negocio ──
+        # ── Validaciones de negocio ──────────────────────────────────────────
         if fecha_fin <= fecha_inicio:
             return False, "La fecha de fin debe ser posterior a la de inicio."
         if personas < 1:
@@ -49,6 +50,16 @@ class BusinessCliente:
 
         monto_total = precio_unitario * personas
 
+        # ── Estrategia de pago ───────────────────────────────────────────────
+        estrategia = obtener_estrategia(metodo_pago)
+        if not estrategia:
+            return False, f"Método de pago '{metodo_pago}' no reconocido."
+
+        ok, msg_validacion = estrategia.validar(monto_total)
+        if not ok:
+            return False, msg_validacion
+
+        # ── Persistencia ─────────────────────────────────────────────────────
         vo = PedidoVO(
             cliente_id=usuario_id,
             paquete_id=paquete.get("id") or paquete.get("paquete_id"),
@@ -58,11 +69,22 @@ class BusinessCliente:
             fecha_fin=fecha_fin,
         )
 
-        pedido_id = self._ped.insertar_pedido(vo)   # reutiliza la instancia
+        pedido_id = self._ped.insertar_pedido(vo)
         if pedido_id is None:
             return False, "No se pudo registrar el pedido. Inténtalo de nuevo."
 
-        return True, f"¡Reserva confirmada! Tu número de pedido es #{pedido_id}."
+        # ── Procesamiento del pago ───────────────────────────────────────────
+        ok, msg_pago = estrategia.procesar(monto_total)
+        if not ok:
+            return False, msg_pago
+
+        return True, (
+            f"¡Reserva confirmada! Tu número de pedido es #{pedido_id}.\n\n"
+            f"{msg_pago}"
+        )
+
+    def obtener_metodos_pago(self) -> list[str]:
+        return nombres_disponibles()
 
     # ── Perfil ───────────────────────────────────────────────────────────────
 
@@ -79,7 +101,6 @@ class BusinessCliente:
 
     def cambiar_contrasena(self, usuario_id: int, email: str,
                            pass_actual: str, pass_nueva: str) -> tuple[bool, str]:
-        # Solo lógica de negocio: verificar contra BD y actualizar
         login_vo = LoginVO(email, pass_actual)
         if not self._usr.consultaLogin(login_vo):
             return False, "La contraseña actual es incorrecta."
