@@ -1,19 +1,7 @@
-"""
-ReservaDAO.py  –  Acceso a datos de Pedidos_Viajes (Reservas)
-Hereda de Conexion.  Cada operación de escritura actualiza también Historial_Estados_Pedidos -> trazabilidad (Req_26).
-
-Claves de dict que usa ControladorOperador:
-    identificador_unico  (computed: 'ORD-N')  → id
-    u.nombre_completo                         → cliente
-    pt.nombre_paquete                         → paquete
-    fecha_pedido                              → fecha   (YYYY-MM-DD)
-    monto_total                               → precio  ("1 200,00 EUR")
-    estado_pedido                             → estado
-    pedido_id                                 → _pedido_id  (uso interno)
-"""
-
 from __future__ import annotations
 from src.modelo.conexion.Conexion import Conexion
+from src.modelo.vo.ReservaVO import ReservaVO
+
 
 class ReservaDAO(Conexion):
     _SELECT = """
@@ -33,46 +21,43 @@ class ReservaDAO(Conexion):
     """
 
     @staticmethod
-    def _row_a_dict(row) -> dict:
-        monto = row[5] or 0
-        return {
-            "id":          row[1] or f"ORD-{row[0]}",
-            "cliente":     row[2] or "",
-            "paquete":     row[3] or "",
-            "fecha":       row[4] or "",
-            "precio":      f"{monto:,.2f} EUR".replace(",", "X")
-                                               .replace(".", ",")
-                                               .replace("X", "."),
-            "estado":      row[6] or "Pendiente confirmacion",
-            "metodo_pago": row[7] or "PayPal",
-            # Claves internas (no se exponen en la tabla)
-            "_pedido_id":  row[0],
-            "_cliente_id": row[8],
-            "_paquete_id": row[9],
-        }
+    def _row_a_vo(row) -> ReservaVO:
+        """Convierte una fila de BD en ReservaVO. Único punto de construcción."""
+        return ReservaVO(
+            id          = row[1] or f"ORD-{row[0]}",
+            cliente     = row[2] or "",
+            paquete     = row[3] or "",
+            fecha       = row[4] or "",
+            precio      = float(row[5] or 0),
+            estado      = row[6] or "Pendiente confirmacion",
+            metodo_pago = row[7] or "PayPal",
+            pedido_id   = row[0],
+            cliente_id  = row[8],
+            paquete_id  = row[9],
+        )
 
-    def obtener_todas(self) -> list[dict]:
-        #Devuelve todas las reservas en fecha descendente. Con nombre de cliente y paquete mediante JOIN (Req_25)
+    def obtener_todas(self) -> list[ReservaVO]:
+        """Devuelve todas las reservas en fecha descendente (Req_25)."""
         try:
             cursor = self.getCursor()
             cursor.execute(self._SELECT + "ORDER BY pv.fecha_pedido DESC")
-            return [self._row_a_dict(r) for r in cursor.fetchall()]
+            return [self._row_a_vo(r) for r in cursor.fetchall()]
         except Exception as e:
             print(f"[ReservaDAO] Error en obtener_todas: {e}")
             return []
 
-    def buscar(self, texto: str = "", estado: str = "") -> list[dict]:
-        #Filtra reservas por texto libre (cliente, paquete, id) o estado (Req_23, Req_26)
+    def buscar(self, texto: str = "", estado: str = "") -> list[ReservaVO]:
+        """Filtra reservas por texto libre (cliente, paquete, id) o estado (Req_23, Req_26)."""
         try:
-            cursor   = self.getCursor()
-            conds    = []
-            params   = []
+            cursor = self.getCursor()
+            conds  = []
+            params = []
 
             if texto:
                 like = f"%{texto}%"
                 conds.append(
-                    "(u.nombre_completo   LIKE ? "
-                    " OR pt.nombre_paquete LIKE ? "
+                    "(u.nombre_completo        LIKE ? "
+                    " OR pt.nombre_paquete     LIKE ? "
                     " OR pv.identificador_unico LIKE ?)"
                 )
                 params += [like, like, like]
@@ -84,13 +69,13 @@ class ReservaDAO(Conexion):
             where = ("WHERE " + " AND ".join(conds)) if conds else ""
             query = f"{self._SELECT} {where} ORDER BY pv.fecha_pedido DESC"
             cursor.execute(query, params)
-            return [self._row_a_dict(r) for r in cursor.fetchall()]
+            return [self._row_a_vo(r) for r in cursor.fetchall()]
         except Exception as e:
             print(f"[ReservaDAO] Error en buscar: {e}")
             return []
 
-    def obtener_por_identificador(self, identificador: str) -> dict | None:
-        #Devuelve una reserva por su identificador_unico 
+    def obtener_por_identificador(self, identificador: str) -> ReservaVO | None:
+        """Devuelve una reserva por su identificador_unico."""
         try:
             cursor = self.getCursor()
             cursor.execute(
@@ -98,36 +83,32 @@ class ReservaDAO(Conexion):
                 [identificador]
             )
             row = cursor.fetchone()
-            return self._row_a_dict(row) if row else None
+            return self._row_a_vo(row) if row else None
         except Exception as e:
             print(f"[ReservaDAO] Error en obtener_por_identificador: {e}")
             return None
 
     def insertar(self, datos: dict) -> str | None:
-            #ids -> int
-            #monto_total* -> float o str
-            #metodo_pago -> [str, default 'PayPal']
-            #fechas -> str YYYY-MM-DD
-        #Crea un nuevo pedido.  Devuelve el identificador_unico ('ORD-N')
+        """
+        Crea un nuevo pedido. Espera un dict con:
+            cliente_id, paquete_id, monto_total, metodo_pago,
+            fecha_inicio, fecha_fin, usuario_responsable
+        Devuelve el identificador_unico ('ORD-N') o None si falla.
+        """
         try:
             cursor = self.getCursor()
             cursor.execute(
                 """INSERT INTO Pedidos_Viajes
-                       (cliente_id, 
-                       paquete_id,
-                       monto_total,
-                       metodo_pago, 
-                       estado_pedido,
-                       fecha_inicio, 
-                       fecha_fin) 
-                   VALUES (?, ?, ?, ?, 'Pendiente', ?, ?)""",
+                       (cliente_id, paquete_id, monto_total, metodo_pago,
+                        estado_pedido, fecha_inicio, fecha_fin)
+                   VALUES (?, ?, ?, ?, 'Pendiente confirmacion', ?, ?)""",
                 [
                     int(datos["cliente_id"]),
                     int(datos["paquete_id"]),
                     _to_float(datos.get("monto_total", 0)),
                     datos.get("metodo_pago", "PayPal"),
                     datos.get("fecha_inicio") or None,
-                    datos.get("fecha_fin") or None,
+                    datos.get("fecha_fin")    or None,
                 ]
             )
             cursor.execute("SELECT @@IDENTITY")
@@ -136,32 +117,28 @@ class ReservaDAO(Conexion):
                 return None
             pedido_id = int(row[0])
 
-            # Registrar primer estado en el historial
             cursor.execute(
                 """INSERT INTO Historial_Estados_Pedidos
                        (pedido_id, estado_anterior, estado_nuevo, usuario_responsable)
-                   VALUES (?, 'Ninguno', 'Pendiente', ?)""",
+                   VALUES (?, 'Ninguno', 'Pendiente confirmacion', ?)""",
                 [pedido_id, datos.get("usuario_responsable")]
             )
             self.conexion.commit()
             return f"ORD-{pedido_id}"
         except Exception as e:
             print(f"[ReservaDAO] Error en insertar: {e}")
-            #Devuelve None si falla
             return None
 
     def actualizar_estado(self, identificador: str, nuevo_estado: str,
                           usuario_id: int | None = None) -> bool:
-        #Cambia el estado de un pedido y actualiza Historial_Estados_Pedidos (Req_26).
+        """Cambia el estado de un pedido y actualiza Historial_Estados_Pedidos (Req_26)."""
         try:
             cursor = self.getCursor()
-
-            # Resolver pedido_id y estado actual
             cursor.execute(
                 """SELECT pedido_id, estado_pedido
                    FROM   Pedidos_Viajes
                    WHERE  identificador_unico = ?""",
-                [identificador] #identificador_unico ('ORD-N')/ pedido_id numérico.
+                [identificador]
             )
             row = cursor.fetchone()
             if not row:
@@ -170,19 +147,13 @@ class ReservaDAO(Conexion):
 
             pedido_id, estado_anterior = row[0], row[1]
 
-            # Actualizar estado principal
             cursor.execute(
-                "UPDATE Pedidos_Viajes "
-                "SET    estado_pedido = ? "
-                "WHERE  pedido_id     = ?",
+                "UPDATE Pedidos_Viajes SET estado_pedido = ? WHERE pedido_id = ?",
                 [nuevo_estado, pedido_id]
             )
-
-            # Registrar en historial
             cursor.execute(
                 """INSERT INTO Historial_Estados_Pedidos
-                       (pedido_id, estado_anterior, estado_nuevo,
-                        motivo, usuario_responsable)
+                       (pedido_id, estado_anterior, estado_nuevo, motivo, usuario_responsable)
                    VALUES (?, ?, ?, NULL, ?)""",
                 [pedido_id, estado_anterior, nuevo_estado, usuario_id]
             )
@@ -193,14 +164,15 @@ class ReservaDAO(Conexion):
             return False
 
     def exportar_todas(self) -> list[dict]:
-        #Devuelve todas las reservas sin claves internas (_*)
-        return [
-            {k: v for k, v in r.items() if not k.startswith("_")}
-            for r in self.obtener_todas()
-        ]
+        """
+        Devuelve list[dict] exclusivamente para escritura CSV.
+        Usa ReservaVO.to_export_dict() como único punto de serialización.
+        """
+        return [vo.to_export_dict() for vo in self.obtener_todas()]
 
 
-#Función auxiliar
+# ── Función auxiliar ───────────────────────────────────────────────────────────
+
 def _to_float(valor, defecto: float = 0.0) -> float:
     try:
         return float(str(valor).strip().replace(",", "."))
