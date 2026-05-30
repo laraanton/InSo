@@ -23,6 +23,39 @@ class BusinessCliente:
     def obtener_paquete_por_id(self, id_paquete: int) -> dict | None:
         vo = self._paq.obtener_por_id(id_paquete)
         return vo.to_dict() if vo else None
+    
+    def buscar_paquetes(self, texto: str, preferencia: str,
+                    preferencia_acc: str) -> list[dict]:
+        """
+        Filtra paquetes cuyo destino o nombre contienen el texto (sin distinción
+        de mayúsculas) y los ordena por relevancia respecto al perfil del usuario.
+        """
+        texto_lower = texto.lower().strip()
+
+        todos = self.obtener_todos_paquetes()   # ya devuelve list[dict]
+
+        # ── Filtro ───────────────────────────────────────────────────────────
+        coincidentes = [
+            p for p in todos
+            if texto_lower in p["destino"].lower()
+            or texto_lower in p["nombre"].lower()
+        ]
+
+        # ── Ordenamiento por relevancia ──────────────────────────────────────
+        def prioridad(p: dict) -> int:
+            perfil_paquete = (p.get("perfil") or "").lower()
+            pref_usuario   = (preferencia or "").lower()
+            acc_usuario    = (preferencia_acc or "").lower()
+
+            # 0 = mayor prioridad
+            if perfil_paquete and pref_usuario and perfil_paquete == pref_usuario:
+                return 0   # coincide con preferencia del usuario
+            if p.get("accesibilidad") and acc_usuario not in ("", "ninguna"):
+                return 1   # accesible y el usuario lo necesita
+            return 2       # resto
+
+        coincidentes.sort(key=prioridad)
+        return coincidentes
 
     # ── Pedidos ──────────────────────────────────────────────────────────────
 
