@@ -1,5 +1,6 @@
 from src.modelo.Logica_login import BussinessObject
 from src.modelo.Logica_cliente import BusinessCliente
+from src.controlador.ControladorPrincipal import ControladorPrincipal
 
 # Se importan también las ventanas siguientes:
 # from src.vista.VentanaCliente import VentanaCliente
@@ -20,7 +21,7 @@ class ControladorCliente:
         self.ventana_viajes    = None
         self.ventana_detalle   = None
         self.ventana_compra    = None
-
+        self.ventana_resultados = None
     # ── Navegación ───────────────────────────────────────────────────────────
 
     def abrir_principal(self):
@@ -44,14 +45,7 @@ class ControladorCliente:
         self._ocultar_todas_menos(None)
         self.abrir_principal()
 
-#def cerrar_sesion(self):
-#    from src.vista.Login import MiVentana
-#    self._cerrar_todo()
-#    self.ventana_login = MiVentana()
-#    self.ventana_login.show()
-
     def cerrar_sesion(self):
-        from src.controlador.ControladorPrincipal import ControladorPrincipal
         self._cerrar_todo()
         ctrl = ControladorPrincipal()
         ctrl.abrirIniciarSesion()
@@ -82,6 +76,16 @@ class ControladorCliente:
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
 
+# funcion para ver el paquete de viaje si lo abre desde el buscador
+    def ver_paquete_buscado(self, paquete_id: int, fecha, n_personas):
+        from src.vista.VentanaDetalleBuscador import VentanaDetalleBuscador 
+        paquete = self.logica_cliente.obtener_paquete_por_id(paquete_id)
+        if not paquete:
+            return
+        self.ventana_detalle = VentanaDetalleBuscador(self.user, paquete, fecha, n_personas)
+        self.ventana_detalle.show()
+        self._ocultar_todas_menos(self.ventana_detalle)
+
     def ver_pedido(self, pedido_id: int):
         from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje 
         pedido = self.logica_cliente.obtener_pedido(pedido_id)
@@ -90,6 +94,14 @@ class ControladorCliente:
         self.ventana_detalle = VentanaDetalleMViaje(self.user, pedido)
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
+
+    def buscar_paquetes(self, texto: str) -> list[dict]:
+        """Delega la búsqueda al modelo pasando el perfil del usuario."""
+        return self.logica_cliente.buscar_paquetes(
+            texto,
+            getattr(self.user, "preferencia", ""),
+            getattr(self.user, "preferencia_accesibilidad", ""),
+        )
 
     # ── Pedidos ──────────────────────────────────────────────────────────────
 
