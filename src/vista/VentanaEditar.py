@@ -5,6 +5,7 @@ from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
 
 from src.controlador.ControladorOperador import ControladorOperador
+from src.modelo.vo.PaqueteVO import PaqueteVO
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -12,7 +13,7 @@ UI_FILE = os.path.join(
     "vistaEditar.ui"
 )
 
-EMOJI_PAQUETE = "✈️"
+_EMOJI = "✈️"
 
 _PERFILES = [
     "General", "Familias", "Jovenes", "Jubilados",
@@ -33,10 +34,10 @@ def _fecha_fin_caducada(fecha_fin_str: str) -> bool:
     return fecha.isValid() and fecha < QDate.currentDate()
 
 
-def _texto_lista(paquete: dict) -> str:
-    nombre = paquete.get("nombre", "Sin nombre")
-    sufijo = "  · No disponible" if _fecha_fin_caducada(paquete.get("fecha_fin", "")) else ""
-    return f"✈️  {nombre}{sufijo}"
+def _texto_lista(paquete: PaqueteVO) -> str:
+    nombre = paquete.nombre or "Sin nombre"
+    sufijo = "  · No disponible" if _fecha_fin_caducada(paquete.fecha_fin or "") else ""
+    return f"{_EMOJI}  {nombre}{sufijo}"
 
 
 class VentanaEditar(QWidget):
@@ -49,9 +50,17 @@ class VentanaEditar(QWidget):
         self._id_seleccionado: int | None = None
         self._cargando_formulario: bool = False
 
+        self._inicializar_combos()
         self._conectar_senales()
         self._recargar_lista()
-        self._limpiar_formulario()
+        self._set_modo_lectura(True)
+
+    # ── Inicialización ─────────────────────────────────────────────────────
+
+    def _inicializar_combos(self):
+        self.comboPerfil.clear()
+        for p in _PERFILES:
+            self.comboPerfil.addItem(p)
 
     # ── Señales ────────────────────────────────────────────────────────────
 
@@ -74,13 +83,13 @@ class VentanaEditar(QWidget):
 
         self.listaPaquetes.clear()
         for p in self._ctrl.obtener_todos():
-            if filtro and filtro not in p["nombre"].lower():
+            if filtro and filtro not in (p.nombre or "").lower():
                 continue
 
             item = QListWidgetItem(_texto_lista(p))
-            item.setData(Qt.UserRole, p["id"])
+            item.setData(Qt.UserRole, p.id)
 
-            if _fecha_fin_caducada(p.get("fecha_fin", "")):
+            if _fecha_fin_caducada(p.fecha_fin or ""):
                 item.setForeground(QColor("#aaaaaa"))
 
             self.listaPaquetes.addItem(item)
@@ -96,30 +105,27 @@ class VentanaEditar(QWidget):
 
     # ── Formulario ─────────────────────────────────────────────────────────
 
-    def _rellenar_formulario(self, p: dict):
-            self._cargando_formulario = True
+    def _rellenar_formulario(self, p: PaqueteVO):
+        self._cargando_formulario = True
 
-            self.inputNombre.setText(p.get("nombre", ""))
-            self.inputDestino.setText(p.get("destino", ""))
-            self.inputDuracion.setText(str(p.get("duracion", "")))
-            self.inputPrecio.setText(str(p.get("precio", "")))
-            self.inputServicios.setText(p.get("servicios", ""))
-            self.textDescripcion.setPlainText(p.get("descripcion", ""))
+        self.inputNombre.setText(p.nombre or "")
+        self.inputDestino.setText(p.destino or "")
+        self.inputDuracion.setText(str(p.duracion or ""))
+        self.inputPrecio.setText(str(p.precio or ""))
+        self.inputServicios.setText(p.servicios or "")
+        self.textDescripcion.setPlainText(p.descripcion or "")
 
-            perfil = p.get("perfil", "General")
-            idx = _PERFILES.index(perfil) if perfil in _PERFILES else 0
-            self.comboPerfil.setCurrentIndex(idx)
+        perfil = p.perfil or "General"
+        idx = _PERFILES.index(perfil) if perfil in _PERFILES else 0
+        self.comboPerfil.setCurrentIndex(idx)
 
-            self.inputFechaInicio.setDate(_parse_fecha(p.get("fecha_ini", "")))
+        self.inputFechaInicio.setDate(_parse_fecha(p.fecha_ini or ""))
 
-            self._cargando_formulario = False
-
-            # Calcular fecha_fin en base a fecha_ini + duración, no usar la de BD
-            self._actualizar_fecha_fin()
-
-            self._mostrar_aviso_caducidad(p.get("fecha_fin", ""))
-            self.lblEstado.clear()
-            self._set_modo_lectura(True) 
+        self._cargando_formulario = False
+        self._actualizar_fecha_fin()
+        self._mostrar_aviso_caducidad(p.fecha_fin or "")
+        self.lblEstado.clear()
+        self._set_modo_lectura(True)
 
     def _mostrar_aviso_caducidad(self, fecha_fin_str: str):
         if _fecha_fin_caducada(fecha_fin_str):
@@ -138,19 +144,18 @@ class VentanaEditar(QWidget):
         self._cargando_formulario = False
         self.listaPaquetes.clearSelection()
         for w in (self.inputNombre, self.inputDestino,
-                self.inputDuracion, self.inputPrecio, self.inputServicios):
+                  self.inputDuracion, self.inputPrecio, self.inputServicios):
             w.clear()
         self.textDescripcion.clear()
         self.comboPerfil.setCurrentIndex(0)
         self.lblEstado.clear()
         self.lblAviso.setVisible(False)
-        # ── resetear fechas ──────────────────────────────────────────────────
         hoy = QDate.currentDate()
         self.inputFechaInicio.setDate(hoy)
         self.inputFechaFin.setReadOnly(False)
         self.inputFechaFin.setDate(hoy)
         self.inputFechaFin.setReadOnly(True)
-        self._set_modo_lectura(True) 
+        self._set_modo_lectura(True)
 
     # ── Acciones ───────────────────────────────────────────────────────────
 
@@ -166,21 +171,21 @@ class VentanaEditar(QWidget):
             return
 
         datos = {
-            "nombre": self.inputNombre.text().strip(),
-            "destino": self.inputDestino.text().strip(),
-            "duracion": self.inputDuracion.text().strip(),
-            "precio": self.inputPrecio.text().strip(),
-            "servicios": self.inputServicios.text().strip(),
+            "nombre":      self.inputNombre.text().strip(),
+            "destino":     self.inputDestino.text().strip(),
+            "duracion":    self.inputDuracion.text().strip(),
+            "precio":      self.inputPrecio.text().strip(),
+            "servicios":   self.inputServicios.text().strip(),
             "descripcion": self.textDescripcion.toPlainText().strip(),
-            "perfil": self.comboPerfil.currentText(),
-            "emoji": EMOJI_PAQUETE,
-            "fecha_ini": self.inputFechaInicio.date().toString("yyyy-MM-dd"),
-            "fecha_fin": self.inputFechaFin.date().toString("yyyy-MM-dd"),
+            "perfil":      self.comboPerfil.currentText(),
+            "emoji":       _EMOJI,
+            "fecha_ini":   self.inputFechaInicio.date().toString("yyyy-MM-dd"),
+            "fecha_fin":   self.inputFechaFin.date().toString("yyyy-MM-dd"),
         }
 
-        ok, msg = self._ctrl.editar_paquete(self._id_seleccionado, datos)
-        self._set_estado(msg, error=not ok)
-        if ok:
+        resultado = self._ctrl.editar_paquete(self._id_seleccionado, datos)
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
+        if resultado.ok:
             self._recargar_lista(self.inputFiltroLista.text())
             self._mostrar_aviso_caducidad(datos["fecha_fin"])
             self._set_modo_lectura(True)
@@ -200,9 +205,9 @@ class VentanaEditar(QWidget):
         if resp != QMessageBox.Yes:
             return
 
-        ok, msg = self._ctrl.eliminar_paquete(self._id_seleccionado)
-        self._set_estado(msg, error=not ok)
-        if ok:
+        resultado = self._ctrl.eliminar_paquete(self._id_seleccionado)
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
+        if resultado.ok:
             self._limpiar_formulario()
             self._recargar_lista()
 
@@ -211,7 +216,6 @@ class VentanaEditar(QWidget):
     def _actualizar_fecha_fin(self):
         if self._cargando_formulario:
             return
-
         fecha_ini = self.inputFechaInicio.date()
         try:
             dias = int(self.inputDuracion.text().strip())
@@ -224,12 +228,8 @@ class VentanaEditar(QWidget):
         self.inputFechaFin.setReadOnly(True)
 
     def _set_modo_lectura(self, solo_lectura: bool):
-        campos = [
-            self.inputNombre, self.inputDestino,
-            self.inputDuracion, self.inputPrecio,
-            self.inputServicios,
-        ]
-        for campo in campos:
+        for campo in (self.inputNombre, self.inputDestino,
+                      self.inputDuracion, self.inputPrecio, self.inputServicios):
             campo.setReadOnly(solo_lectura)
         self.textDescripcion.setReadOnly(solo_lectura)
         self.comboPerfil.setEnabled(not solo_lectura)
