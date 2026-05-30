@@ -43,12 +43,13 @@ class ControladorCliente:
     def volver_a_principal(self):
         self._ocultar_todas_menos(None)
         self.abrir_principal()
-'''
-def cerrar_sesion(self):
-    from src.vista.Login import MiVentana
-    self._cerrar_todo()
-    self.ventana_login = MiVentana()
-    self.ventana_login.show()'''
+
+#def cerrar_sesion(self):
+#    from src.vista.Login import MiVentana
+#    self._cerrar_todo()
+#    self.ventana_login = MiVentana()
+#    self.ventana_login.show()
+
     def cerrar_sesion(self):
         from src.controlador.ControladorPrincipal import ControladorPrincipal
         self._cerrar_todo()
@@ -121,10 +122,7 @@ def cerrar_sesion(self):
             self.user.usuario_id, paquete,
             fecha_inicio, fecha_fin, personas, metodo_pago
         )
-                            
-    def obtener_metodos_pago(self) -> list[str]:
-        return self.logica_cliente.obtener_metodos_pago()
-        
+
     def formatear_pedido(self, pedido: dict) -> dict:
         def fmt(f):
             try:
