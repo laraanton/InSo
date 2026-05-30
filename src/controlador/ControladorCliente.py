@@ -121,7 +121,10 @@ def cerrar_sesion(self):
             self.user.usuario_id, paquete,
             fecha_inicio, fecha_fin, personas, metodo_pago
         )
-
+                            
+    def obtener_metodos_pago(self) -> list[str]:
+        return self.logica_cliente.obtener_metodos_pago()
+        
     def formatear_pedido(self, pedido: dict) -> dict:
         def fmt(f):
             try:
