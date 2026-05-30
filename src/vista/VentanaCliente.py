@@ -6,6 +6,9 @@ from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaCliente.ui")
 
+_COLS = 3
+
+
 class VentanaCliente(QMainWindow, Form):
     def __init__(self, user):
         super().__init__()
@@ -97,12 +100,9 @@ class VentanaCliente(QMainWindow, Form):
         self._mostrar_resultados(resultados, destino)
 
     def _mostrar_resultados(self, paquetes: list, termino: str):
-        from src.vista.VentanaResultados import VentanaResultados
         fecha = self.in_fecha_ida.date()
-        n_personas = self.in_personas.value() 
-        self.ventana_resultados = VentanaResultados(self.user, paquetes, termino, fecha, n_personas)
-        self.ventana_resultados.show()
-        self.hide()
+        n_personas = self.in_personas.value()
+        self.controlador.ir_a_resultados(paquetes, termino, fecha, n_personas)
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
