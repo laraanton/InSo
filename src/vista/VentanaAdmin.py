@@ -1,5 +1,18 @@
+"""
+VentanaAdmin.py  –  Ventana principal del módulo Administrador
+==============================================================
+Responsabilidad: contenedor del menú lateral, topbar y QStackedWidget.
+No contiene lógica de negocio ni estilos (el estilo está en vistaAdmin.ui / QSS global).
+
+CORRECCIÓN APLICADA:
+  - _configurar_topbar ahora separa inicial y nombre para que el avatar
+    circular muestre solo la inicial y adminNameLabel muestre el nombre completo,
+    sin que se solapen ni partan.
+"""
+
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PyQt5.QtCore import QTimer
 from PyQt5 import uic
 
 from src.controlador.ControladorAdmin import ControladorAdmin
@@ -25,6 +38,14 @@ _TITULOS = {
     PAGE_SISTEMA:    ("Sistema y Backups",     "Softrip › Administración › Sistema"),
 }
 
+_BOTONES_NAV = [
+    "btnNavDashboard",
+    "btnNavOperadores",
+    "btnNavUsuarios",
+    "btnNavActividad",
+    "btnNavSistema",
+]
+
 
 class VentanaAdmin(QMainWindow, Form):
 
@@ -33,7 +54,6 @@ class VentanaAdmin(QMainWindow, Form):
         self.setupUi(self)
         self.usuario_actual = usuario_actual
 
-        # El controlador centraliza el acceso al DAO
         self.controlador = ControladorAdmin(usuario_actual)
 
         self._pages = {
@@ -49,13 +69,20 @@ class VentanaAdmin(QMainWindow, Form):
 
         self._configurar_topbar()
         self._conectar_senales()
-        self._navegar(PAGE_DASHBOARD)
+
+        QTimer.singleShot(0, lambda: self._navegar(PAGE_DASHBOARD))
+
+    # ── Topbar ────────────────────────────────────────────────────────────────
 
     def _configurar_topbar(self):
         nombre  = self.usuario_actual.nombre_completo or "Admin"
         inicial = nombre[0].upper()
+        # avatarLabel muestra solo la inicial (el círculo está definido en el .ui)
         self.avatarLabel.setText(inicial)
+        # adminNameLabel muestra el nombre completo en el widget de texto aparte
         self.adminNameLabel.setText(nombre)
+
+    # ── Señales ───────────────────────────────────────────────────────────────
 
     def _conectar_senales(self):
         self.btnNavDashboard.clicked.connect(lambda: self._navegar(PAGE_DASHBOARD))
@@ -65,29 +92,29 @@ class VentanaAdmin(QMainWindow, Form):
         self.btnNavSistema.clicked.connect(lambda: self._navegar(PAGE_SISTEMA))
         self.btnLogout.clicked.connect(self._cerrar_sesion)
 
-        # El dashboard tiene un botón "Ver todos" que salta a actividad
         self._pages[PAGE_DASHBOARD].ir_a_actividad.connect(
             lambda: self._navegar(PAGE_ACTIVIDAD)
         )
+
+    # ── Navegación ────────────────────────────────────────────────────────────
 
     def _navegar(self, pagina):
         self.stackedWidget.setCurrentWidget(self._pages[pagina])
         self.pageTitle.setText(_TITULOS[pagina][0])
         self.pageBreadcrumb.setText(_TITULOS[pagina][1])
+        self._marcar_activo(pagina)
+        self._pages[pagina].cargar()
 
-        _botones = {
-            PAGE_DASHBOARD:  self.btnNavDashboard,
-            PAGE_OPERADORES: self.btnNavOperadores,
-            PAGE_USUARIOS:   self.btnNavUsuarios,
-            PAGE_ACTIVIDAD:  self.btnNavActividad,
-            PAGE_SISTEMA:    self.btnNavSistema,
-        }
-        for p, btn in _botones.items():
-            btn.setProperty("active", p == pagina)
+    def _marcar_activo(self, pagina: int):
+        """Marca el botón del menú lateral correspondiente a la página activa."""
+        for i, nombre in enumerate(_BOTONES_NAV):
+            btn = getattr(self, nombre)
+            btn.setProperty("active", i == pagina)
             btn.style().unpolish(btn)
             btn.style().polish(btn)
+            btn.update()
 
-        self._pages[pagina].cargar()
+    # ── Cerrar sesión ─────────────────────────────────────────────────────────
 
     def _cerrar_sesion(self):
         resp = QMessageBox.question(
@@ -96,10 +123,10 @@ class VentanaAdmin(QMainWindow, Form):
             QMessageBox.Yes | QMessageBox.No
         )
         if resp == QMessageBox.Yes:
-            from src.controlador.ControladorPrincipal import ControladorPrincipal
+            from src.vista.Login import MiVentana
+            self.ventana_login = MiVentana()
+            self.ventana_login.show()
             self.close()
-            ctrl = ControladorPrincipal()
-            ctrl.abrirIniciarSesion()
 
 
 if __name__ == "__main__":
