@@ -1,10 +1,3 @@
-"""
-VentanaFeedback.py  –  Vista de Feedback de Clientes (Operador)
-===============================================================
-Solo lectura. El operador consulta y filtra las valoraciones.
-Se inyecta como página dentro del QStackedWidget de VentanaOperador.
-"""
-
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView
@@ -146,14 +139,14 @@ class VentanaFeedback(QWidget):
             tabla.insertRow(fila)
 
             # Columnas de texto plano.
-            tabla.setItem(fila, 0, self._item(f.get("pedido_ref", "")))
-            tabla.setItem(fila, 1, self._item(f.get("cliente", "")))
-            tabla.setItem(fila, 2, self._item(f.get("paquete", "")))
-            tabla.setItem(fila, 3, self._item(f.get("fecha_viaje", "")))
+            tabla.setItem(fila, 0, self._item(f.pedido_ref))
+            tabla.setItem(fila, 1, self._item(f.cliente))
+            tabla.setItem(fila, 2, self._item(f.paquete))
+            tabla.setItem(fila, 3, self._item(f.fecha_viaje))
 
             # Valoración general: mostramos estrellas (★★★☆☆) y las coloreamos
             # según la puntuación para leerlo de un vistazo sin mirar el número.
-            val = f.get("val_general")
+            val = f.val_general
             item_val = QTableWidgetItem(self._estrellas(val))
             item_val.setTextAlignment(Qt.AlignCenter)
             color = _STAR_COLORS.get(val, "#888888")   # gris si el valor es None o inesperado
@@ -161,7 +154,7 @@ class VentanaFeedback(QWidget):
             tabla.setItem(fila, 4, item_val)
 
             # Trato del operador: misma lógica que la valoración general.
-            trato = f.get("val_trato_operador")
+            trato = f.val_trato_operador
             item_trato = QTableWidgetItem(self._estrellas(trato))
             item_trato.setTextAlignment(Qt.AlignCenter)
             item_trato.setForeground(QColor(_STAR_COLORS.get(trato, "#888888")))
@@ -197,9 +190,9 @@ class VentanaFeedback(QWidget):
         self._seleccionado = f
 
         # Cabecera del panel: nombre del paquete y datos de contexto.
-        self.lblDetalleTitle.setText(f.get("paquete", "—"))
+        self.lblDetalleTitle.setText(f.paquete or "—")
         self.lblDetalleSub.setText(
-            f"{f.get('cliente', '—')}  ·  {f.get('destino', '—')}  ·  {f.get('fecha_viaje', '—')}"
+            f"{f.cliente}  ·  {f.destino}  ·  {f.fecha_viaje}"
         )
 
         # Función local para formatear una valoración numérica como
@@ -208,19 +201,19 @@ class VentanaFeedback(QWidget):
             return f"{self._estrellas(v)}  ({v}/5)" if v is not None else "—"
 
         # Rellenamos las cuatro valoraciones del panel.
-        self.lblV1.setText(fmt(f.get("val_trato_operador")))
-        self.lblV2.setText(fmt(f.get("val_calidad_transporte")))
-        self.lblV3.setText(fmt(f.get("val_satisfaccion_alojamiento")))
-        self.lblV4.setText(fmt(f.get("val_general")))
+        self.lblV1.setText(fmt(f.val_trato_operador))
+        self.lblV2.setText(fmt(f.val_calidad_transporte))
+        self.lblV3.setText(fmt(f.val_satisfaccion_alojamiento))
+        self.lblV4.setText(fmt(f.val_general))
 
         # La valoración general se destaca en color para que sea
         # la primera cifra que capta la atención del operador.
-        val = f.get("val_general")
+        val = f.val_general
         color = _STAR_COLORS.get(val, "#888888")
         self.lblV4.setStyleSheet(f"color: {color}; font-weight: bold; font-size: 13px;")
 
         # Mostramos el comentario libre del cliente, o un texto neutro si no hay.
-        self.lblComentario.setText(f.get("comentarios") or "Sin comentarios.")
+        self.lblComentario.setText(f.comentarios or "Sin comentarios.")
 
     def _limpiar_detalle(self):
         # Devolvemos el panel derecho a su estado inicial vacío.
