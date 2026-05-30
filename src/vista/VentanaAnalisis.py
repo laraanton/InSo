@@ -29,6 +29,7 @@ from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
 from src.controlador.ControladorOperador import ControladorOperador
+from src.modelo.vo.AnalisisVO import AnalisisVO
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -74,7 +75,7 @@ class VentanaAnalisis(QWidget):
         self._set_estado("Cargando datos…")
 
         try:
-            datos = self._ctrl.get_datos_analisis(periodo)
+            datos: AnalisisVO = self._ctrl.get_datos_analisis(periodo)
         except Exception as exc:
             self._set_estado(f"Error al cargar datos: {exc}", error=True)
             return
@@ -85,22 +86,19 @@ class VentanaAnalisis(QWidget):
 
     # ── KPIs 
 
-    def _poblar_kpis(self, datos: dict):
+    def _poblar_kpis(self, datos: AnalisisVO):
         """
-        datos esperado:
-            kpi_ingresos   → str  p.ej. "12 430 €"
-            kpi_pedidos    → str  p.ej. "87"
-            kpi_satisf     → str  p.ej. "4.2 / 5"
-            kpi_reclam     → str  p.ej. "5"
+        datos es un AnalisisVO; los KPIs viven en datos.kpis (KpiVO).
         """
-        self.kpiValue1.setText(datos.get("kpi_ingresos", "—"))
-        self.kpiValue2.setText(datos.get("kpi_pedidos",  "—"))
-        self.kpiValue3.setText(datos.get("kpi_satisf",   "—"))
-        self.kpiValue4.setText(datos.get("kpi_reclam",   "—"))
+        kpis = datos.kpis
+        self.kpiValue1.setText(kpis.ingresos      if kpis else "—")
+        self.kpiValue2.setText(kpis.pedidos       if kpis else "—")
+        self.kpiValue3.setText(kpis.satisfaccion  if kpis else "—")
+        self.kpiValue4.setText(kpis.reclamaciones if kpis else "—")
 
     # ── Gráficos 
 
-    def _poblar_graficos(self, datos: dict):
+    def _poblar_graficos(self, datos: AnalisisVO):
         self._embed_chart(self.chartArea1, self._fig_ventas_paquete, datos)
         self._embed_chart(self.chartArea2, self._fig_ingresos_mes,   datos)
         self._embed_chart(self.chartArea3, self._fig_estado_pedidos, datos)
@@ -108,7 +106,7 @@ class VentanaAnalisis(QWidget):
         self._embed_chart(self.chartArea5, self._fig_reclamaciones,  datos)
         self._embed_chart(self.chartArea6, self._fig_perfil_viajero, datos)
 
-    def _embed_chart(self, frame: QWidget, builder, datos: dict):
+    def _embed_chart(self, frame: QWidget, builder, datos: AnalisisVO):
         """Limpia el QFrame e inyecta el canvas de Matplotlib."""
         if frame.layout() is not None:
             while frame.layout().count():
@@ -135,14 +133,14 @@ class VentanaAnalisis(QWidget):
         fig.subplots_adjust(left=0.12, right=0.97, top=0.88, bottom=0.18)
         return fig
 
-    def _fig_ventas_paquete(self, datos: dict) -> Figure:
+    def _fig_ventas_paquete(self, datos: AnalisisVO) -> Figure:
         """
         Barras: unidades vendidas por paquete turístico.
-        datos["ventas_paquete"] → list[dict] con claves 'paquete', 'ventas'
+        datos.ventas_paquete → list[dict] con claves 'paquete', 'ventas'
         """
         fig = self._base_fig()
         ax  = fig.add_subplot(111)
-        filas = datos.get("ventas_paquete", [])
+        filas = datos.ventas_paquete or []
         if filas:
             nombres = [r["paquete"] for r in filas]
             valores = [r["ventas"]  for r in filas]
@@ -157,14 +155,14 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Ventas por paquete")
         return fig
 
-    def _fig_ingresos_mes(self, datos: dict) -> Figure:
+    def _fig_ingresos_mes(self, datos: AnalisisVO) -> Figure:
         """
         Línea: ingresos mensuales.
-        datos["ingresos_mes"] → list[dict] con claves 'mes', 'total'
+        datos.ingresos_mes → list[dict] con claves 'mes', 'total'
         """
         fig = self._base_fig()
         ax  = fig.add_subplot(111)
-        filas = datos.get("ingresos_mes", [])
+        filas = datos.ingresos_mes or []
         if filas:
             meses  = [r["mes"]   for r in filas]
             totals = [r["total"] for r in filas]
@@ -179,14 +177,14 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Ingresos por mes (€)")
         return fig
 
-    def _fig_estado_pedidos(self, datos: dict) -> Figure:
+    def _fig_estado_pedidos(self, datos: AnalisisVO) -> Figure:
         """
         Tarta: distribución de estados de pedido.
-        datos["estado_pedidos"] → list[dict] con claves 'estado', 'cantidad'
+        datos.estado_pedidos → list[dict] con claves 'estado', 'cantidad'
         """
         fig = Figure(figsize=(4, 2.4), dpi=96, facecolor=_BG)
         ax  = fig.add_subplot(111)
-        filas = datos.get("estado_pedidos", [])
+        filas = datos.estado_pedidos or []
         if filas:
             etiquetas = [r["estado"]   for r in filas]
             valores   = [r["cantidad"] for r in filas]
@@ -206,14 +204,14 @@ class VentanaAnalisis(QWidget):
         fig.tight_layout(pad=0.4)
         return fig
 
-    def _fig_satisfaccion(self, datos: dict) -> Figure:
+    def _fig_satisfaccion(self, datos: AnalisisVO) -> Figure:
         """
         Barras horizontales: puntuación media por paquete.
-        datos["satisfaccion"] → list[dict] con claves 'paquete', 'media'
+        datos.satisfaccion → list[dict] con claves 'paquete', 'media'
         """
         fig = self._base_fig(height=2.4)
         ax  = fig.add_subplot(111)
-        filas = datos.get("satisfaccion", [])
+        filas = datos.satisfaccion or []
         if filas:
             paquetes = [r["paquete"] for r in filas]
             medias   = [r["media"]   for r in filas]
@@ -229,14 +227,14 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Satisfacción media (/ 5)")
         return fig
 
-    def _fig_reclamaciones(self, datos: dict) -> Figure:
+    def _fig_reclamaciones(self, datos: AnalisisVO) -> Figure:
         """
         Barras: número de reclamaciones por categoría.
-        datos["reclamaciones"] → list[dict] con claves 'categoria', 'cantidad'
+        datos.reclamaciones → list[dict] con claves 'categoria', 'cantidad'
         """
         fig = self._base_fig()
         ax  = fig.add_subplot(111)
-        filas = datos.get("reclamaciones", [])
+        filas = datos.reclamaciones or []
         if filas:
             cats = [r["categoria"] for r in filas]
             cnts = [r["cantidad"]  for r in filas]
@@ -251,10 +249,10 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Reclamaciones por categoría")
         return fig
 
-    def _fig_perfil_viajero(self, datos: dict) -> Figure:
+    def _fig_perfil_viajero(self, datos: AnalisisVO) -> Figure:
         """
         Barras horizontales: presupuesto medio por preferencia de viajero.
-        datos["perfil_viajero"] → list[dict] con claves:
+        datos.perfil_viajero → list[dict] con claves:
             'perfil'            → str   (valor de Usuarios.preferencia)
             'media_presupuesto' → float (media de Clientes_Perfiles.presupuesto_promedio)
             'cantidad'          → int   (número de clientes en ese grupo)
@@ -268,7 +266,7 @@ class VentanaAnalisis(QWidget):
         fig.subplots_adjust(left=0.28, right=0.95, top=0.88, bottom=0.12)
         ax = fig.add_subplot(111)
 
-        filas = datos.get("perfil_viajero", [])
+        filas = datos.perfil_viajero or []
         if filas:
             preferencias = [r["perfil"]            for r in filas]
             medias       = [r["media_presupuesto"]  for r in filas]
@@ -322,5 +320,5 @@ class VentanaAnalisis(QWidget):
 
     def _exportar(self):
         """Delega la exportación en el controlador."""
-        ok, msg = self._ctrl.exportar_analisis(self.cbPeriodo.currentText())
-        self._set_estado(msg, error=not ok)
+        resultado = self._ctrl.exportar_analisis(self.cbPeriodo.currentText())
+        self._set_estado(resultado.mensaje, error=not resultado.ok)
