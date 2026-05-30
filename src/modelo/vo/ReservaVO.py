@@ -3,6 +3,7 @@ class ReservaVO:
                  pedido_id=0, cliente_id=0, paquete_id=0,
                  fecha_inicio=None, fecha_fin=None):
         self.id          = id           # identificador_unico 'ORD-N'
+        self.identificador_unico = id
         self.cliente     = cliente
         self.paquete     = paquete
         self.fecha       = fecha        # 'YYYY-MM-DD'
