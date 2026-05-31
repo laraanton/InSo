@@ -81,6 +81,17 @@ _Q_BASE_BUSCAR = """
     ORDER BY pv.fecha_pedido DESC
 """
 
+_Q_INSERT_FEEDBACK = """
+    INSERT INTO Feedback_Clientes
+        (pedido_id, val_general, val_trato_operador,
+         val_calidad_transporte, val_satisfaccion_alojamiento, comentarios)
+    VALUES (?, ?, ?, ?, ?, ?)
+"""
+
+_Q_EXISTS_FEEDBACK = """
+    SELECT COUNT(*) FROM Feedback_Clientes WHERE pedido_id = ?
+"""
+
 class FeedbackDAO(Conexion):
 
     @staticmethod
@@ -156,3 +167,32 @@ class FeedbackDAO(Conexion):
         except Exception as e:
             print(f"[FeedbackDAO] Error en obtener_paquetes_con_feedback: {e}")
             return []
+        
+    def insertar(self, vo: FeedbackVO) -> bool:
+        """Inserta un nuevo feedback. Devuelve True si se guardó correctamente."""
+        try:
+            cursor = self.getCursor()
+            cursor.execute(_Q_INSERT_FEEDBACK, [
+                vo.pedido_id,
+                vo.val_general,
+                vo.val_trato_operador,
+                vo.val_calidad_transporte,
+                vo.val_satisfaccion_alojamiento,
+                vo.comentarios,
+            ])
+            self.conexion.commit()
+            return True
+        except Exception as e:
+            print(f"[FeedbackDAO] Error en insertar: {e}")
+            return False
+
+    def existe_feedback(self, pedido_id: int) -> bool:
+        """Devuelve True si el pedido ya tiene una reseña (UNIQUE en BD)."""
+        try:
+            cursor = self.getCursor()
+            cursor.execute(_Q_EXISTS_FEEDBACK, [pedido_id])
+            row = cursor.fetchone()
+            return bool(row and row[0] > 0)
+        except Exception as e:
+            print(f"[FeedbackDAO] Error en existe_feedback: {e}")
+            return False
