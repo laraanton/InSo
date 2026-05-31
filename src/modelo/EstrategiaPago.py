@@ -56,7 +56,7 @@ class PagoTarjeta(EstrategiaPago):
 
     @property
     def nombre(self) -> str:
-        return "Tarjeta"
+        return "Tarjeta de crédito"
 
     def validar(self, total: float, **kwargs) -> tuple[bool, str]:
         if total <= 0:
@@ -71,7 +71,7 @@ class PagoTransferencia(EstrategiaPago):
 
     @property
     def nombre(self) -> str:
-        return "Transferencia"
+        return "Transferencia bancaria"
 
     def validar(self, total: float, **kwargs) -> tuple[bool, str]:
         if total <= 0:
