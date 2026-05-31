@@ -177,7 +177,7 @@ class ControladorOperador:
         return self._operador_bo.obtener_paquete_por_id(id_paquete)
 
     def crear_paquete(self, datos: dict) -> OperacionResultadoVO:
-        return self._operador_bo.crear_paquete(datos)
+        return self._operador_bo.crear_paquete(PaqueteVO.from_dict(datos))
 
     def editar_paquete(self, id_paquete: int, datos: dict) -> OperacionResultadoVO:
         return self._operador_bo.editar_paquete(id_paquete, datos)
