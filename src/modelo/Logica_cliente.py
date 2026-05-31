@@ -72,7 +72,7 @@ class BusinessCliente:
                         fecha_inicio, fecha_fin,
                         personas: int, metodo_pago: str) -> tuple[bool, str]:
         # ── Validaciones de negocio ──────────────────────────────────────────
-        if fecha_fin <= fecha_inicio:
+        if fecha_fin < fecha_inicio:
             return False, "La fecha de fin debe ser posterior a la de inicio."
         if personas < 1:
             return False, "Debe haber al menos 1 persona."
