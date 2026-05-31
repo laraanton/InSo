@@ -181,3 +181,25 @@ class ControladorCliente:
             self.user.usuario_id, self.user.email,
             pass_actual, pass_nueva
         )
+    
+    # ── Feedback ───────────────────────────────────────────────────────────────
+
+    def guardar_feedback(self, pedido_id: int,
+                     val_general: int, val_trato: int,
+                     val_transporte: int, val_alojamiento: int,
+                     comentarios: str) -> tuple[bool, str]:
+        # Validaciones de presentación
+        if not comentarios.strip():
+            return False, "El comentario no puede estar vacío."
+        if len(comentarios.strip()) < 10:
+            return False, "El comentario debe tener al menos 10 caracteres."
+
+        return self.logica_cliente.guardar_feedback(
+            pedido_id, self.user.usuario_id,
+            val_general, val_trato,
+            val_transporte, val_alojamiento,
+            comentarios,
+        )
+
+    def tiene_feedback(self, pedido_id: int) -> bool:
+        return self.logica_cliente.tiene_feedback(pedido_id)
