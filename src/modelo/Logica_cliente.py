@@ -2,6 +2,8 @@ from src.modelo.dao.UserDAO import UserDAO
 from src.modelo.dao.CuentaDAO import CuentaDAO
 from src.modelo.dao.PedidoDAO import PedidoDAO
 from src.modelo.dao.PaqueteDAO import PaqueteDAO
+from src.modelo.dao.FeedbackDAO import FeedbackDAO
+from src.modelo.vo.FeedbackVO import FeedbackVO
 from src.modelo.vo.LoginVO import LoginVO
 from src.modelo.vo.PedidoVO import PedidoVO
 from src.modelo.vo.PaqueteVO import PaqueteVO
@@ -14,6 +16,7 @@ class BusinessCliente:
         self._ped = PedidoDAO()
         self._usr = UserDAO()
         self._cta = CuentaDAO()
+        self._fb = FeedbackDAO()
 
     # ── Paquetes ─────────────────────────────────────────────────────────────
 
@@ -144,3 +147,35 @@ class BusinessCliente:
 
     def refrescar_usuario(self, usuario_id: int):
         return self._usr.obtenerUsuarioPorId(usuario_id)
+    
+    # ── Feedback ───────────────────────────────────────────────────────────────
+
+    def guardar_feedback(self, pedido_id: int, cliente_id: int,
+                     val_general: int, val_trato: int,
+                     val_transporte: int, val_alojamiento: int,
+                     comentarios: str) -> tuple[bool, str]:
+        # Validaciones de negocio
+        for val in [val_general, val_trato, val_transporte, val_alojamiento]:
+            if not (1 <= val <= 5):
+                return False, "Todas las valoraciones deben estar entre 1 y 5."
+
+        if self._fb.existe_feedback(pedido_id):
+            return False, "Ya has dejado una reseña para este viaje."
+
+        vo = FeedbackVO(
+            feedback_id=None,
+            pedido_id=pedido_id,
+            cliente_id=cliente_id,
+            val_general=val_general,
+            val_trato_operador=val_trato,
+            val_calidad_transporte=val_transporte,
+            val_satisfaccion_alojamiento=val_alojamiento,
+            comentarios=comentarios.strip(),
+        )
+        ok = self._fb.insertar(vo)
+        if ok:
+            return True, "¡Gracias por tu reseña!"
+        return False, "No se pudo guardar la reseña. Inténtalo de nuevo."
+
+    def tiene_feedback(self, pedido_id: int) -> bool:
+        return self._fb.existe_feedback(pedido_id)
