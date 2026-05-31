@@ -39,7 +39,23 @@ class PaqueteVO:
             fecha_creacion = row[10] or "",
             estado_paquete = row[11] or "Activo",
         )
-
+        
+    @staticmethod
+    def from_dict(d: dict) -> "PaqueteVO":
+        return PaqueteVO(
+            id=d.get("id"),
+            nombre=d.get("nombre", ""),
+            destino=d.get("destino", ""),
+            duracion=d.get("duracion", ""),
+            precio=d.get("precio", ""),
+            descripcion=d.get("descripcion", ""),
+            servicios=d.get("servicios", ""),
+            perfil=d.get("perfil", "General"),
+            accesibilidad=d.get("accesibilidad", False),
+            fecha_ini=d.get("fecha_ini", ""),
+            fecha_fin=d.get("fecha_fin", ""),
+        )
+        
     def to_insert_params(self, operador_id=None):
         return [
             self.nombre.strip(),
