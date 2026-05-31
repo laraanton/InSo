@@ -16,6 +16,7 @@ from PyQt5.QtCore import QTimer
 from PyQt5 import uic
 
 from src.controlador.ControladorAdmin import ControladorAdmin
+from src.controlador.ControladorPrincipal import ControladorPrincipal
 from src.vista.VentanaDashboard_admin  import VentanaDashboard_admin
 from src.vista.VentanaOperadores_admin import VentanaOperadores_admin
 from src.vista.VentanaUsuarios_admin   import VentanaUsuarios_admin
@@ -124,7 +125,8 @@ class VentanaAdmin(QMainWindow, Form):
         )
         if resp == QMessageBox.Yes:
             from src.vista.Login import MiVentana
-            self.ventana_login = MiVentana()
+            controlador = ControladorPrincipal()
+            self.ventana_login = MiVentana(controlador)
             self.ventana_login.show()
             self.close()
 
