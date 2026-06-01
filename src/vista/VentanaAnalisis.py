@@ -155,26 +155,32 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Ventas por paquete")
         return fig
 
-    def _fig_ingresos_mes(self, datos: AnalisisVO) -> Figure:
-        """
-        Línea: ingresos mensuales.
-        datos.ingresos_mes → list[dict] con claves 'mes', 'total'
-        """
-        fig = self._base_fig()
-        ax  = fig.add_subplot(111)
+    def _fig_ingresos_mes(self, datos) -> Figure:
+        fig, ax = self._fig("Ingresos por mes (€)")
         filas = datos.ingresos_mes or []
-        if filas:
-            meses  = [r["mes"]   for r in filas]
-            totals = [r["total"] for r in filas]
-            ax.plot(meses, totals, color=_TEAL, linewidth=2, marker="o",
-                    markersize=4, zorder=3)
-            ax.fill_between(meses, totals, alpha=0.12, color=_TEAL)
-            ax.set_xticks(range(len(meses)))
-            ax.set_xticklabels(meses, rotation=18, ha="right", fontsize=7)
-        else:
-            ax.text(0.5, 0.5, "Sin datos", ha="center", va="center",
-                    transform=ax.transAxes, color=_GRAY)
-        self._estilizar_ax(ax, "Ingresos por mes (€)")
+
+        if not filas:
+            self._sin_datos(ax)
+            return fig
+
+        meses  = [r["mes"]   for r in filas]
+        totals = [r["total"] for r in filas]
+        x      = list(range(len(meses)))
+
+        ax.plot(x, totals, color=_COLOR, linewidth=2, marker="o", markersize=4, label="Ingresos")
+        #si hay mas de dos ventas se hace regresión lineal
+        if len(x) >= 2:
+            import numpy as np
+            m, b      = np.polyfit(x, totals, 1)
+            tendencia = [m * xi + b for xi in x]
+            ax.plot(x, tendencia, color="#e08a5e", linewidth=1.5,
+                    linestyle="--", alpha=0.8, label="Tendencia")
+            direccion = "↑" if m > 0 else "↓"
+            ax.set_title(f"Ingresos por mes (€)  {direccion}", fontsize=8, color=_TEXT, pad=6)
+            ax.legend(fontsize=6, framealpha=0.5)
+
+        ax.set_xticks(x)
+        ax.set_xticklabels(meses, rotation=15, ha="right", fontsize=7)
         return fig
 
     def _fig_estado_pedidos(self, datos: AnalisisVO) -> Figure:
