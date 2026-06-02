@@ -10,8 +10,9 @@ class VentanaRecuperar(QMainWindow, Form):
         self.controlador = controlador
 
         self.botonRecuperar.clicked.connect(self.on_actualizar)
-        self.botonVolver.clicked.connect(self.on_volver)          # ← NUEVO
+        self.botonVolver.clicked.connect(self.on_volver)
 
+        #usar lamda para que no se ejecute al entrar
         self.in_email.returnPressed.connect(lambda: self.in_dni.setFocus())
         self.in_dni.returnPressed.connect(lambda: self.in_nueva_contrasena.setFocus())
         self.in_nueva_contrasena.returnPressed.connect(lambda: self.in_confirmar.setFocus())
@@ -40,5 +41,5 @@ class VentanaRecuperar(QMainWindow, Form):
         QMessageBox.information(self, "Éxito", mensaje)
         self.controlador.abrirIniciarSesion()
 
-    def on_volver(self):                                           # ← NUEVO
+    def on_volver(self):
         self.controlador.abrirIniciarSesion()
