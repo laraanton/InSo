@@ -4,6 +4,9 @@ from src.vista.VentanaCliente import VentanaCliente
 from src.controlador.ControladorAdmin import ControladorAdmin
 from src.controlador.ControladorOperador import ControladorOperador
 from src.controlador.ControladorCliente import ControladorCliente
+from src.vista.VentanaRegistro import VentanaRegistro
+from src.vista.VentanaRecuperar import VentanaRecuperar
+
 
 class ControladorPrincipal:
     def __init__(self, ventanaLogin, modelo):
@@ -15,11 +18,9 @@ class ControladorPrincipal:
         self._ventanaLogin.show()
 
     def abrirRegistro(self):
-        from src.vista.VentanaRegistro import VentanaRegistro
         self._cambiar_ventana(VentanaRegistro(self))
 
     def abrirRecuperar(self):
-        from src.vista.VentanaRecuperar import VentanaRecuperar
         self._cambiar_ventana(VentanaRecuperar(self))
 
     def abrirVentanaPrincipal(self, user):
@@ -30,7 +31,10 @@ class ControladorPrincipal:
             self._ventana_actual.controlador = ControladorAdmin(user, self)
         elif tipo == "Operador":
             self._ventana_actual = VentanaOperador(user)
-            ctrl = ControladorOperador(usuario_id=user.usuario_id, ventana=self._ventana_actual, controlador_principal=self
+            ctrl = ControladorOperador(
+                usuario_id=user.usuario_id,
+                ventana=self._ventana_actual,
+                controlador_principal=self
             )
             self._ventana_actual.controlador = ctrl
         elif tipo == "Cliente":
@@ -60,4 +64,4 @@ class ControladorPrincipal:
         return self._modelo.registrarUsuario(*args, **kwargs)
 
     def actualizarContrasena(self, *args, **kwargs):
-        return self._modelo.actualizarContrasena(*args, **kwargs) self._modelo.actualizarContrasena(*args, **kwargs)
+        return self._modelo.actualizarContrasena(*args, **kwargs)
