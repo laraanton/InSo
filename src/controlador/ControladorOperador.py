@@ -62,14 +62,15 @@ _NAV_BOTONES = ["btnNav1", "btnNav2", "btnNav3", "btnNav4", "btnNav5", "btnNav6"
 
 class ControladorOperador:
 
-    def __init__(self, usuario_id=None, ventana=None):
+    def __init__(self, usuario_id=None, ventana=None, controlador_principal=None):
         """
         ventana : VentanaOperador  –  referencia a la vista principal.
                   El controlador la necesita para cambiar de página y
                   para inyectar las subvistas en los QFrame placeholder.
         """
         self._usuario_id  = usuario_id
-        self._ventana     = ventana          # VentanaOperador
+        self._ventana     = ventana
+        self._ctrl_principal = controlador_principal          # VentanaOperador
         self._operador_bo = OperadorBO(usuario_id)
         self._analisis_bo = AnalisisBO()
 
@@ -83,6 +84,10 @@ class ControladorOperador:
 
     
     #  NAVEGACIÓN
+    def cerrar_sesion(self):
+        if self._ctrl_principal:
+            self._ctrl_principal.cerrarSesion()
+
     def navegar_hub(self):
         self._ir_a(PAG_HUB)
 
@@ -161,6 +166,8 @@ class ControladorOperador:
         mod    = importlib.import_module(f"src.vista.{modulo}")
         cls    = getattr(mod, clase)
         widget = cls(user=self._ventana.user)
+
+        widget.controlador = self
 
         layout = page_widget.layout()
         layout.removeWidget(placeholder)
