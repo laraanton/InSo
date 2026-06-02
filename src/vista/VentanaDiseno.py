@@ -3,7 +3,6 @@ from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget
 from PyQt5.QtCore import QDate
 
-from src.controlador.ControladorOperador import ControladorOperador
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -15,15 +14,24 @@ AVION = "✈️"
 
 class VentanaDiseno(QWidget):
 
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+
+
     def __init__(self, user=None):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        self._ctrl = ControladorOperador()
+        self._ctrl = None
         self._inicializar_fechas()
         self._conectar_senales()
 
-    # ── Inicialización ─────────────────────────────────────────────────────
+    # Inicialización 
 
     def _inicializar_fechas(self):
         hoy = QDate.currentDate()
@@ -36,7 +44,7 @@ class VentanaDiseno(QWidget):
         self.inputFechaFin.setDate(hoy)
         self.inputFechaFin.setReadOnly(True)
 
-    # ── Señales ────────────────────────────────────────────────────────────
+    # Señales 
 
     def _conectar_senales(self):
         self.btnNuevoPaquete.clicked.connect(self._limpiar_formulario)
@@ -45,7 +53,7 @@ class VentanaDiseno(QWidget):
         self.inputFechaIni.dateChanged.connect(lambda _: self._actualizar_fecha_fin())
         self.inputDuracion.textChanged.connect(lambda _: self._actualizar_fecha_fin())
 
-    # ── Acciones ───────────────────────────────────────────────────────────
+    # Acciones 
 
     def _guardar_paquete(self):
         datos = {
@@ -76,7 +84,7 @@ class VentanaDiseno(QWidget):
         self.inputFechaFin.setDate(hoy)
         self.inputFechaFin.setReadOnly(True)
 
-    # ── Helpers ────────────────────────────────────────────────────────────
+    # Helpers 
 
     def _actualizar_fecha_fin(self):
         """Calcula fecha_fin = fecha_ini + duración (días).
