@@ -10,7 +10,7 @@ class VentanaRegistro(QMainWindow, Form):
         self.controlador = controlador
 
         self.botonRegistrar.clicked.connect(self.on_registrar)
-        self.botonVolver.clicked.connect(self.on_volver)           # ← NUEVO
+        self.botonVolver.clicked.connect(self.on_volver)
 
         self.in_dni.returnPressed.connect(lambda: self.in_nombre.setFocus())
         self.in_nombre.returnPressed.connect(lambda: self.in_email.setFocus())
@@ -20,6 +20,7 @@ class VentanaRegistro(QMainWindow, Form):
         self.in_confirmar.returnPressed.connect(self.on_registrar)
 
     def on_registrar(self):
+        #recopilacion del input introducido por el usuario
         dni_nie    = self.in_dni.text().strip()
         nombre     = self.in_nombre.text().strip()
         email      = self.in_email.text().strip()
@@ -27,10 +28,12 @@ class VentanaRegistro(QMainWindow, Form):
         contrasena = self.in_contrasena.text().strip()
         confirmar  = self.in_confirmar.text().strip()
 
+        #validación básica
         if contrasena != confirmar:
             QMessageBox.warning(self, "Error", "Las contraseñas no coinciden")
             return
 
+        #llamada al controlador para que registre al usuario
         exito, mensaje = self.controlador.registrarUsuario(
             dni_nie, nombre, email, telefono, contrasena, preferencia="General", accesibilidad="Ninguna"
         )
