@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from src.controlador.ControladorOperador import ControladorOperador
 
 # Ruta absoluta al .ui para que no falle si se ejecuta desde otro directorio.
 UI_FILE = os.path.join(
@@ -26,26 +25,36 @@ _STAR_COLORS = {
 
 class VentanaFeedback(QWidget):
 
+
+
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self._cargar_paquetes()  # ← ahora sí, el controlador ya existe
+        self._cargar_datos()
+
+
     def __init__(self, user=None):
         super().__init__()
 
         # Carga el diseño visual desde el .ui (hecho con Qt Designer).
         uic.loadUi(UI_FILE, self)
 
-        self.user = user                        # usuario logueado (reservado para uso futuro)
-        self._ctrl = ControladorOperador()      # controlador que centraliza la lógica de negocio
-        self._feedbacks: list[dict] = []        # caché local con todos los feedbacks cargados
+        self.user = user    # usuario logueado (reservado para uso futuro)
+        self._ctrl = None      # controlador que centraliza la lógica de negocio
+        self._feedbacks: list[dict] = []     # caché local con todos los feedbacks cargados
         self._seleccionado: dict | None = None  # dict del feedback que tiene el foco ahora mismo
 
         # Orden de arranque: primero el aspecto, luego los combos, luego
         # los eventos, y por último los datos (que dependen de todo lo anterior).
         self._configurar_tabla()
-        self._cargar_paquetes()    # el combo de paquetes necesita datos de la BD
         self._conectar_senales()
-        self._cargar_datos()
 
-    # ── Configuración inicial 
-
+    # Configuración inicial 
     def _configurar_tabla(self):
         tabla = self.tablaFeedback
 
@@ -168,7 +177,6 @@ class VentanaFeedback(QWidget):
         tabla.resizeRowsToContents()
 
     # Detalle 
-
     def _on_seleccion(self):
         # Comprobamos que haya algo seleccionado antes de continuar.
         filas = self.tablaFeedback.selectedItems()
