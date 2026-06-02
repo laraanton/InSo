@@ -28,7 +28,6 @@ matplotlib.use("Qt5Agg")
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
 
-from src.controlador.ControladorOperador import ControladorOperador
 from src.modelo.vo.AnalisisVO import AnalisisVO
 
 UI_FILE = os.path.join(
@@ -48,29 +47,38 @@ _PALETTE = [_TEAL, _TEAL2, "#a8c8c8", _TEAL3, "#2d5f5f", "#91b8b8"]
 
 class VentanaAnalisis(QWidget):
 
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self._cargar_datos()
+
     def __init__(self, user=None):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user  = user
-        self._ctrl = ControladorOperador()
+        self._ctrl = None
         self._canvases: list[FigureCanvas] = []   # referencia para limpiar
 
-        # "Todo" es el índice 0 → sin filtro de fecha desde el inicio
+        # "Todo" es el índice 0 (sin filtro de fecha desde el inicio)
         self.cbPeriodo.setCurrentIndex(0)
 
         self._conectar_senales()
-        self._cargar_datos()
+       
 
-    # ── Señales 
+    # Señales 
 
     def _conectar_senales(self):
         self.cbPeriodo.currentIndexChanged.connect(self._cargar_datos)
         self.btnExportar.clicked.connect(self._exportar)
 
-    # ── Carga principal 
+    # Carga principal 
 
     def _cargar_datos(self):
-        """Pide los datos al controlador y refresca todos los gráficos."""
+        """Pide los datos al controlador y refresca los gráficos."""
         periodo = self.cbPeriodo.currentText()
         self._set_estado("Cargando datos…")
 
@@ -84,19 +92,19 @@ class VentanaAnalisis(QWidget):
         self._poblar_graficos(datos)
         self._set_estado("")
 
-    # ── KPIs 
+    # KPIs 
 
     def _poblar_kpis(self, datos: AnalisisVO):
         """
         datos es un AnalisisVO; los KPIs viven en datos.kpis (KpiVO).
         """
         kpis = datos.kpis
-        self.kpiValue1.setText(kpis.ingresos      if kpis else "—")
-        self.kpiValue2.setText(kpis.pedidos       if kpis else "—")
-        self.kpiValue3.setText(kpis.satisfaccion  if kpis else "—")
+        self.kpiValue1.setText(kpis.ingresos if kpis else "—")
+        self.kpiValue2.setText(kpis.pedidos if kpis else "—")
+        self.kpiValue3.setText(kpis.satisfaccion if kpis else "—")
         self.kpiValue4.setText(kpis.reclamaciones if kpis else "—")
 
-    # ── Gráficos 
+    # Gráficos 
 
     def _poblar_graficos(self, datos: AnalisisVO):
         self._embed_chart(self.chartArea1, self._fig_ventas_paquete, datos)
@@ -125,7 +133,7 @@ class VentanaAnalisis(QWidget):
         layout.addWidget(canvas)
         self._canvases.append(canvas)
 
-    # ── Builders de figuras 
+    # Builders de figuras 
 
     @staticmethod
     def _base_fig(nrows=1, ncols=1, height=2.4):
@@ -155,32 +163,26 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Ventas por paquete")
         return fig
 
-    def _fig_ingresos_mes(self, datos) -> Figure:
-        fig, ax = self._fig("Ingresos por mes (€)")
+    def _fig_ingresos_mes(self, datos: AnalisisVO) -> Figure:
+        """
+        Línea: ingresos mensuales.
+        datos.ingresos_mes → list[dict] con claves 'mes', 'total'
+        """
+        fig = self._base_fig()
+        ax  = fig.add_subplot(111)
         filas = datos.ingresos_mes or []
-
-        if not filas:
-            self._sin_datos(ax)
-            return fig
-
-        meses  = [r["mes"]   for r in filas]
-        totals = [r["total"] for r in filas]
-        x      = list(range(len(meses)))
-
-        ax.plot(x, totals, color=_COLOR, linewidth=2, marker="o", markersize=4, label="Ingresos")
-        #si hay mas de dos ventas se hace regresión lineal
-        if len(x) >= 2:
-            import numpy as np
-            m, b      = np.polyfit(x, totals, 1)
-            tendencia = [m * xi + b for xi in x]
-            ax.plot(x, tendencia, color="#e08a5e", linewidth=1.5,
-                    linestyle="--", alpha=0.8, label="Tendencia")
-            direccion = "↑" if m > 0 else "↓"
-            ax.set_title(f"Ingresos por mes (€)  {direccion}", fontsize=8, color=_TEXT, pad=6)
-            ax.legend(fontsize=6, framealpha=0.5)
-
-        ax.set_xticks(x)
-        ax.set_xticklabels(meses, rotation=15, ha="right", fontsize=7)
+        if filas:
+            meses  = [r["mes"]   for r in filas]
+            totals = [r["total"] for r in filas]
+            ax.plot(meses, totals, color=_TEAL, linewidth=2, marker="o",
+                    markersize=4, zorder=3)
+            ax.fill_between(meses, totals, alpha=0.12, color=_TEAL)
+            ax.set_xticks(range(len(meses)))
+            ax.set_xticklabels(meses, rotation=18, ha="right", fontsize=7)
+        else:
+            ax.text(0.5, 0.5, "Sin datos", ha="center", va="center",
+                    transform=ax.transAxes, color=_GRAY)
+        self._estilizar_ax(ax, "Ingresos por mes (€)")
         return fig
 
     def _fig_estado_pedidos(self, datos: AnalisisVO) -> Figure:
@@ -304,7 +306,7 @@ class VentanaAnalisis(QWidget):
         self._estilizar_ax(ax, "Presupuesto medio por preferencia (€)")
         return fig
 
-    # ── Helpers visuales ───────────────────────────────────────────────────
+    # Helpers visuales 
 
     @staticmethod
     def _estilizar_ax(ax, titulo: str):
