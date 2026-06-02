@@ -11,31 +11,20 @@ igual que antes. No cambia nada en la vista.
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
-
-# ─────────────────────────────────────────────
-#  Interfaz base
-# ─────────────────────────────────────────────
-
 class EstrategiaPago(ABC):
     """Interfaz común para todos los métodos de pago."""
 
     @property
     @abstractmethod
     def nombre(self) -> str:
-        """Nombre legible; debe coincidir con el texto del combo_pago."""
-
+        """Devuelve el nombre del método (debe coincidir con el menú desplegable)."""
     @abstractmethod
     def validar(self, total: float, **kwargs) -> tuple[bool, str]:
-        """Valida que la operación puede realizarse."""
+        """Valida que el pago es correcto antes de cobrar."""
 
     @abstractmethod
     def procesar(self, total: float, **kwargs) -> tuple[bool, str]:
-        """Ejecuta el cobro / genera la confirmación."""
-
-
-# ─────────────────────────────────────────────
-#  Estrategias concretas
-# ─────────────────────────────────────────────
+        """Realiza el cobro y devuleve el mensaje de éxito"""
 
 class PagoEfectivo(EstrategiaPago):
 
@@ -51,7 +40,6 @@ class PagoEfectivo(EstrategiaPago):
     def procesar(self, total: float, **kwargs) -> tuple[bool, str]:
         return True, f"Pago en efectivo de {total:,.2f} € pendiente en destino."
 
-
 class PagoTarjeta(EstrategiaPago):
 
     @property
@@ -65,7 +53,6 @@ class PagoTarjeta(EstrategiaPago):
 
     def procesar(self, total: float, **kwargs) -> tuple[bool, str]:
         return True, f"Pago con tarjeta de {total:,.2f} € procesado correctamente."
-
 
 class PagoTransferencia(EstrategiaPago):
 
@@ -86,7 +73,6 @@ class PagoTransferencia(EstrategiaPago):
             f"El viaje se confirmará al recibir el pago.",
         )
 
-
 class PagoPayPal(EstrategiaPago):
 
     @property
@@ -101,11 +87,8 @@ class PagoPayPal(EstrategiaPago):
     def procesar(self, total: float, **kwargs) -> tuple[bool, str]:
         return True, f"Pago de {total:,.2f} € tramitado a través de PayPal."
 
-
-# ─────────────────────────────────────────────
-#  Registro central
-# ─────────────────────────────────────────────
-
+# Diccionario automático que guarda todos los métodos disponibles
+# Clave: "Nombre del pago" -> Valor: El objeto del pago correspondiente
 _ESTRATEGIAS: dict[str, EstrategiaPago] = {
     e.nombre: e
     for e in [
@@ -116,15 +99,12 @@ _ESTRATEGIAS: dict[str, EstrategiaPago] = {
     ]
 }
 
-
 def obtener_estrategia(nombre: str) -> EstrategiaPago | None:
     """Usada internamente por BusinessCliente."""
     return _ESTRATEGIAS.get(nombre)
 
-
 def nombres_disponibles() -> list[str]:
     """
-    Usada por ControladorCliente para devolver los métodos a la vista,
-    que los pone en el combo_pago al arrancar.
+    Usada por ControladorCliente para devolver la lista de textos para rellenar el menú desplegable de la pantalla.
     """
     return list(_ESTRATEGIAS.keys())
