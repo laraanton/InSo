@@ -4,7 +4,6 @@ from PyQt5.QtWidgets import QWidget, QListWidgetItem, QMessageBox
 from PyQt5.QtCore import Qt, QDate
 from PyQt5.QtGui import QColor
 
-from src.controlador.ControladorOperador import ControladorOperador
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -35,16 +34,25 @@ def _fecha_fin_caducada(fecha_fin_str: str) -> bool:
 
 class VentanaEditar(QWidget):
 
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self._recargar_lista()
+
+
     def __init__(self, user=None):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        self._ctrl = ControladorOperador()
+        self._ctrl = None
         self._id_seleccionado: int | None = None
         self._cargando_formulario: bool = False
 
         self._conectar_senales()
-        self._recargar_lista()
         self._limpiar_formulario()
 
     # ── Señales ────────────────────────────────────────────────────────────
