@@ -12,7 +12,6 @@ from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QMessageBox
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from src.controlador.ControladorOperador import ControladorOperador
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -32,20 +31,29 @@ _ESTADO_COLORES = {
 
 class VentanaReclamaciones(QWidget):
 
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self._cargar_datos()
+
+
     def __init__(self, user=None):
         super().__init__()
 
         uic.loadUi(UI_FILE, self)
 
         self.user = user
-        self._ctrl = ControladorOperador()
+        self._ctrl = None
 
         self._reclamaciones = []
         self._id_seleccionado = None
 
         self._configurar_tabla()
         self._conectar_senales()
-        self._cargar_datos()
 
     # CONFIGURACIÓN
 
@@ -230,10 +238,8 @@ class VentanaReclamaciones(QWidget):
     # ACTUALIZAR ESTADO
 
     def _guardar_estado(self):
-
         if self._id_seleccionado is None:
             return
-
         nuevo_estado = self.comboEstadoDetalle.currentText()
 
         resultado = self._ctrl.cambiar_estado_reclamacion(
@@ -256,7 +262,6 @@ class VentanaReclamaciones(QWidget):
             )
 
     # HELPERS
-
     @staticmethod
     def _item(texto):
         # Crea una celda de solo lectura. Sin esto el usuario podría
