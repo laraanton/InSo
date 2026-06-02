@@ -2,12 +2,11 @@ import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import (
     QWidget, QTableWidgetItem, QComboBox, QHBoxLayout, QFileDialog,
-    QDialog, QFormLayout, QLineEdit, QDialogButtonBox, QMessageBox  # [FIX-3] añadidos para el diálogo de nueva reserva
+    QDialog, QFormLayout, QLineEdit, QDialogButtonBox, QMessageBox 
 )
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QColor
 
-from src.controlador.ControladorOperador import ControladorOperador
 
 UI_FILE = os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
@@ -40,6 +39,16 @@ COL_ID, COL_CLIENTE, COL_PAQUETE, COL_FECHA, COL_PRECIO, COL_ESTADO, COL_ACCIONE
 
 class VentanaCompra(QWidget):
 
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self.refrescar()
+
+
     def __init__(self, user=None):
         super().__init__()
         uic.loadUi(UI_FILE, self)
@@ -47,11 +56,10 @@ class VentanaCompra(QWidget):
         # [FIX-1] Se pasa usuario_id al controlador si el user está disponible,
         #         evitando que OperadorBO reciba siempre None cuando hay sesión activa.
         usuario_id = getattr(user, "usuario_id", None) if user else None
-        self._ctrl = ControladorOperador(usuario_id=usuario_id)
+        self._ctrl = None
 
         self._configurar_tabla()
         self._conectar_senales()
-        self.refrescar()
 
     # ── Configuración ──────────────────────────────────────────────────────
 
@@ -154,9 +162,7 @@ class VentanaCompra(QWidget):
 
     def _cambiar_estado(self, id_pedido, nuevo_estado: str, fila: int):
         resultado = self._ctrl.cambiar_estado_reserva(id_pedido, nuevo_estado)
-        # [FIX-5] OperacionResultadoVO tenía _init_ en vez de __init__,
-        #         por lo que .ok y .mensaje no existían → AttributeError en tiempo
-        #         de ejecución.  Corregido en OperacionResultadoVO.py.
+       
         self._set_estado(resultado.mensaje, error=not resultado.ok)
         if resultado.ok:
             item = self.tablaReservas.item(fila, COL_ESTADO)
@@ -198,7 +204,7 @@ class VentanaCompra(QWidget):
         resultado = self._ctrl.exportar_csv(ruta)
         self._set_estado(resultado.mensaje, error=not resultado.ok)
 
-    # ── Helpers ────────────────────────────────────────────────────────────
+    # ── Helpers 
 
     def _set_estado(self, msg: str, error: bool = False):
         self.lblEstado.setText(msg)
