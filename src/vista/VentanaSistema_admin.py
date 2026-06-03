@@ -22,15 +22,25 @@ Form, _ = uic.loadUiType("./src/vista/ui/vistasistemasadmin.ui")
 
 class VentanaSistema_admin(VentanaBase, Form):
 
-    def __init__(self, controlador, parent=None):
+    def __init__(self, user=None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self._ctrl    = controlador
-        self._backups = []   # historial local de backups de esta sesión
+        self._user    = user
+        self._ctrl    = None
+        self._backups = []
 
         self._configurar_info()
         self._configurar_tabla()
+
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
         self.btnBackupAhora.clicked.connect(self._hacer_backup)
+        self.cargar()
 
     # ── Configuración inicial ─────────────────────────────────────────────────
 
@@ -49,7 +59,6 @@ class VentanaSistema_admin(VentanaBase, Form):
     # ── Carga de datos ────────────────────────────────────────────────────────
 
     def cargar(self):
-        """Llamado por el Controlador al navegar a esta página."""
         self._poblar_tabla()
 
     # ── Backup ────────────────────────────────────────────────────────────────
@@ -64,7 +73,6 @@ class VentanaSistema_admin(VentanaBase, Form):
         self.btnBackupAhora.setEnabled(False)
         self.btnBackupAhora.setText("Generando backup…")
 
-        # Toda la lógica (nombre, ruta, SQL) está en la Lógica/DAO
         resultado = self._ctrl.hacer_backup(carpeta)
 
         self.btnBackupAhora.setEnabled(True)
@@ -75,7 +83,7 @@ class VentanaSistema_admin(VentanaBase, Form):
         if resultado.ok:
             entrada = {
                 "fecha":   ahora,
-                "archivo": resultado.mensaje,   # mensaje lleva el nombre del archivo
+                "archivo": resultado.mensaje,
                 "tamano":  self._tamano_archivo(carpeta, resultado.mensaje),
                 "estado":  "OK",
             }
