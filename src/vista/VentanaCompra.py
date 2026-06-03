@@ -26,12 +26,12 @@ ESTADOS = [
 
 _COLOR_ESTADO = {
     "Pendiente confirmacion": ("#fff3cd", "#856404"),
-    "Confirmado":             ("#d4edda", "#155724"),
-    "Pagado":                 ("#d1ecf1", "#0c5460"),
-    "En curso":               ("#cce5ff", "#004085"),
-    "Finalizado":             ("#e8f2f2", "#2d6b6b"),
-    "Cancelado":              ("#f8d7da", "#721c24"),
-    "Reembolsado":            ("#e2e3e5", "#383d41"),
+    "Confirmado": ("#d4edda", "#155724"),
+    "Pagado": ("#d1ecf1", "#0c5460"),
+    "En curso": ("#cce5ff", "#004085"),
+    "Finalizado": ("#e8f2f2", "#2d6b6b"),
+    "Cancelado": ("#f8d7da", "#721c24"),
+    "Reembolsado": ("#e2e3e5", "#383d41"),
 }
 
 COL_ID, COL_CLIENTE, COL_PAQUETE, COL_FECHA, COL_PRECIO, COL_ESTADO, COL_ACCIONES = range(7)
@@ -53,11 +53,9 @@ class VentanaCompra(QWidget):
         super().__init__()
         uic.loadUi(UI_FILE, self)
         self.user = user
-        # [FIX-1] Se pasa usuario_id al controlador si el user está disponible,
-        #         evitando que OperadorBO reciba siempre None cuando hay sesión activa.
+        #Se pasa usuario_id al controlador si el user está disponible
         usuario_id = getattr(user, "usuario_id", None) if user else None
         self._ctrl = None
-
         self._configurar_tabla()
         self._conectar_senales()
 
@@ -67,12 +65,12 @@ class VentanaCompra(QWidget):
         t = self.tablaReservas
         t.horizontalHeader().setStretchLastSection(True)
         t.verticalHeader().setVisible(False)
-        t.setColumnWidth(COL_ID,      100)
+        t.setColumnWidth(COL_ID, 100)
         t.setColumnWidth(COL_CLIENTE, 150)
         t.setColumnWidth(COL_PAQUETE, 160)
-        t.setColumnWidth(COL_FECHA,   110)
-        t.setColumnWidth(COL_PRECIO,   90)
-        t.setColumnWidth(COL_ESTADO,  130)
+        t.setColumnWidth(COL_FECHA, 110)
+        t.setColumnWidth(COL_PRECIO, 90)
+        t.setColumnWidth(COL_ESTADO, 130)
 
     def _conectar_senales(self):
         self.btnNuevaReserva.clicked.connect(self._nueva_reserva)
@@ -102,18 +100,15 @@ class VentanaCompra(QWidget):
 
         for fila, r in enumerate(reservas):
             t.insertRow(fila)
-
-            # [FIX-3] El VO expone .precio como float; para mostrar en tabla
-            #         se usa precio_fmt() si existe, o se formatea aquí.
-            #         Las demás columnas usan el atributo correcto del ReservaVO.
+            # atributos del VO
             valores_col = [
-                getattr(r, "identificador_unico", "") or "",   # COL_ID
-                getattr(r, "cliente",  "") or "",               # COL_CLIENTE
-                getattr(r, "paquete",  "") or "",               # COL_PAQUETE
-                getattr(r, "fecha",    "") or "",               # COL_FECHA
+                getattr(r, "identificador_unico", "") or "", # COL_ID
+                getattr(r, "cliente", "") or "", # COL_CLIENTE
+                getattr(r, "paquete", "") or "", # COL_PAQUETE
+                getattr(r, "fecha", "") or "", # COL_FECHA
                 # precio: ReservaVO guarda float en .precio; se formatea para display
-                (r.precio_fmt() if callable(getattr(r, "precio_fmt", None))
-                 else str(getattr(r, "precio", ""))),           # COL_PRECIO
+                (r.precio_fmt() if callable(getattr(r, "precio_fmt", None)) # se usa precio_fmt() si existe
+                 else str(getattr(r, "precio", ""))), # COL_PRECIO
             ]
             for col, valor in enumerate(valores_col):
                 item = QTableWidgetItem(str(valor))
@@ -129,8 +124,7 @@ class VentanaCompra(QWidget):
             item_e.setForeground(QColor(fg))
             t.setItem(fila, COL_ESTADO, item_e)
 
-            # [FIX-4] Se usa .identificador_unico (alias de .id en ReservaVO)
-            #         como clave para cambiar estado — coherente con ReservaDAO.
+            # .identificador_unico como clave para cambiar estado
             self._insertar_combo_estado(
                 t, fila,
                 getattr(r, "identificador_unico", None) or getattr(r, "id", ""),
@@ -171,17 +165,9 @@ class VentanaCompra(QWidget):
                 bg, fg = _COLOR_ESTADO.get(nuevo_estado, ("#ffffff", "#333333"))
                 item.setBackground(QColor(bg))
                 item.setForeground(QColor(fg))
-
+    
     def _nueva_reserva(self):
-        """
-        [FIX-6] El código original enviaba datos de texto inventados
-        ('Cliente Ejemplo', 'Escapada Paris') al controlador, que los
-        pasa al DAO esperando cliente_id y paquete_id como enteros.
-        Esto siempre fallaba (TypeError en la INSERT) o insertaba basura.
-
-        Solución: pedir al operador los IDs reales mediante un pequeño
-        diálogo antes de llamar al controlador.
-        """
+        # se pide al operador los IDs reales mediante un diálogo antes de llamar al controlador.
         dialogo = _DialogoNuevaReserva(self)
         if dialogo.exec_() != QDialog.Accepted:
             return
@@ -195,6 +181,7 @@ class VentanaCompra(QWidget):
         if resultado.ok:
             self.refrescar()
 
+    # función exportar csv con los datos de reservas
     def _exportar_csv(self):
         ruta, _ = QFileDialog.getSaveFileName(
             self, "Exportar reservas", "reservas.csv", "CSV (*.csv)"
@@ -215,11 +202,6 @@ class VentanaCompra(QWidget):
 # ── Diálogo auxiliar para nueva reserva ───────────────────────────────────────
 
 class _DialogoNuevaReserva(QDialog):
-    """
-    Diálogo mínimo que pide los datos obligatorios para crear una reserva.
-    Sólo se valida que cliente_id y paquete_id sean enteros; el resto es
-    opcional (el DAO / BO aplican sus propios defaults).
-    """
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -230,7 +212,7 @@ class _DialogoNuevaReserva(QDialog):
 
         self._cliente_id  = QLineEdit()
         self._paquete_id  = QLineEdit()
-        self._monto       = QLineEdit()
+        self._monto = QLineEdit()
         self._metodo_pago = QLineEdit("PayPal")
         self._fecha_ini   = QLineEdit()   # YYYY-MM-DD  (puede quedar vacío)
         self._fecha_fin   = QLineEdit()
