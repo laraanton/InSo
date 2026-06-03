@@ -41,7 +41,6 @@ class UserDAO(Conexion):
                 return None
 
             password_hash_guardado = row[-1]
-            print(f"DEBUG hash leído: {repr(password_hash_guardado)}")
 
             if isinstance(password_hash_guardado, str) and password_hash_guardado.startswith("b'"):
                 password_hash_guardado = password_hash_guardado[2:-1]
