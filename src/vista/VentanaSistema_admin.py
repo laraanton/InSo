@@ -5,7 +5,6 @@ Responsabilidad: mostrar información del sistema y delegar
 la generación de backups en el Controlador.
 No construye rutas de archivo ni hace lógica de negocio.
 """
-
 import platform
 from datetime import datetime
 
