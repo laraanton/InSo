@@ -1,12 +1,8 @@
 """
 VentanaDashboard_admin.py  –  Vista del Dashboard del Administrador
 ===================================================================
-Responsabilidad: pedir datos al ControladorAdmin y pintarlos.
-No contiene lógica de negocio ni estilos (el estilo está en el .ui / QSS global).
-
-CORRECCIÓN APLICADA:
-  - Columna "Tipo" de la tabla de actividad reciente ampliada con Stretch
-    para que textos como CREAR_OPERADOR no queden cortados.
+    - __init__ recibe user= (no controlador)
+    - controlador llega por setter, que llama a cargar()
 """
 
 from PyQt5.QtWidgets import QAbstractItemView, QHeaderView
@@ -23,19 +19,28 @@ class VentanaDashboard_admin(VentanaBase, Form):
     # Señal que VentanaAdmin escucha para saltar a la página de actividad
     ir_a_actividad = pyqtSignal()
 
-    def __init__(self, controlador, parent=None):
+    def __init__(self, user=None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self._ctrl = controlador
+        self._user = user
+        self._ctrl = None
 
         self._configurar_tabla()
         self.btnVerTodosDash.clicked.connect(self.ir_a_actividad.emit)
+
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
+        self.cargar()
 
     # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
         header = self.tablaDashActividad.horizontalHeader()
-        # Columna "Tipo" (índice 2) pasa a Stretch para no cortar CREAR_OPERADOR, etc.
         anchos = [150, 170, None, None]
         for i, w in enumerate(anchos):
             if w is None:
@@ -50,7 +55,6 @@ class VentanaDashboard_admin(VentanaBase, Form):
     # ── Carga de datos ────────────────────────────────────────────────────────
 
     def cargar(self):
-        """Llamado por el Controlador cada vez que se navega a esta página."""
         todos      = self._ctrl.obtener_todos_usuarios()
         operadores = [u for u in todos if u.tipo_usuario == "Operador"]
         clientes   = [u for u in todos if u.tipo_usuario == "Cliente"]
@@ -72,7 +76,7 @@ class VentanaDashboard_admin(VentanaBase, Form):
             row = tabla.rowCount()
             tabla.insertRow(row)
             fecha = str(r.fecha)[:19] if r.fecha else "—"
-            tabla.setItem(row, 0, self._item(fecha,                    selectable=False, center=True))
-            tabla.setItem(row, 1, self._item(r.nombre_usuario or "",   selectable=False))
-            tabla.setItem(row, 2, self._item(r.tipo_accion   or "",   selectable=False))
-            tabla.setItem(row, 3, self._item(r.detalle       or "",   selectable=False))
+            tabla.setItem(row, 0, self._item(fecha,                  selectable=False, center=True))
+            tabla.setItem(row, 1, self._item(r.nombre_usuario or "", selectable=False))
+            tabla.setItem(row, 2, self._item(r.tipo_accion   or "", selectable=False))
+            tabla.setItem(row, 3, self._item(r.detalle       or "", selectable=False))
