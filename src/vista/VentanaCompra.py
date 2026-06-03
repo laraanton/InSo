@@ -13,7 +13,7 @@ UI_FILE = os.path.join(
     "ui",
     "vistaCompra.ui"
 )
-
+# estados posibles de reserva, orden de flujo
 ESTADOS = [
     "Pendiente confirmacion",
     "Confirmado",
@@ -34,11 +34,12 @@ _COLOR_ESTADO = {
     "Reembolsado": ("#e2e3e5", "#383d41"),
 }
 
+# índices de columnas de la tabla
 COL_ID, COL_CLIENTE, COL_PAQUETE, COL_FECHA, COL_PRECIO, COL_ESTADO, COL_ACCIONES = range(7)
 
 
 class VentanaCompra(QWidget):
-
+    # asignar el controlador desde fuera y actualizar la tabla al conectarse
     @property
     def controlador(self):
         return self._ctrl
@@ -46,7 +47,7 @@ class VentanaCompra(QWidget):
     @controlador.setter
     def controlador(self, value):
         self._ctrl = value
-        self.refrescar()
+        self.refrescar() # cargar los datos 
 
 
     def __init__(self, user=None):
@@ -63,8 +64,9 @@ class VentanaCompra(QWidget):
 
     def _configurar_tabla(self):
         t = self.tablaReservas
-        t.horizontalHeader().setStretchLastSection(True)
+        t.horizontalHeader().setStretchLastSection(True) 
         t.verticalHeader().setVisible(False)
+        
         t.setColumnWidth(COL_ID, 100)
         t.setColumnWidth(COL_CLIENTE, 150)
         t.setColumnWidth(COL_PAQUETE, 160)
@@ -75,8 +77,8 @@ class VentanaCompra(QWidget):
     def _conectar_senales(self):
         self.btnNuevaReserva.clicked.connect(self._nueva_reserva)
         self.btnExportar.clicked.connect(self._exportar_csv)
-        self.inputBuscar.textChanged.connect(self._filtrar)
-        self.comboEstado.currentIndexChanged.connect(self._filtrar)
+        self.inputBuscar.textChanged.connect(self._filtrar) # filtra en tiempo real al escribir
+        self.comboEstado.currentIndexChanged.connect(self._filtrar) # filtra al cambiar el combo
 
     # ── Carga / filtrado ───────────────────────────────────────────────────
 
@@ -86,7 +88,7 @@ class VentanaCompra(QWidget):
     def _filtrar(self):
         texto  = self.inputBuscar.text().strip()
         estado = self.comboEstado.currentText()
-        # [FIX-2] "Todos los estados" (u opción vacía) no debe filtrarse por estado.
+        # si no hay filtro de estado seleccionado, se pasa vacío al controlador
         if estado in ("", "Todos los estados"):
             estado = ""
         reservas = self._ctrl.buscar_reservas(texto=texto, estado=estado)
@@ -96,44 +98,46 @@ class VentanaCompra(QWidget):
 
     def _poblar_tabla(self, reservas: list):
         t = self.tablaReservas
-        t.setRowCount(0)
+        t.setRowCount(0) # limpiar la tabla antes de rehacerla
 
         for fila, r in enumerate(reservas):
             t.insertRow(fila)
-            # atributos del VO
+            # atributos de ReservaVO
             valores_col = [
                 getattr(r, "identificador_unico", "") or "", # COL_ID
                 getattr(r, "cliente", "") or "", # COL_CLIENTE
                 getattr(r, "paquete", "") or "", # COL_PAQUETE
                 getattr(r, "fecha", "") or "", # COL_FECHA
-                # precio: ReservaVO guarda float en .precio; se formatea para display
-                (r.precio_fmt() if callable(getattr(r, "precio_fmt", None)) # se usa precio_fmt() si existe
+                # se usa precio_fmt() si existe, si no se convierte el float directamente
+                (r.precio_fmt() if callable(getattr(r, "precio_fmt", None)) 
                  else str(getattr(r, "precio", ""))), # COL_PRECIO
             ]
             for col, valor in enumerate(valores_col):
                 item = QTableWidgetItem(str(valor))
-                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
+                item.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled) # solo lectura
                 t.setItem(fila, col, item)
 
+            # celda de estado con color según el valor
             estado = getattr(r, "estado", "") or ""
             item_e = QTableWidgetItem(estado)
             item_e.setFlags(Qt.ItemIsSelectable | Qt.ItemIsEnabled)
             item_e.setTextAlignment(Qt.AlignCenter)
-            bg, fg = _COLOR_ESTADO.get(estado, ("#ffffff", "#333333"))
+            bg, fg = _COLOR_ESTADO.get(estado, ("#ffffff", "#333333")) # default
             item_e.setBackground(QColor(bg))
             item_e.setForeground(QColor(fg))
             t.setItem(fila, COL_ESTADO, item_e)
 
-            # .identificador_unico como clave para cambiar estado
+            # columna de acciones, desplegable para cambiar el estado
             self._insertar_combo_estado(
                 t, fila,
                 getattr(r, "identificador_unico", None) or getattr(r, "id", ""),
                 estado,
             )
 
-        t.resizeRowsToContents()
+        t.resizeRowsToContents() # ajusta altura de filas al contenido
 
     def _insertar_combo_estado(self, tabla, fila: int, id_pedido, estado_actual: str):
+        # cada fila tiene su propio QComboBox dentro de un widget contenedor
         w = QWidget()
         lay = QHBoxLayout(w)
         lay.setContentsMargins(4, 2, 4, 2)
@@ -143,8 +147,9 @@ class VentanaCompra(QWidget):
         if estado_actual in ESTADOS:
             combo.setCurrentIndex(ESTADOS.index(estado_actual))
         combo.setFixedWidth(170)
-        combo.wheelEvent = lambda event: None
+        combo.wheelEvent = lambda event: None # desactivar scroll para evitar cambios accidentales
 
+        # al cambiar el combo, llama a cambiar_estado con el id y la fila correcta
         combo.currentTextChanged.connect(
             lambda nuevo, pid=id_pedido, f=fila: self._cambiar_estado(pid, nuevo, f)
         )
@@ -159,6 +164,7 @@ class VentanaCompra(QWidget):
        
         self._set_estado(resultado.mensaje, error=not resultado.ok)
         if resultado.ok:
+            # actualiza solo la celda de estado visualmente, sin recargar toda la tabla
             item = self.tablaReservas.item(fila, COL_ESTADO)
             if item:
                 item.setText(nuevo_estado)
@@ -167,7 +173,7 @@ class VentanaCompra(QWidget):
                 item.setForeground(QColor(fg))
     
     def _nueva_reserva(self):
-        # se pide al operador los IDs reales mediante un diálogo antes de llamar al controlador.
+        # abre el diálogo modal; si el usuario cancela, no hace nada
         dialogo = _DialogoNuevaReserva(self)
         if dialogo.exec_() != QDialog.Accepted:
             return
@@ -183,17 +189,19 @@ class VentanaCompra(QWidget):
 
     # función exportar csv con los datos de reservas
     def _exportar_csv(self):
+        # diálogo para elegir dónde guardar el CSV
         ruta, _ = QFileDialog.getSaveFileName(
             self, "Exportar reservas", "reservas.csv", "CSV (*.csv)"
         )
         if not ruta:
-            return
+            return # el user canceló el diálogo
         resultado = self._ctrl.exportar_csv(ruta)
         self._set_estado(resultado.mensaje, error=not resultado.ok)
 
     # ── Helpers 
 
     def _set_estado(self, msg: str, error: bool = False):
+        # mensaje en el label en rojo (error) p verde (éxito)
         self.lblEstado.setText(msg)
         color = "#e05252" if error else "#5e8d8d"
         self.lblEstado.setStyleSheet(f"color: {color}; font-weight: bold;")
@@ -210,35 +218,38 @@ class _DialogoNuevaReserva(QDialog):
 
         lay = QFormLayout(self)
 
-        self._cliente_id  = QLineEdit()
-        self._paquete_id  = QLineEdit()
+        # campos del formulario
+        self._cliente_id = QLineEdit()
+        self._paquete_id = QLineEdit()
         self._monto = QLineEdit()
         self._metodo_pago = QLineEdit("PayPal")
-        self._fecha_ini   = QLineEdit()   # YYYY-MM-DD  (puede quedar vacío)
-        self._fecha_fin   = QLineEdit()
+        self._fecha_ini = QLineEdit()   # YYYY-MM-DD  (puede quedar vacío)
+        self._fecha_fin = QLineEdit()
 
+        # textos de ayuda por si el campo está vacío
         self._cliente_id.setPlaceholderText("Entero, p.ej. 12")
         self._paquete_id.setPlaceholderText("Entero, p.ej. 3")
         self._monto.setPlaceholderText("Decimal, p.ej. 1200.00")
         self._fecha_ini.setPlaceholderText("YYYY-MM-DD  (opcional)")
         self._fecha_fin.setPlaceholderText("YYYY-MM-DD  (opcional)")
 
-        lay.addRow("ID Cliente *",  self._cliente_id)
-        lay.addRow("ID Paquete *",  self._paquete_id)
-        lay.addRow("Monto total",   self._monto)
-        lay.addRow("Método pago",   self._metodo_pago)
-        lay.addRow("Fecha inicio",  self._fecha_ini)
-        lay.addRow("Fecha fin",     self._fecha_fin)
+        lay.addRow("ID Cliente *", self._cliente_id)
+        lay.addRow("ID Paquete *", self._paquete_id)
+        lay.addRow("Monto total", self._monto)
+        lay.addRow("Método pago", self._metodo_pago)
+        lay.addRow("Fecha inicio", self._fecha_ini)
+        lay.addRow("Fecha fin", self._fecha_fin)
 
         botones = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
             parent=self,
         )
-        botones.accepted.connect(self._validar_y_aceptar)
-        botones.rejected.connect(self.reject)
+        botones.accepted.connect(self._validar_y_aceptar) # OK -> valida antes de cerrar
+        botones.rejected.connect(self.reject) # Candcelar -> cierra sin hacer nada
         lay.addRow(botones)
 
     def _validar_y_aceptar(self):
+        # valida que los campos obligatorios sean números enteros antes de aceptar
         errores = []
         if not self._cliente_id.text().strip().isdigit():
             errores.append("• ID Cliente debe ser un número entero.")
@@ -246,11 +257,12 @@ class _DialogoNuevaReserva(QDialog):
             errores.append("• ID Paquete debe ser un número entero.")
         if errores:
             QMessageBox.warning(self, "Datos inválidos", "\n".join(errores))
-            return
+            return # no cierra el diálogo, deja al user corregir
         self.accept()
 
     def datos(self) -> dict | None:
-        """Devuelve el dict listo para pasarlo a ControladorOperador.registrar_reserva()."""
+        # devuelve los datos del formulario como dict para el controlador
+        # devuelve None si algo falla al parsear (seguridad)
         try:
             return {
                 "cliente_id":  int(self._cliente_id.text().strip()),
