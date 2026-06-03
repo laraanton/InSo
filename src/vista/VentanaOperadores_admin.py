@@ -1,22 +1,15 @@
 """
 VentanaOperadores_admin.py  –  Vista de Gestión de Operadores
-=============================================================
-Responsabilidad: mostrar la lista de operadores y delegar
-las acciones de creación/edición/bloqueo en el Controlador.
-No contiene lógica de negocio ni estilos (el estilo está en el .ui / QSS global).
 
-CORRECCIÓN APLICADA:
-  - _DialogoOperador valida internamente antes de llamar accept().
-    Antes: btns.accepted → self.accept() (cerraba sin validar).
-    Ahora: btns.accepted → _validar_y_aceptar() → self.accept() solo si ok.
-    Esto evita que la ventana principal recargue o se cierre con datos incorrectos.
+    - __init__ recibe user= (no controlador)
+    - controlador llega por setter, que llama a cargar()
 """
 
 from PyQt5.QtWidgets import (
     QWidget, QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
     QLabel, QLineEdit, QComboBox, QDialogButtonBox,
     QPushButton, QMessageBox, QFileDialog, QHeaderView,
-    QAbstractItemView, QFrame
+    QAbstractItemView
 )
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -28,14 +21,26 @@ Form, _ = uic.loadUiType("./src/vista/ui/vistaoperadoresadmin.ui")
 
 class VentanaOperadores_admin(VentanaBase, Form):
 
-    def __init__(self, controlador, parent=None):
+    def __init__(self, user=None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self.controlador = controlador
-        self._cache      = []
+        self._user   = user
+        self._ctrl   = None
+        self._cache  = []
 
         self._configurar_tabla()
+
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
         self._conectar_senales()
+        self.cargar()
+
+    # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
         anchos = [50, 180, 110, 170, 110, 90, 100, 160]
@@ -56,8 +61,10 @@ class VentanaOperadores_admin(VentanaBase, Form):
         self.searchOperadores.textChanged.connect(self._filtrar)
         self.filtroEstadoOp.currentTextChanged.connect(self._filtrar)
 
+    # ── Carga de datos ────────────────────────────────────────────────────────
+
     def cargar(self):
-        self._cache = self.controlador.obtener_operadores()
+        self._cache = self._ctrl.obtener_operadores()
         self._poblar(self._cache)
 
     def _poblar(self, lista):
@@ -90,24 +97,17 @@ class VentanaOperadores_admin(VentanaBase, Form):
         ]
         self._poblar(filtrados)
 
-    def _nuevo_operador(self):
-        """
-        Abre el diálogo. El diálogo valida internamente antes de aceptar,
-        por lo que si llega aquí con Accepted los datos son correctos.
+    # ── Acciones ──────────────────────────────────────────────────────────────
 
-        FIX #1: ControladorAdmin.crear_operador devuelve OperacionResultadoVO,
-        NO una tupla (exito, msg). Desempaquetar en tupla lanzaba TypeError
-        silenciosa → el QMessageBox nunca aparecía y self.cargar() nunca
-        se ejecutaba, por eso la tabla no se actualizaba hasta cerrar sesión.
-        """
+    def _nuevo_operador(self):
         dlg = _DialogoOperador(self)
         if dlg.exec_() != QDialog.Accepted:
             return
         d = dlg.datos()
-        resultado = self.controlador.crear_operador(          # devuelve OperacionResultadoVO
+        resultado = self._ctrl.crear_operador(
             d["dni_nie"], d["nombre_completo"], d["email"], d["telefono"], d["password"]
         )
-        if resultado.ok:                                       # .ok, no desempaquetar en tupla
+        if resultado.ok:
             QMessageBox.information(self, "Operador creado", resultado.mensaje)
             self.cargar()
         else:
@@ -118,7 +118,7 @@ class VentanaOperadores_admin(VentanaBase, Form):
         if dlg.exec_() != QDialog.Accepted:
             return
         d = dlg.datos()
-        resultado = self.controlador.actualizar_operador(
+        resultado = self._ctrl.actualizar_operador(
             usuario, d["telefono"], d["estado"], d["password"] or None
         )
         if resultado.ok:
@@ -129,10 +129,10 @@ class VentanaOperadores_admin(VentanaBase, Form):
 
     def _toggle_bloqueo(self, usuario):
         if usuario.cuenta_bloqueada:
-            resultado = self.controlador.desbloquear_operador(usuario)
+            resultado = self._ctrl.desbloquear_operador(usuario)
             titulo = "Cuenta desbloqueada"
         else:
-            resultado = self.controlador.bloquear_operador(usuario)
+            resultado = self._ctrl.bloquear_operador(usuario)
             titulo = "Cuenta bloqueada"
         if resultado.ok:
             QMessageBox.information(self, titulo, resultado.mensaje)
@@ -156,6 +156,8 @@ class VentanaOperadores_admin(VentanaBase, Form):
             QMessageBox.information(self, "Exportado", f"Guardado en:\n{ruta}")
         except Exception as e:
             QMessageBox.critical(self, "Error al exportar", str(e))
+
+    # ── Widgets de celda ──────────────────────────────────────────────────────
 
     def _badge_estado(self, estado, bloqueada=False):
         if bloqueada:
@@ -198,12 +200,6 @@ class VentanaOperadores_admin(VentanaBase, Form):
 # ── Diálogo de Nuevo / Editar Operador ────────────────────────────────────────
 
 class _DialogoOperador(QDialog):
-    """
-    Diálogo con validación interna.
-    CORRECCIÓN: solo llama self.accept() si todos los campos son válidos,
-    evitando que la ventana padre recargue con datos incompletos o erróneos.
-    El estilo visual se hereda del QSS global de la aplicación.
-    """
 
     def __init__(self, parent=None, usuario=None):
         super().__init__(parent)
@@ -257,16 +253,13 @@ class _DialogoOperador(QDialog):
         btns = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
         btns.button(QDialogButtonBox.Save).setText("Guardar")
         btns.button(QDialogButtonBox.Cancel).setText("Cancelar")
-        # CORRECCIÓN CLAVE: accepted → _validar_y_aceptar, no → self.accept
         btns.accepted.connect(self._validar_y_aceptar)
         btns.rejected.connect(self.reject)
         lay.addWidget(btns)
 
     def _validar_y_aceptar(self):
-        """Valida todos los campos y solo llama accept() si todo es correcto."""
         d = self.datos()
         if not self._usuario:
-            # Nuevo operador: todos los campos obligatorios
             if not d["dni_nie"]:
                 QMessageBox.warning(self, "Campo obligatorio", "El DNI/NIE es obligatorio.")
                 return
@@ -284,12 +277,10 @@ class _DialogoOperador(QDialog):
                                     "La contraseña debe tener al menos 6 caracteres.")
                 return
         else:
-            # Editar operador: solo validar contraseña si se ha rellenado
             if d["password"] and len(d["password"]) < 6:
                 QMessageBox.warning(self, "Contraseña corta",
                                     "La nueva contraseña debe tener al menos 6 caracteres.")
                 return
-        # Solo aquí el diálogo se cierra con resultado Accepted
         self.accept()
 
     def datos(self):
