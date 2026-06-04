@@ -84,10 +84,6 @@ class OperadorBO:
         nuevo_id = self._paq.insertar(paquete, operador_id=self._usuario_id)
         if nuevo_id is None:
             return OperacionResultadoVO(False, "Error al guardar el paquete en la base de datos.")
-        self._paq.registrar_historial(
-            nuevo_id, self._usuario_id,
-            f"Paquete '{paquete.nombre}' creado."
-        )
         return OperacionResultadoVO(
             True, f"Paquete '{paquete.nombre}' guardado correctamente (ID {nuevo_id})."
         )
@@ -98,10 +94,6 @@ class OperadorBO:
             return resultado
         if not self._paq.actualizar(id_paquete, paquete):
             return OperacionResultadoVO(False, "Error al actualizar el paquete en la base de datos.")
-        self._paq.registrar_historial(
-            id_paquete, self._usuario_id,
-            f"Paquete actualizado: {paquete.nombre}."
-        )
         return OperacionResultadoVO(True, f"Paquete '{paquete.nombre}' actualizado correctamente.")
 
     def eliminar_paquete(self, id_paquete: int) -> OperacionResultadoVO:
@@ -114,10 +106,6 @@ class OperadorBO:
             return OperacionResultadoVO(False, "Paquete no encontrado.")
         if not self._paq.eliminar(id_paquete):
             return OperacionResultadoVO(False, "Error al eliminar el paquete en la base de datos.")
-        self._paq.registrar_historial(
-            id_paquete, self._usuario_id,
-            f"Paquete '{paquete.nombre}' marcado como Inactivo (eliminado)."
-        )
         return OperacionResultadoVO(True, f"Paquete '{paquete.nombre}' eliminado correctamente.")
 
     # ── RESERVAS ──────────────────────────────────────────────────────────
