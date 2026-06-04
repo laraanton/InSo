@@ -1,7 +1,6 @@
 from src.modelo.conexion.Conexion import Conexion
 from src.modelo.vo.ReclamacionVO import ReclamacionVO
 
-
 _Q_SELECT_TODAS = """
     SELECT
         rc.reclamacion_id,
@@ -48,19 +47,13 @@ _Q_UPDATE_ESTADO = """
     SET    estado_reclamacion = ?
     WHERE  reclamacion_id = ?
 """
-_Q_UPDATE_RESPUESTA = """
-    UPDATE Reclamaciones
-    SET    
-           estado_reclamacion = ?,
-           fecha_resolucion   = GETDATE()
-    WHERE  reclamacion_id = ?
-"""
-
 
 class ReclamacionDAO(Conexion):
 
     @staticmethod
     def _row_a_vo(row) -> ReclamacionVO:
+        # Convierte una fila cruda de la BD en un ReclamacionVO
+        # Es @staticmethod porque solo transforma datos, no necesita self.
         # Orden columnas: 0 reclamacion_id, 1 pedido_id, 2 cliente_id,
         # 3 pedido_ref, 4 cliente, 5 paquete, 6 destino, 7 fecha_pedido,
         # 8 tipo, 9 descripcion, 10 estado,
@@ -99,6 +92,7 @@ class ReclamacionDAO(Conexion):
             filtros = []
 
             if texto:
+            # busca el texto en cliente, descripción Y paquete a la vez
                 filtros.append(
                     "(u.nombre_completo LIKE ? OR rc.descripcion_incidente LIKE ? "
                     "OR pt.nombre_paquete LIKE ?)"
@@ -110,7 +104,8 @@ class ReclamacionDAO(Conexion):
             if estado and estado != "Todos":
                 filtros.append("rc.estado_reclamacion = ?")
                 params.append(estado)
-
+            
+            # si no hay filtros, where queda "" y devuelve todo
             where = ("WHERE " + " AND ".join(filtros)) if filtros else ""
             cursor.execute(_Q_BASE_BUSCAR.format(where=where), params)
             return [self._row_a_vo(row) for row in cursor.fetchall()]
@@ -119,7 +114,8 @@ class ReclamacionDAO(Conexion):
             return []
 
     def actualizar_estado(self, reclamacion_id: int, nuevo_estado: str) -> bool:
-        """Actualiza el estado de una reclamación."""
+        """Actualiza el estado de una reclamación. Devuelve True/False para que el BO decida qué mensaje mostrar.
+        commit() es obligatorio para persistir el UPDATE en la BD."""
         try:
             cursor = self.getCursor()
             cursor.execute(_Q_UPDATE_ESTADO, [nuevo_estado, reclamacion_id])
@@ -128,16 +124,4 @@ class ReclamacionDAO(Conexion):
         except Exception as e:
             print(f"[ReclamacionDAO] Error en actualizar_estado: {e}")
             return False
-'''
-    def actualizar_respuesta(self, reclamacion_id: int,
-                             respuesta: str, nuevo_estado: str) -> bool:
-        """Guarda la respuesta del operador y actualiza estado + fecha_resolucion."""
-        try:
-            cursor = self.getCursor()
-            cursor.execute(_Q_UPDATE_RESPUESTA, [respuesta, nuevo_estado, reclamacion_id])
-            self.conexion.commit()
-            return True
-        except Exception as e:
-            print(f"[ReclamacionDAO] Error en actualizar_respuesta: {e}")
-            return False
-'''
+
