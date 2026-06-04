@@ -1,6 +1,5 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePedido.ui")
 
@@ -10,11 +9,18 @@ class VentanaDetalleMViaje(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
         self.user = user
-        self.controlador = ControladorCliente(user)
-        self.controlador.ventana_detalle = self
-        self.pedido = self.controlador.formatear_pedido(pedido)
+        self.pedido = pedido
+        self._controlador = None
+
+    @property
+    def controlador(self):
+        return self._controlador
+
+    @controlador.setter
+    def controlador(self, value):
+        self._controlador = value
+        self.pedido = self._controlador.formatear_pedido(self.pedido)
         self._rellenar_datos()
-        self._configurar_resena()
         self._conectar_señales()
 
     def _rellenar_datos(self):
@@ -43,7 +49,7 @@ class VentanaDetalleMViaje(QMainWindow, Form):
     def _configurar_resena(self):
         """Bloquea el formulario si ya existe reseña para este pedido."""
         pedido_id = self.pedido.get("pedido_id")
-        if pedido_id and self.controlador.tiene_feedback(pedido_id):
+        if pedido_id and self._controlador.tiene_feedback(pedido_id):
             self._bloquear_formulario_resena()
 
     def _bloquear_formulario_resena(self):
@@ -58,7 +64,7 @@ class VentanaDetalleMViaje(QMainWindow, Form):
         self.resena_subtitulo.setText("Ya has valorado este viaje.")
 
     def _conectar_señales(self):
-        self.btn_volver.clicked.connect(self.controlador.ir_a_mis_viajes)
+        self.btn_volver.clicked.connect(self._controlador.ir_a_mis_viajes)
         self.btn_enviar_resena.clicked.connect(self._enviar_resena)   # ✅
 
     def _enviar_resena(self):
@@ -66,7 +72,7 @@ class VentanaDetalleMViaje(QMainWindow, Form):
         if not pedido_id:
             return
 
-        ok, msg = self.controlador.guardar_feedback(
+        ok, msg = self._controlador.guardar_feedback(
             pedido_id,
             self.spin_val_general.value(),
             self.spin_val_trato.value(),
