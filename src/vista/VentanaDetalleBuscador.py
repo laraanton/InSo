@@ -1,7 +1,6 @@
 from PyQt5 import uic
 from PyQt5.QtCore import QDate
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
-from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePaquete.ui")
 
@@ -14,8 +13,15 @@ class VentanaDetalleBuscador(QMainWindow, Form):
         self.paquete = paquete
         self.fecha = fecha
         self.personas = n_personas
-        self.controlador = ControladorCliente(user)
-        self.controlador.ventana_detalle = self
+        self._controlador = None
+
+    @property
+    def controlador(self):
+        return self._controlador
+
+    @controlador.setter
+    def controlador(self, value):
+        self._controlador = value
         self._rellenar_datos()
         self._conectar_señales()
 
@@ -46,7 +52,7 @@ class VentanaDetalleBuscador(QMainWindow, Form):
         self.dt_fin.dateChanged.connect(self._actualizar_total)
         self.spin_personas.valueChanged.connect(self._actualizar_total)
         self.btn_confirmar.clicked.connect(self._confirmar)
-        self.btn_volver.clicked.connect(self.controlador.volver_a_principal)
+        self.btn_volver.clicked.connect(self._controlador.volver_a_principal)
 
     def _actualizar_fecha_fin(self):
         duracion = int(self.paquete.get("duracion", 0))
@@ -59,7 +65,7 @@ class VentanaDetalleBuscador(QMainWindow, Form):
     def _actualizar_total(self):
         self.spin_personas.setValue(self.personas)
         personas = self.personas
-        total    = self.controlador.calcular_total(self.paquete, personas) 
+        total    = self._controlador.calcular_total(self.paquete, personas) 
 
         try:
             precio = float(self.paquete.get("precio", 0))
@@ -78,14 +84,14 @@ class VentanaDetalleBuscador(QMainWindow, Form):
         metodo    = self.combo_pago.currentText()
 
         # El controlador valida, la vista solo muestra el error
-        ok, msg = self.controlador.validar_compra(
+        ok, msg = self._controlador.validar_compra(
             self.paquete, fecha_ini, fecha_fin, personas, metodo
         )
         if not ok:
             QMessageBox.warning(self, "Error", msg)
             return
 
-        total = self.controlador.calcular_total(self.paquete, personas)
+        total = self._controlador.calcular_total(self.paquete, personas)
         resp = QMessageBox.question(
             self, "Confirmar reserva",
             f"<b>{self.paquete.get('destino')}</b><br><br>"
@@ -99,7 +105,7 @@ class VentanaDetalleBuscador(QMainWindow, Form):
         if resp != QMessageBox.Yes:
             return
 
-        exito, mensaje = self.controlador.comprar_paquete(
+        exito, mensaje = self._controlador.comprar_paquete(
             self.paquete, fecha_ini, fecha_fin, personas, metodo
         )
         if exito:
