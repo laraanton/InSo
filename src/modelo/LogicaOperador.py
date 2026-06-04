@@ -2,10 +2,6 @@
 LogicaOperador.py  –  Lógica de negocio del Operador
 =====================================================
 Orquesta los DAOs y aplica reglas de negocio.
-El Controlador NUNCA llama a los DAOs directamente.
-
-Los DAOs ya devuelven VOs; este BO los recibe y los pasa
-directamente sin re-construirlos ni convertir dicts.
 
 Reglas de negocio aquí:
     - Validación de campos obligatorios del paquete
