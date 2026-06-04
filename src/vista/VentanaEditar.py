@@ -20,9 +20,12 @@ _PERFILES = [
 
 
 def _parse_fecha(s: str) -> QDate:
-    s = (s or "").replace("/", "-")
-    fecha = QDate.fromString(s, "yyyy-MM-dd")
-    return fecha if fecha.isValid() else QDate.currentDate()
+    s = s or ""
+    for fmt in ("yyyy-MM-dd", "yyyy/MM/dd"):
+        fecha = QDate.fromString(s, fmt)
+        if fecha.isValid():
+            return fecha
+    return QDate.currentDate()
 
 
 def _fecha_fin_caducada(fecha_fin_str: str) -> bool:
@@ -64,8 +67,8 @@ class VentanaEditar(QWidget):
         self.btnGuardarCambios.clicked.connect(self._guardar_cambios)
         self.btnEliminar.clicked.connect(self._eliminar_paquete)
         self.btnLimpiar.clicked.connect(self._limpiar_formulario)
-        self.inputFechaInicio.dateChanged.connect(lambda _: self._actualizar_fecha_fin())
-        self.inputDuracion.textChanged.connect(lambda _: self._actualizar_fecha_fin())
+        self.inputFechaInicio.dateChanged.connect(self._actualizar_fecha_fin)
+        self.inputDuracion.textChanged.connect(self._actualizar_fecha_fin)
 
     # ── Lista izquierda ────────────────────────────────────────────────────
 
@@ -155,9 +158,8 @@ class VentanaEditar(QWidget):
         self.lblAviso.setVisible(False)
         hoy = QDate.currentDate()
         self.inputFechaInicio.setDate(hoy)
-        self.inputFechaFin.setReadOnly(False)
-        self.inputFechaFin.setDate(hoy)
-        self.inputFechaFin.setReadOnly(True)
+        self.inputFechaInicio.setDate(hoy)
+        self._actualizar_fecha_fin()
         self._set_modo_lectura(True)
 
     # ── Acciones ───────────────────────────────────────────────────────────
@@ -216,7 +218,7 @@ class VentanaEditar(QWidget):
 
     # ── Helpers ────────────────────────────────────────────────────────────
 
-    def _actualizar_fecha_fin(self):
+    def _actualizar_fecha_fin(self, *_):
         if self._cargando_formulario:
             return
 
