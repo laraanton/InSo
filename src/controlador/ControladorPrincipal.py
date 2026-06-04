@@ -15,13 +15,15 @@ class ControladorPrincipal:
         self._ventana_actual = None
 
     def ventanaIniciarSesion(self):
-        self._ventanaLogin.show()
+        self._cambiar_ventana(self._ventanaLogin)
 
     def abrirRegistro(self):
         self._cambiar_ventana(VentanaRegistro(self))
+        self._ventanaLogin.hide()
 
     def abrirRecuperar(self):
         self._cambiar_ventana(VentanaRecuperar(self))
+        self._ventanaLogin.hide()
 
     def abrirVentanaPrincipal(self, user):
         cliente = False
@@ -29,12 +31,7 @@ class ControladorPrincipal:
         tipo = user.tipo_usuario
         if tipo == "Administrador":
             self._ventana_actual = VentanaAdmin(user)
-            ctrl = ControladorAdmin(
-                usuario_actual=user,
-                ventana=self._ventana_actual,        
-                controlador_principal=self          
-            )
-            self._ventana_actual.controlador = ctrl
+            self._ventana_actual.controlador = ControladorAdmin(user, self)
         elif tipo == "Operador":
             self._ventana_actual = VentanaOperador(user)
             ctrl = ControladorOperador(
