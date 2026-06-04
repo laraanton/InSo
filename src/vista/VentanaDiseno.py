@@ -28,33 +28,18 @@ class VentanaDiseno(QWidget):
         uic.loadUi(UI_FILE, self)
         self.user = user
         self._ctrl = None
-        self._inicializar_fechas()
         self._conectar_senales()
-
-    # Inicialización 
-
-    def _inicializar_fechas(self):
-        hoy = QDate.currentDate()
-        self.inputFechaIni.setMinimumDate(hoy)
-        self.inputFechaFin.setMinimumDate(hoy)
-        self.inputFechaIni.setDate(hoy)
-        # fecha_fin arranca igual a hoy; se recalcula cuando el usuario
-        # escriba los días de duración (señal textChanged ya conectada)
-        self.inputFechaFin.setReadOnly(False)
-        self.inputFechaFin.setDate(hoy)
-        self.inputFechaFin.setReadOnly(True)
+        self._limpiar_formulario()
 
     # Señales 
-
     def _conectar_senales(self):
         self.btnNuevoPaquete.clicked.connect(self._limpiar_formulario)
         self.btnGuardar.clicked.connect(self._guardar_paquete)
         self.btnLimpiar.clicked.connect(self._limpiar_formulario)
-        self.inputFechaIni.dateChanged.connect(lambda _: self._actualizar_fecha_fin())
-        self.inputDuracion.textChanged.connect(lambda _: self._actualizar_fecha_fin())
+        self.inputFechaIni.dateChanged.connect(self._actualizar_fecha_fin)
+        self.inputDuracion.textChanged.connect(self._actualizar_fecha_fin)
 
     # Acciones 
-
     def _guardar_paquete(self):
         datos = {
             "nombre":      self.inputNombre.text().strip(),
@@ -68,27 +53,24 @@ class VentanaDiseno(QWidget):
             "servicios":   "",
             "perfil":      "",
         }
-
         resultado = self._ctrl.crear_paquete(datos)
         self._set_estado(resultado.mensaje, error=not resultado.ok)
-
+    
     def _limpiar_formulario(self):
         for w in (self.inputNombre, self.inputDestino,
-                  self.inputDuracion, self.inputPrecio):
+                self.inputDuracion, self.inputPrecio):
             w.clear()
         self.textDescripcion.clear()
         self.lblEstado.clear()
         hoy = QDate.currentDate()
+        self.inputFechaIni.setMinimumDate(hoy)  
+        self.inputFechaFin.setMinimumDate(hoy)  
         self.inputFechaIni.setDate(hoy)
-        self.inputFechaFin.setReadOnly(False)
-        self.inputFechaFin.setDate(hoy)
-        self.inputFechaFin.setReadOnly(True)
+        self._actualizar_fecha_fin()
 
     # Helpers 
-
     def _actualizar_fecha_fin(self):
-        """Calcula fecha_fin = fecha_ini + duración (días).
-        Si la duración no es un número válido, fecha_fin = fecha_ini."""
+        #vCalcula fecha_fin = fecha_ini + duración (días)
         fecha_ini = self.inputFechaIni.date()
         try:
             dias = int(self.inputDuracion.text().strip())
