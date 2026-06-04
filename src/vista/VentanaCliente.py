@@ -1,21 +1,21 @@
 import os
 from PyQt5 import uic
-from PyQt5.QtWidgets import QMainWindow, QWidget, QSizePolicy
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QSizePolicy, QWidget
 from PyQt5.QtCore import QDate
+Form, Window = uic.loadUiType("./src/vista/ui/vistaCliente.ui")
 
-Form, Window = uic.loadUiType("./src/vista/ui/vistaResultados.ui")
 
-
-class VentanaResultados(QMainWindow, Form):
-    def __init__(self, user, paquetes: list, termino: str, fecha, n_personas):
+class VentanaCliente(QMainWindow, Form):
+    def __init__(self, user):
         super().__init__()
         self.setupUi(self)
-        self.user     = user
-        self.paquetes = paquetes
-        self.termino  = termino
-        self.fecha = fecha
-        self.personas = n_personas
+        self.user = user
         self._controlador = None
+        self.menuCuenta.hide()
+
+        hoy = QDate.currentDate()
+        self.in_fecha_ida.setDate(hoy)
+        self.in_fecha_vuelta.setDate(hoy.addDays(1))
 
     @property
     def controlador(self):
@@ -24,118 +24,94 @@ class VentanaResultados(QMainWindow, Form):
     @controlador.setter
     def controlador(self, value):
         self._controlador = value
-        self._inicializar_buscador()
         self._connect_signals()
-        self._poblar_resultados()
+        self._cargar_paquetes()
 
-    # ── Inicialización ────────────────────────────────────────────────────────
 
-    def _inicializar_buscador(self):
-        """Rellena el buscador con el término que ya se buscó y las fechas de hoy."""
-        self.in_destino.setText(self.termino)
-        hoy = QDate.currentDate()
-        self.in_fecha_ida.setDate(hoy)
-        self.in_fecha_vuelta.setDate(hoy.addDays(1))
-        # Actualiza el avatar del botón cuenta con la inicial del usuario
-        self.btnCuenta.setText(self.user.nombre_completo[0].upper())
-
-    def _connect_signals(self):
-        self.logoBtn.clicked.connect(self._volver)
-        self.btnVolver.clicked.connect(self._volver)
-        self.btnBuscar.clicked.connect(self._nueva_busqueda)
-        self.btnCuenta.clicked.connect(self._controlador.ir_a_ajustes)
-
-    # ── Resultados ────────────────────────────────────────────────────────────
-
-    def _poblar_resultados(self):
-        # Limpia cualquier contenido previo
-        while self.listaResultados.count():
-            item = self.listaResultados.takeAt(0)
+    def _cargar_paquetes(self):
+        while self.gridPaquetes.count():
+            item = self.gridPaquetes.takeAt(0)
             if item.widget():
                 item.widget().deleteLater()
 
-        num = len(self.paquetes)
-        self.lbl_titulo.setText(
-            f"RESULTADOS PARA «{self.termino.upper()}»"
-        )
-        self.lbl_num_resultados.setText(
-            f"{num} paquete{'s' if num != 1 else ''} encontrado{'s' if num != 1 else ''}"
-        )
+        paquetes = self._controlador.obtener_paquetes()
 
-        if not self.paquetes:
-            self.scrollResultados.hide()
-            self.widgetSinResultados.show()
-            return
-
-        self.widgetSinResultados.hide()
-        self.scrollResultados.show()
-
-        for p in self.paquetes:
+        for i, p in enumerate(paquetes):
             card = self._crear_tarjeta(p)
-            self.listaResultados.addWidget(card)
+            if card is None:
+                continue
+            # se dividen las tarjetas en 3 por fila
+            self.gridPaquetes.addWidget(card, i // 3, i % 3)
 
-        self.scrollContentResultados.adjustSize()
+        self.scrollContent.adjustSize()
+        self.scrollPaquetes.updateGeometry()
 
-    def _crear_tarjeta(self, p: dict) -> QWidget:
+    def _crear_tarjeta(self, p: dict):
         contenedor = QWidget()
-        uic.loadUi(
-            os.path.join(os.path.dirname(__file__), "ui", "cardResultado.ui"),
-            contenedor
-        )
+        uic.loadUi(os.path.join(os.path.dirname(__file__), "ui", "cardPaquete.ui"), contenedor)
 
-        duracion = p.get("duracion", "?")
-        sufijo   = "noche" if str(duracion) == "1" else "noches"
-        contenedor.card_titulo.setText(f"{p.get('destino', '—')} · {duracion} {sufijo}")
+        duracion = p["duracion"]
+        sufijo = f"{duracion} noche" if str(duracion) == "1" else f"{duracion} noches"
+        contenedor.card_titulo.setText(f"{p['destino']} · {sufijo}")
 
-        descripcion = p.get("servicios") or (p.get("descripcion", "")[:80])
+        descripcion = p["servicios"] if p["servicios"] else p["descripcion"][:40]
         contenedor.card_desc.setText(descripcion)
 
         try:
-            precio_txt = f"{float(p.get('precio', 0)):,.2f} € / persona"
+            precio_fmt = f"Desde {float(p['precio']):.0f} €"
         except (ValueError, TypeError):
-            precio_txt = f"{p.get('precio', '—')} € / persona"
-        contenedor.card_precio.setText(precio_txt)
+            precio_fmt = f"Desde {p['precio']} €"
+        contenedor.card_precio.setText(precio_fmt)
 
-        perfil = p.get("perfil", "General")
-        contenedor.card_chip_perfil.setText(perfil)
-
-        # Chip "Recomendado" solo si coincide con la preferencia del usuario
-        pref_usuario = getattr(self.user, "preferencia", "") or ""
-        es_recomendado = perfil.lower() == pref_usuario.lower()
-        contenedor.card_chip_recomendado.setVisible(es_recomendado)
-
-        # Chip accesible
-        contenedor.card_chip_accesible.setVisible(bool(p.get("accesibilidad")))
-
-        pid = p.get("id")
+        pid = p["id"]
         contenedor.card_btn.clicked.connect(
-            lambda _checked, pid=pid: self._ver_paquete(pid)
+            lambda _checked, pid=pid: self._controlador.ver_paquete(pid)
         )
-
         contenedor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        contenedor.setFixedHeight(120)
+        contenedor.setFixedHeight(155)
         return contenedor
 
-    # ── Acciones ──────────────────────────────────────────────────────────────
+    def _connect_signals(self):
+        self.btnCuenta.clicked.connect(self._abrir_cuenta)
+        self.btnAjustes.clicked.connect(self._controlador.ir_a_ajustes)
+        self.btnMisViajes.clicked.connect(self._controlador.ir_a_mis_viajes)
+        self.btnCerrarSesion.clicked.connect(self._cerrar_sesion)
+        self.btnBuscar.clicked.connect(self._buscar_paquetes)
 
-    def _nueva_busqueda(self):
+    def _abrir_cuenta(self):
+        if self.menuCuenta.isVisible():
+            self.menuCuenta.hide()
+        else:
+            self.menuCuenta.show()
+            self.menuCuenta.raise_()
+
+    def _buscar_paquetes(self):
         destino      = self.in_destino.text().strip()
         fecha_ida    = self.in_fecha_ida.date()
         fecha_vuelta = self.in_fecha_vuelta.date()
 
         if not destino:
+            QMessageBox.warning(self, "Campo requerido", "Por favor, escribe un destino.")
             self.in_destino.setFocus()
             return
+
         if fecha_vuelta < fecha_ida:
+            QMessageBox.warning(self, "Fechas incorrectas",
+                                "La fecha de vuelta no puede ser anterior a la de ida.")
             return
 
-        nuevos = self._controlador.buscar_paquetes(destino)
-        self.paquetes = nuevos
-        self.termino  = destino
-        self._poblar_resultados()
+        resultados = self._controlador.buscar_paquetes(destino)
+        self._mostrar_resultados(resultados, destino)
 
-    def _ver_paquete(self, paquete_id: int):
-        self._controlador.ver_paquete_buscado(paquete_id, self.fecha, self.personas)
+    def _mostrar_resultados(self, paquetes: list, termino: str):
+        fecha = self.in_fecha_ida.date()
+        n_personas = self.in_personas.value()
+        self._controlador.ir_a_resultados(paquetes, termino, fecha, n_personas)
 
-    def _volver(self):
-        self._controlador.volver_a_principal()
+    def _cerrar_sesion(self):
+        resp = QMessageBox.question(
+            self, "Cerrar sesión", "¿Deseas cerrar la sesión actual?",
+            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+        )
+        if resp == QMessageBox.Yes:
+            self._controlador.cerrar_sesion()
