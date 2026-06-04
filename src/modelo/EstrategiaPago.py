@@ -1,13 +1,3 @@
-"""
-Patrón Estrategia – Métodos de pago
-====================================
-Ubicación: src/modelo/EstrategiaPago.py
-
-La lógica de selección y ejecución vive en BusinessCliente.
-VentanaDetallePaquete solo pasa el string del combo_pago,
-igual que antes. No cambia nada en la vista.
-"""
-
 from __future__ import annotations
 from abc import ABC, abstractmethod
 
@@ -100,11 +90,13 @@ _ESTRATEGIAS: dict[str, EstrategiaPago] = {
 }
 
 def obtener_estrategia(nombre: str) -> EstrategiaPago | None:
-    """Usada internamente por BusinessCliente."""
+    """Usada internamente por BusinessCliente para obtener el objeto de pago según lo que
+    el usuario seleccionó en el desplegable."""
     return _ESTRATEGIAS.get(nombre)
 
 def nombres_disponibles() -> list[str]:
     """
     Usada por ControladorCliente para devolver la lista de textos para rellenar el menú desplegable de la pantalla.
+     Devuelve ["Efectivo", "Tarjeta de crédito", "Transferencia bancaria", "PayPal"]
     """
     return list(_ESTRATEGIAS.keys())
