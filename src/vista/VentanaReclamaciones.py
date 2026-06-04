@@ -138,7 +138,7 @@ class VentanaReclamaciones(QWidget):
 
             tabla.insertRow(fila)
 
-            #Cols:
+            #Cols: (visibles)
             tabla.setItem(fila, 0, self._item(r.pedido_ref))
             tabla.setItem(fila, 1, self._item(r.cliente))
             tabla.setItem(fila, 2, self._item(r.paquete))
@@ -146,18 +146,17 @@ class VentanaReclamaciones(QWidget):
             tabla.setItem(fila, 4, self._item(r.fecha_pedido))
 
             estado = r.estado
-
             item_estado = QTableWidgetItem(estado)
-
             item_estado.setTextAlignment(Qt.AlignCenter)
-
             color = _ESTADO_COLORES.get(estado, "#333333")
 
             item_estado.setForeground(QColor(color))
 
             tabla.setItem(fila, 5, item_estado)
-
-            tabla.item(fila, 0).setData(Qt.UserRole, r)
+            # Guardamos el dict completo en la primera celda para recuperarlo
+            # al hacer clic sin necesidad de volver a consultar la BD.
+            # Qt.UserRole es un "cajón invisible"
+            tabla.item(fila, 0).setData(Qt.UserRole, r)  #está ReclamacionVO completo pero oculto
 
         tabla.resizeRowsToContents()
 
@@ -166,11 +165,11 @@ class VentanaReclamaciones(QWidget):
     def _on_seleccion(self):
         """Se dispara al hacer clic en una fila — recupera el VO y muestra el detalle."""
 
-        fila = self.tablaReclamaciones.currentRow()
+        fila = self.tablaReclamaciones.currentRow() #fila donde hizo clic
         if fila < 0:
             return
 
-        item = self.tablaReclamaciones.item(fila, 0)
+        item = self.tablaReclamaciones.item(fila, 0) #saca el VO que guardamos antes
         if not item:
             return
 
