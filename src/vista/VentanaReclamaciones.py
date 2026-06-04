@@ -1,11 +1,3 @@
-"""
-VentanaReclamaciones.py  –  Vista de Reclamaciones (Operador)
-=============================================================
-El operador puede consultar, filtrar y cambiar el estado
-de las reclamaciones.
-Se inyecta como página dentro del QStackedWidget de VentanaOperador.
-"""
-
 import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QWidget, QTableWidgetItem, QHeaderView, QMessageBox
@@ -38,7 +30,7 @@ class VentanaReclamaciones(QWidget):
     @controlador.setter
     def controlador(self, value):
         self._ctrl = value
-        self._cargar_datos()
+        self._cargar_datos() #arranca cuando el controlador está disponible
 
 
     def __init__(self, user=None):
@@ -172,6 +164,7 @@ class VentanaReclamaciones(QWidget):
     # DETALLE
 
     def _on_seleccion(self):
+        """Se dispara al hacer clic en una fila — recupera el VO y muestra el detalle."""
 
         fila = self.tablaReclamaciones.currentRow()
         if fila < 0:
@@ -181,13 +174,13 @@ class VentanaReclamaciones(QWidget):
         if not item:
             return
 
-        r = item.data(Qt.UserRole)
+        r = item.data(Qt.UserRole)  # recupera el VO guardado en _poblar_tabla
 
         if r:
             self._mostrar_detalle(r)
 
     def _mostrar_detalle(self, r):
-
+        """Rellena el panel derecho con los datos de la reclamación seleccionada."""
         self._id_seleccionado = r.reclamacion_id
         self.lblDetalleTitle.setText(r.pedido_ref or "—")
         self.lblDetalleSub.setText(
@@ -201,18 +194,20 @@ class VentanaReclamaciones(QWidget):
         self.lblDesc.setText(r.descripcion or "—")
         estado_actual = r.estado
 
+        # Selecciona en el combo el estado actual de esta reclamación
         idx = self.comboEstadoDetalle.findText(estado_actual)
 
         if idx >= 0:
             self.comboEstadoDetalle.setCurrentIndex(idx)
 
+        # Colorea la categoría con el mismo color que en la tabla
         color = _ESTADO_COLORES.get(estado_actual, "#333333")
 
         self.lblCategoria.setStyleSheet(
             f"color: {color}; font-weight: bold;"
         )
 
-        self.btnGuardarEstado.setEnabled(True)
+        self.btnGuardarEstado.setEnabled(True) # habilita el botón ahora que hay selección
 
     def _limpiar_detalle(self):
 
@@ -232,14 +227,16 @@ class VentanaReclamaciones(QWidget):
         self.lblFecha.setText("—")
         self.lblDesc.setText("—")
 
-        self.btnGuardarEstado.setEnabled(False)
+        self.btnGuardarEstado.setEnabled(False) # deshabilita hasta nueva selección
 
 
     # ACTUALIZAR ESTADO
 
     def _guardar_estado(self):
+        """Envía el nuevo estado al controlador y recarga la tabla si tiene éxito."""
         if self._id_seleccionado is None:
             return
+
         nuevo_estado = self.comboEstadoDetalle.currentText()
 
         resultado = self._ctrl.cambiar_estado_reclamacion(
@@ -252,7 +249,7 @@ class VentanaReclamaciones(QWidget):
 
         if ok:
             self._set_estado(msg)
-            self._cargar_datos()
+            self._cargar_datos() # refresca la tabla con el estado actualizado
 
         else:
             QMessageBox.warning(
@@ -262,10 +259,11 @@ class VentanaReclamaciones(QWidget):
             )
 
     # HELPERS
+
     @staticmethod
     def _item(texto):
-        # Crea una celda de solo lectura. Sin esto el usuario podría
-        # editar el contenido de la tabla directamente, lo que no queremos.
+        """Celda de solo lectura — evita que el usuario edite la tabla directamente."""
+
         it = QTableWidgetItem(str(texto))
         it.setFlags(it.flags() & ~Qt.ItemIsEditable)
         return it
