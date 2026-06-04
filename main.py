@@ -16,6 +16,6 @@ if __name__ == "__main__":
 
     controlador = ControladorPrincipal(ventanaLogin, modelo)
     ventanaLogin.controlador = controlador
-    controlador.ventanaInciarSesion()
+    controlador.ventanaIniciarSesion()
 
     sys.exit(app.exec_())
