@@ -198,8 +198,8 @@ class ControladorOperador:
     def get_datos_analisis(self, periodo: str) -> AnalisisVO:
         return self._analisis_bo.get_analisis(periodo)
 
-    def exportar_analisis(self, periodo: str) -> OperacionResultadoVO:
-        return self._analisis_bo.exportar_analisis(periodo)
+    def exportar_analisis(self, periodo: str, ruta: str) -> OperacionResultadoVO:
+        return self._analisis_bo.exportar_analisis(periodo, ruta)
 
     # ── FEEDBACK ──────────────────────────────────────────────────────────
 
