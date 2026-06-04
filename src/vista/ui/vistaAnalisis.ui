@@ -67,19 +67,12 @@ QLabel#chartSub5, QLabel#chartSub6 {
     color: #aaaaaa;
 }
 
-/* ── Placeholder chart areas ────────────────────────── */
+/* ── Placeholder chart areas (LIMPIO) ────────────────────────── */
 QFrame#chartArea1, QFrame#chartArea2,
 QFrame#chartArea3, QFrame#chartArea4,
 QFrame#chartArea5, QFrame#chartArea6 {
-    background-color: #f4f2ed;
-    border-radius: 8px;
-    border: 1px dashed #dddddd;
-}
-QLabel#chartPlaceholder1, QLabel#chartPlaceholder2,
-QLabel#chartPlaceholder3, QLabel#chartPlaceholder4,
-QLabel#chartPlaceholder5, QLabel#chartPlaceholder6 {
-    font-size: 28px;
-    color: #cccccc;
+    background: transparent;
+    border: none;
 }
 
 /* ── Combo selector ─────────────────────────────────── */
@@ -132,30 +125,30 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
     min-height: 20px;
 }
+QScrollBar::add-line:vertical,
+QScrollBar::sub-line:vertical { height: 0px; }
+
 QLabel#kpiValue1, QLabel#kpiValue2,
-QLabel#kpiValue3, QLabel#kpiValue4 { font-size: 27px; }   /* era 22px */
+QLabel#kpiValue3, QLabel#kpiValue4 { font-size: 27px; }
 
 QLabel#kpiLabel1, QLabel#kpiLabel2,
-QLabel#kpiLabel3, QLabel#kpiLabel4 { font-size: 14px; }   /* era 9px */
+QLabel#kpiLabel3, QLabel#kpiLabel4 { font-size: 14px; }
 
-QLabel#sectionLabel { font-size: 15px; }                   /* era 10px */
+QLabel#sectionLabel { font-size: 15px; }
 
 QLabel#chartTitle1, QLabel#chartTitle2,
 QLabel#chartTitle3, QLabel#chartTitle4,
-QLabel#chartTitle5, QLabel#chartTitle6 { font-size: 15px; } /* era 10px */
+QLabel#chartTitle5, QLabel#chartTitle6 { font-size: 15px; }
 
 QLabel#chartSub1, QLabel#chartSub2,
 QLabel#chartSub3, QLabel#chartSub4,
-QLabel#chartSub5, QLabel#chartSub6 { font-size: 13px; }   /* era 8px */
+QLabel#chartSub5, QLabel#chartSub6 { font-size: 13px; }
 
-QComboBox#cbPeriodo { font-size: 15px; }                   /* era 10px */
-QPushButton#btnExportar { font-size: 15px; }               /* era 10px */
-QScrollBar::add-line:vertical,
-QScrollBar::sub-line:vertical { height: 0px; }
+QComboBox#cbPeriodo { font-size: 15px; }
+QPushButton#btnExportar { font-size: 15px; }
    </string>
   </property>
 
-  <!-- Raíz: todo el contenido dentro de un scroll -->
   <layout class="QVBoxLayout" name="pageAnalisisRootLayout">
    <property name="spacing"><number>0</number></property>
    <property name="leftMargin"><number>0</number></property>
@@ -196,7 +189,6 @@ QScrollBar::sub-line:vertical { height: 0px; }
            <property name="sizeHint" stdset="0"><size><width>40</width><height>20</height></size></property>
           </spacer>
          </item>
-         <!-- Selector de periodo -->
          <item>
           <widget class="QComboBox" name="cbPeriodo">
            <item><property name="text"><string>Todo</string></property></item>
@@ -206,7 +198,6 @@ QScrollBar::sub-line:vertical { height: 0px; }
            <item><property name="text"><string>Este año</string></property></item>
           </widget>
          </item>
-         <!-- Botón exportar -->
          <item>
           <widget class="QPushButton" name="btnExportar">
            <property name="text"><string>⬇  Exportar</string></property>
@@ -221,7 +212,7 @@ QScrollBar::sub-line:vertical { height: 0px; }
         <layout class="QHBoxLayout" name="kpiRow">
          <property name="spacing"><number>16</number></property>
 
-         <!-- KPI 1: Total Ingresos -->
+         <!-- KPI 1 -->
          <item>
           <widget class="QFrame" name="kpiCard1">
            <property name="minimumHeight"><number>90</number></property>
@@ -255,7 +246,7 @@ QScrollBar::sub-line:vertical { height: 0px; }
           </widget>
          </item>
 
-         <!-- KPI 2: Pedidos -->
+         <!-- KPI 2 -->
          <item>
           <widget class="QFrame" name="kpiCard2">
            <property name="minimumHeight"><number>90</number></property>
@@ -289,7 +280,7 @@ QScrollBar::sub-line:vertical { height: 0px; }
           </widget>
          </item>
 
-         <!-- KPI 3: Satisfacción -->
+         <!-- KPI 3 -->
          <item>
           <widget class="QFrame" name="kpiCard3">
            <property name="minimumHeight"><number>90</number></property>
@@ -323,7 +314,7 @@ QScrollBar::sub-line:vertical { height: 0px; }
           </widget>
          </item>
 
-         <!-- KPI 4: Reclamaciones -->
+         <!-- KPI 4 -->
          <item>
           <widget class="QFrame" name="kpiCard4">
            <property name="minimumHeight"><number>90</number></property>
@@ -360,15 +351,14 @@ QScrollBar::sub-line:vertical { height: 0px; }
         </layout>
        </item>
 
-       <!-- ── Fila gráficos superior (barras + línea) ── -->
+       <!-- ── Fila gráficos 1 ── -->
        <item>
         <layout class="QHBoxLayout" name="chartsRow1">
          <property name="spacing"><number>16</number></property>
 
-         <!-- Gráfico 1: Ventas por paquete (barras) -->
          <item>
           <widget class="QFrame" name="chartCard1">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart1Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -393,24 +383,15 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea1">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder1">
-                 <property name="text"><string>📊</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
 
-         <!-- Gráfico 2: Ingresos por mes (línea) -->
          <item>
           <widget class="QFrame" name="chartCard2">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart2Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -435,14 +416,6 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea2">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder2">
-                 <property name="text"><string>📈</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
@@ -452,15 +425,14 @@ QScrollBar::sub-line:vertical { height: 0px; }
         </layout>
        </item>
 
-       <!-- ── Fila gráficos inferior (tarta + satisfacción) ── -->
+       <!-- ── Fila gráficos 2 ── -->
        <item>
         <layout class="QHBoxLayout" name="chartsRow2">
          <property name="spacing"><number>16</number></property>
 
-         <!-- Gráfico 3: Estado de pedidos (tarta) -->
          <item>
           <widget class="QFrame" name="chartCard3">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart3Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -485,24 +457,15 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea3">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder3">
-                 <property name="text"><string>🥧</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
 
-         <!-- Gráfico 4: Satisfacción media -->
          <item>
           <widget class="QFrame" name="chartCard4">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart4Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -527,14 +490,6 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea4">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder4">
-                 <property name="text"><string>⭐</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
@@ -544,15 +499,14 @@ QScrollBar::sub-line:vertical { height: 0px; }
         </layout>
        </item>
 
-       <!-- ── Fila gráficos última (reclamaciones + perfil viajero) ── -->
+       <!-- ── Fila gráficos 3 ── -->
        <item>
         <layout class="QHBoxLayout" name="chartsRow3">
          <property name="spacing"><number>16</number></property>
 
-         <!-- Gráfico 5: Reclamaciones por categoría -->
          <item>
           <widget class="QFrame" name="chartCard5">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart5Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -577,24 +531,15 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea5">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder5">
-                 <property name="text"><string>📋</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
           </widget>
          </item>
 
-         <!-- Gráfico 6: Perfil de viajero más común -->
          <item>
           <widget class="QFrame" name="chartCard6">
-           <property name="minimumHeight"><number>240</number></property>
+           <property name="minimumHeight"><number>340</number></property>
            <layout class="QVBoxLayout" name="chart6Layout">
             <property name="leftMargin"><number>20</number></property>
             <property name="topMargin"><number>18</number></property>
@@ -619,14 +564,6 @@ QScrollBar::sub-line:vertical { height: 0px; }
             <item>
              <widget class="QFrame" name="chartArea6">
               <property name="minimumHeight"><number>170</number></property>
-              <layout class="QVBoxLayout">
-               <item>
-                <widget class="QLabel" name="chartPlaceholder6">
-                 <property name="text"><string>🧭</string></property>
-                 <property name="alignment"><set>Qt::AlignCenter</set></property>
-                </widget>
-               </item>
-              </layout>
              </widget>
             </item>
            </layout>
@@ -636,7 +573,7 @@ QScrollBar::sub-line:vertical { height: 0px; }
         </layout>
        </item>
 
-       <!-- ── Estado carga ─────────────────────────── -->
+       <!-- ── Estado carga ── -->
        <item>
         <widget class="QLabel" name="lblEstado">
          <property name="text"><string></string></property>
