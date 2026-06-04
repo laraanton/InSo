@@ -1,50 +1,51 @@
 from src.modelo.Logica_login import BussinessObject
 from src.modelo.Logica_cliente import BusinessCliente
-from src.controlador.ControladorPrincipal import ControladorPrincipal
 
-# Se importan también las ventanas siguientes:
-# from src.vista.VentanaCliente import VentanaCliente
-# from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
-# from src.vista.VentanaMisViajes import VentanaMisViajes
-# from src.vista.Login import MiVentana
+from src.vista.VentanaCliente import VentanaCliente
+from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
+from src.vista.VentanaResultados import VentanaResultados
+from src.vista.VentanaMisViajes import VentanaMisViajes
+from src.vista.VentanaDetallePaquete import VentanaDetallePaquete
+from src.vista.VentanaDetalleBuscador import VentanaDetalleBuscador
+from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje
 
-# Se importan localmente en las funciones donde las vaya a usar porque si no
-# se me genera un circular import y provoca fallos.
+
 
 class ControladorCliente:
-    def __init__(self, user):
+    def __init__(self, user, controlador_principal=None):
         self.user = user
+        self._ctrl_principal = controlador_principal
         self.logica = BussinessObject()
         self.logica_cliente = BusinessCliente()
-        self.ventana_principal = None
-        self.ventana_ajustes   = None
-        self.ventana_viajes    = None
-        self.ventana_detalle   = None
-        self.ventana_compra    = None
+        self.ventana_principal  = None
+        self.ventana_ajustes    = None
+        self.ventana_viajes     = None
+        self.ventana_detalle    = None
+        self.ventana_compra     = None
         self.ventana_resultados = None
+
     # ── Navegación ───────────────────────────────────────────────────────────
 
     def abrir_principal(self):
-        from src.vista.VentanaCliente import VentanaCliente
         self.ventana_principal = VentanaCliente(self.user)
+        self.ventana_principal.controlador = self
         self.ventana_principal.show()
 
     def ir_a_ajustes(self):
-        from src.vista.VentanaAjustesCuenta import VentanaAjustesCuenta
         self.ventana_ajustes = VentanaAjustesCuenta(self.user)
+        self.ventana_ajustes.controlador = self
         self.ventana_ajustes.show()
         self._ocultar_todas_menos(self.ventana_ajustes)
 
     def ir_a_resultados(self, paquetes, termino, fecha, n_personas):
-        from src.vista.VentanaResultados import VentanaResultados
         self.ventana_resultados = VentanaResultados(self.user, paquetes, termino, fecha, n_personas)
+        self.ventana_resultados.controlador = self
         self.ventana_resultados.show()
         self._ocultar_todas_menos(self.ventana_resultados)
 
-
     def ir_a_mis_viajes(self):
-        from src.vista.VentanaMisViajes import VentanaMisViajes
         self.ventana_viajes = VentanaMisViajes(self.user)
+        self.ventana_viajes.controlador = self
         self.ventana_viajes.show()
         self._ocultar_todas_menos(self.ventana_viajes)
 
@@ -54,18 +55,20 @@ class ControladorCliente:
 
     def cerrar_sesion(self):
         self._cerrar_todo()
-        ctrl = ControladorPrincipal()
-        ctrl.abrirIniciarSesion()
+        if self._ctrl_principal:
+            self._ctrl_principal.cerrarSesion()
 
     def _ocultar_todas_menos(self, excepcion):
         for v in [self.ventana_principal, self.ventana_ajustes,
-                  self.ventana_viajes, self.ventana_detalle, self.ventana_compra]:
+                  self.ventana_viajes, self.ventana_detalle,
+                  self.ventana_compra, self.ventana_resultados]:
             if v and v is not excepcion:
                 v.hide()
 
     def _cerrar_todo(self):
         for v in [self.ventana_principal, self.ventana_ajustes,
-                  self.ventana_viajes, self.ventana_detalle, self.ventana_compra]:
+                  self.ventana_viajes, self.ventana_detalle,
+                  self.ventana_compra, self.ventana_resultados]:
             if v:
                 v.close()
 
@@ -75,35 +78,33 @@ class ControladorCliente:
         return self.logica_cliente.obtener_todos_paquetes()
 
     def ver_paquete(self, paquete_id: int):
-        from src.vista.VentanaDetallePaquete import VentanaDetallePaquete 
         paquete = self.logica_cliente.obtener_paquete_por_id(paquete_id)
         if not paquete:
             return
         self.ventana_detalle = VentanaDetallePaquete(self.user, paquete)
+        self.ventana_detalle.controlador = self
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
 
-# funcion para ver el paquete de viaje si lo abre desde el buscador
     def ver_paquete_buscado(self, paquete_id: int, fecha, n_personas):
-        from src.vista.VentanaDetalleBuscador import VentanaDetalleBuscador 
         paquete = self.logica_cliente.obtener_paquete_por_id(paquete_id)
         if not paquete:
             return
         self.ventana_detalle = VentanaDetalleBuscador(self.user, paquete, fecha, n_personas)
+        self.ventana_detalle.controlador = self
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
 
     def ver_pedido(self, pedido_id: int):
-        from src.vista.VentanaDetalleMViaje import VentanaDetalleMViaje 
         pedido = self.logica_cliente.obtener_pedido(pedido_id)
         if not pedido:
             return
         self.ventana_detalle = VentanaDetalleMViaje(self.user, pedido)
+        self.ventana_detalle.controlador = self
         self.ventana_detalle.show()
         self._ocultar_todas_menos(self.ventana_detalle)
 
-    def buscar_paquetes(self, texto: str) -> list[dict]:
-        """Delega la búsqueda al modelo pasando el perfil del usuario."""
+    def buscar_paquetes(self, texto: str) -> list:
         return self.logica_cliente.buscar_paquetes(
             texto,
             getattr(self.user, "preferencia", ""),
@@ -112,11 +113,11 @@ class ControladorCliente:
 
     # ── Pedidos ──────────────────────────────────────────────────────────────
 
-    def obtener_viajes_cliente(self) -> list[dict]:
+    def obtener_viajes_cliente(self) -> list:
         return self.logica_cliente.obtener_viajes_cliente(self.user.usuario_id)
 
     def validar_compra(self, paquete, fecha_ini, fecha_fin,
-                       personas, metodo) -> tuple[bool, str]:
+                       personas, metodo) -> tuple:
         from datetime import date
         if fecha_ini < date.today():
             return False, "La fecha de inicio no puede ser anterior a hoy."
@@ -136,7 +137,7 @@ class ControladorCliente:
             return 0.0
 
     def comprar_paquete(self, paquete, fecha_inicio, fecha_fin,
-                        personas, metodo_pago) -> tuple[bool, str]:
+                        personas, metodo_pago) -> tuple:
         return self.logica_cliente.comprar_paquete(
             self.user.usuario_id, paquete,
             fecha_inicio, fecha_fin, personas, metodo_pago
@@ -158,8 +159,7 @@ class ControladorCliente:
 
     # ── Perfil ───────────────────────────────────────────────────────────────
 
-    def guardar_perfil(self, telefono, preferencia,
-                       preferencia_acc) -> tuple[bool, str]:
+    def guardar_perfil(self, telefono, preferencia, preferencia_acc) -> tuple:
         ok, msg = self.logica_cliente.guardar_perfil(
             self.user.usuario_id, telefono, preferencia, preferencia_acc
         )
@@ -167,8 +167,7 @@ class ControladorCliente:
             self.user = self.logica_cliente.refrescar_usuario(self.user.usuario_id)
         return ok, msg
 
-    def cambiar_contrasena(self, pass_actual, pass_nueva,
-                           pass_confirmar) -> tuple[bool, str]:
+    def cambiar_contrasena(self, pass_actual, pass_nueva, pass_confirmar) -> tuple:
         if not pass_actual:
             return False, "Introduce tu contraseña actual."
         if not pass_nueva or len(pass_nueva) < 6:
@@ -181,19 +180,15 @@ class ControladorCliente:
             self.user.usuario_id, self.user.email,
             pass_actual, pass_nueva
         )
-    
-    # ── Feedback ───────────────────────────────────────────────────────────────
 
-    def guardar_feedback(self, pedido_id: int,
-                     val_general: int, val_trato: int,
-                     val_transporte: int, val_alojamiento: int,
-                     comentarios: str) -> tuple[bool, str]:
-        # Validaciones de presentación
+    # ── Feedback ─────────────────────────────────────────────────────────────
+
+    def guardar_feedback(self, pedido_id, val_general, val_trato,
+                         val_transporte, val_alojamiento, comentarios) -> tuple:
         if not comentarios.strip():
             return False, "El comentario no puede estar vacío."
         if len(comentarios.strip()) < 10:
             return False, "El comentario debe tener al menos 10 caracteres."
-
         return self.logica_cliente.guardar_feedback(
             pedido_id, self.user.usuario_id,
             val_general, val_trato,
