@@ -24,6 +24,7 @@ class ControladorPrincipal:
         self._cambiar_ventana(VentanaRecuperar(self))
 
     def abrirVentanaPrincipal(self, user):
+        cliente = False
         self._ventanaLogin.hide()
         tipo = user.tipo_usuario
         if tipo == "Administrador":
