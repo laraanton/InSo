@@ -15,18 +15,16 @@ UI_FILE = os.path.join(
 # A diferencia de Reclamaciones, aquí el color depende de la puntuación numérica
 # (1–5 estrellas), no de un estado textual. Cuanto más baja la nota, más rojo.
 _STAR_COLORS = {
-    5: "#2e7d32",   # verde oscuro  – excelente
-    4: "#5e8d8d",   # teal          – bueno
-    3: "#f57c00",   # naranja       – regular
+    5: "#2e7d32",   # verde oscuro – excelente
+    4: "#5e8d8d",   # teal – bueno
+    3: "#f57c00",   # naranja – regular
     2: "#e65100",   # naranja oscuro – malo
-    1: "#c62828",   # rojo          – muy malo
+    1: "#c62828",   # rojo – muy malo
 }
 
 
 class VentanaFeedback(QWidget):
-
-
-
+    
     @property
     def controlador(self):
         return self._ctrl
@@ -44,9 +42,9 @@ class VentanaFeedback(QWidget):
         # Carga el diseño visual desde el .ui (hecho con Qt Designer).
         uic.loadUi(UI_FILE, self)
 
-        self.user = user    # usuario logueado (reservado para uso futuro)
+        self.user = user     # usuario logueado (reservado para uso futuro)
         self._ctrl = None      # controlador que centraliza la lógica de negocio
-        self._feedbacks: list[dict] = []     # caché local con todos los feedbacks cargados
+        self._feedbacks: list[dict] = []   # caché local con todos los feedbacks cargados
         self._seleccionado: dict | None = None  # dict del feedback que tiene el foco ahora mismo
 
         # Orden de arranque: primero el aspecto, luego los combos, luego
@@ -54,7 +52,6 @@ class VentanaFeedback(QWidget):
         self._configurar_tabla()
         self._conectar_senales()
 
-    # Configuración inicial 
     def _configurar_tabla(self):
         tabla = self.tablaFeedback
 
@@ -147,14 +144,13 @@ class VentanaFeedback(QWidget):
             fila = tabla.rowCount()
             tabla.insertRow(fila)
 
-            # Columnas de texto plano.
+            # Columnas de texto plano
             tabla.setItem(fila, 0, self._item(f.pedido_ref))
             tabla.setItem(fila, 1, self._item(f.cliente))
             tabla.setItem(fila, 2, self._item(f.paquete))
             tabla.setItem(fila, 3, self._item(f.fecha_viaje))
 
-            # Valoración general: mostramos estrellas (★★★☆☆) y las coloreamos
-            # según la puntuación para leerlo de un vistazo sin mirar el número.
+            # Valoración general: mostramos estrellas (★★★☆☆) y las coloreamos según la puntuación para leerlo de un vistazo sin mirar el número.
             val = f.val_general
             item_val = QTableWidgetItem(self._estrellas(val))
             item_val.setTextAlignment(Qt.AlignCenter)
@@ -177,6 +173,7 @@ class VentanaFeedback(QWidget):
         tabla.resizeRowsToContents()
 
     # Detalle 
+
     def _on_seleccion(self):
         # Comprobamos que haya algo seleccionado antes de continuar.
         filas = self.tablaFeedback.selectedItems()
@@ -236,8 +233,7 @@ class VentanaFeedback(QWidget):
 
         self.lblComentario.setText("—")
 
-    # Helpers 
-
+    # HELPERS 
     @staticmethod
     def _estrellas(val) -> str:
         # Convierte un número (1–5) en una cadena visual de estrellas.
