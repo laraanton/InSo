@@ -1,7 +1,6 @@
 from PyQt5.QtWidgets import QMainWindow, QMessageBox
 from PyQt5 import uic
 import pyttsx3
-from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaAjustesCuenta.ui")
 
@@ -11,8 +10,15 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         super().__init__()
         self.setupUi(self)
         self.user = user
-        self.controlador = ControladorCliente(user)
-        self.controlador.ventana_ajustes = self
+        self._controlador = None
+
+    @property
+    def controlador(self):
+        return self._controlador
+
+    @controlador.setter
+    def controlador(self, value):
+        self._controlador = value
         self._cargar_datos()
         self._connect_signals()
 
@@ -41,9 +47,9 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         )
 
     def _connect_signals(self):
-        self.logoBtn.clicked.connect(self.controlador.volver_a_principal)
-        self.btnNavAjustes.clicked.connect(self.controlador.volver_a_principal)
-        self.btnNavViajes.clicked.connect(self.controlador.ir_a_mis_viajes)
+        self.logoBtn.clicked.connect(self._controlador.volver_a_principal)
+        self.btnNavAjustes.clicked.connect(self._controlador.volver_a_principal)
+        self.btnNavViajes.clicked.connect(self._controlador.ir_a_mis_viajes)
         self.btnLogout.clicked.connect(self._cerrar_sesion)
         self.btnEditarPerfil.clicked.connect(self._activar_edicion)
         self.btnGuardarPerfil.clicked.connect(self._guardar_perfil)
@@ -66,7 +72,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
         preferencia    = self.in_preferencia_edit.currentText()
         preferencia_acc = self.in_preferencia_accesibilidad_edit.currentText()
 
-        ok, msg = self.controlador.guardar_perfil(telefono, preferencia, preferencia_acc)
+        ok, msg = self._controlador.guardar_perfil(telefono, preferencia, preferencia_acc)
 
         if ok:
             QMessageBox.information(self, "Éxito", msg)
@@ -76,7 +82,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             self.btnGuardarPerfil.setVisible(False)
             self.btnEditarPerfil.setVisible(True)
             # Actualiza el user local con el VO refrescado del controlador
-            self.user = self.controlador.user
+            self.user = self._controlador.user
             self.btnLeerPantalla.setVisible(
                 getattr(self.user, "preferencia_accesibilidad", "") == "Dificultad lectura"
             )
@@ -84,12 +90,12 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             QMessageBox.warning(self, "Error", msg)
 
     def _cambiar_contrasena(self):
-        pass_actual   = self.in_pass_actual.text().strip()
-        pass_nueva    = self.in_pass_nueva.text().strip()
+        pass_actual    = self.in_pass_actual.text().strip()
+        pass_nueva     = self.in_pass_nueva.text().strip()
         pass_confirmar = self.in_pass_confirmar.text().strip()
 
         # La vista solo recoge los campos y llama al controlador
-        ok, msg = self.controlador.cambiar_contrasena(
+        ok, msg = self._controlador.cambiar_contrasena(
             pass_actual, pass_nueva, pass_confirmar
         )
 
@@ -107,7 +113,7 @@ class VentanaAjustesCuenta(QMainWindow, Form):
             QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
         )
         if resp == QMessageBox.Yes:
-            self.controlador.cerrar_sesion()
+            self._controlador.cerrar_sesion()
 
     def _leer_pantalla(self, *args):
         texto = (
