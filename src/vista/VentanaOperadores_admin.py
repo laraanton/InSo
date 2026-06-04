@@ -1,32 +1,31 @@
 """
-VentanaOperadores_admin.py  –  Vista de Gestión de Operadores
-
+VentanaUsuarios_admin.py  –  Vista de Todos los Usuarios
+========================================================
+Sigue el mismo patrón que las subvistas del Operador:
     - __init__ recibe user= (no controlador)
     - controlador llega por setter, que llama a cargar()
 """
 
 from PyQt5.QtWidgets import (
-    QWidget, QDialog, QVBoxLayout, QHBoxLayout, QFormLayout,
-    QLabel, QLineEdit, QComboBox, QDialogButtonBox,
-    QPushButton, QMessageBox, QFileDialog, QHeaderView,
-    QAbstractItemView
+    QWidget, QHBoxLayout, QPushButton, QLabel,
+    QMessageBox, QAbstractItemView, QHeaderView
 )
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
 
 from src.vista.VentanaBase import VentanaBase
 
-Form, _ = uic.loadUiType("./src/vista/ui/vistaoperadoresadmin.ui")
+Form, _ = uic.loadUiType("./src/vista/ui/vistausuariosadmin.ui")
 
 
-class VentanaOperadores_admin(VentanaBase, Form):
+class VentanaUsuarios_admin(VentanaBase, Form):
 
     def __init__(self, user=None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self._user   = user
-        self._ctrl   = None
-        self._cache  = []
+        self._user  = user
+        self._ctrl  = None
+        self._cache = []
 
         self._configurar_tabla()
 
@@ -43,43 +42,38 @@ class VentanaOperadores_admin(VentanaBase, Form):
     # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
-        header = self.tablaOperadores.horizontalHeader()
-
+        header = self.tablaUsuarios.horizontalHeader()
         anchos_fijos = {
             0: 40,
-            1: 160,
             2: 100,
-            4: 100,
+            4: 90,
             5: 85,
-            6: 95,
+            6: 100,
         }
-
-        for i in range(self.tablaOperadores.columnCount()):
+        for i in range(self.tablaUsuarios.columnCount()):
             if i in anchos_fijos:
                 header.setSectionResizeMode(i, QHeaderView.Fixed)
-                self.tablaOperadores.setColumnWidth(i, anchos_fijos[i])
+                self.tablaUsuarios.setColumnWidth(i, anchos_fijos[i])
             else:
                 header.setSectionResizeMode(i, QHeaderView.Stretch)
-
-        self.tablaOperadores.verticalHeader().setDefaultSectionSize(38)
-        self.tablaOperadores.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.tablaOperadores.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.tablaOperadores.horizontalHeader().setStretchLastSection(False)
+        self.tablaUsuarios.verticalHeader().setDefaultSectionSize(38)
+        self.tablaUsuarios.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tablaUsuarios.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tablaUsuarios.horizontalHeader().setStretchLastSection(False)
 
     def _conectar_senales(self):
-        self.btnNuevoOperador.clicked.connect(self._nuevo_operador)
-        self.btnExportarOp.clicked.connect(self._exportar)
-        self.searchOperadores.textChanged.connect(self._filtrar)
-        self.filtroEstadoOp.currentTextChanged.connect(self._filtrar)
+        self.searchUsuarios.textChanged.connect(self._filtrar)
+        self.filtroTipoUs.currentTextChanged.connect(self._filtrar)
+        self.filtroEstadoUs.currentTextChanged.connect(self._filtrar)
 
     # ── Carga de datos ────────────────────────────────────────────────────────
 
     def cargar(self):
-        self._cache = self._ctrl.obtener_operadores()
+        self._cache = self._ctrl.obtener_todos_usuarios()
         self._poblar(self._cache)
 
     def _poblar(self, lista):
-        tabla = self.tablaOperadores
+        tabla = self.tablaUsuarios
         tabla.setRowCount(0)
         for u in lista:
             row = tabla.rowCount()
@@ -88,20 +82,24 @@ class VentanaOperadores_admin(VentanaBase, Form):
             tabla.setItem(row, 1, self._item(u.nombre_completo or ""))
             tabla.setItem(row, 2, self._item(u.dni_nie or ""))
             tabla.setItem(row, 3, self._item(u.email or ""))
-            tabla.setItem(row, 4, self._item(u.telefono or "—"))
+            tabla.setItem(row, 4, self._item(u.tipo_usuario or ""))
             fecha = str(u.fecha_registro)[:10] if u.fecha_registro else "—"
             tabla.setItem(row, 6, self._item(fecha, center=True))
             tabla.setCellWidget(row, 5, self._badge_estado(u.estado, u.cuenta_bloqueada))
             tabla.setCellWidget(row, 7, self._acciones(u))
 
+    # ── Filtro ────────────────────────────────────────────────────────────────
+
     def _filtrar(self):
-        txt    = self.searchOperadores.text().strip().lower()
-        estado = self.filtroEstadoOp.currentText()
+        txt    = self.searchUsuarios.text().strip().lower()
+        tipo   = self.filtroTipoUs.currentText()
+        estado = self.filtroEstadoUs.currentText()
         filtrados = [
             u for u in self._cache
             if (txt in (u.nombre_completo or "").lower()
                 or txt in (u.email or "").lower()
                 or txt in (u.dni_nie or "").lower())
+            and (tipo == "Todos los tipos" or u.tipo_usuario == tipo)
             and (estado == "Todos los estados"
                  or (estado == "Bloqueado" and u.cuenta_bloqueada)
                  or (estado != "Bloqueado" and u.estado == estado and not u.cuenta_bloqueada))
@@ -110,63 +108,16 @@ class VentanaOperadores_admin(VentanaBase, Form):
 
     # ── Acciones ──────────────────────────────────────────────────────────────
 
-    def _nuevo_operador(self):
-        dlg = _DialogoOperador(self)
-        if dlg.exec_() != QDialog.Accepted:
-            return
-        d = dlg.datos()
-        resultado = self._ctrl.crear_operador(
-            d["dni_nie"], d["nombre_completo"], d["email"], d["telefono"], d["password"]
-        )
-        if resultado.ok:
-            QMessageBox.information(self, "Operador creado", resultado.mensaje)
-            self.cargar()
-        else:
-            QMessageBox.warning(self, "Error al crear", resultado.mensaje)
-
-    def _editar_operador(self, usuario):
-        dlg = _DialogoOperador(self, usuario)
-        if dlg.exec_() != QDialog.Accepted:
-            return
-        d = dlg.datos()
-        resultado = self._ctrl.actualizar_operador(
-            usuario, d["telefono"], d["estado"], d["password"] or None
-        )
-        if resultado.ok:
-            QMessageBox.information(self, "Actualizado", resultado.mensaje)
-        else:
-            QMessageBox.warning(self, "Error", resultado.mensaje)
-        self.cargar()
-
     def _toggle_bloqueo(self, usuario):
         if usuario.cuenta_bloqueada:
-            resultado = self._ctrl.desbloquear_operador(usuario)
-            titulo = "Cuenta desbloqueada"
+            resultado = self._ctrl.desbloquear_cuenta(usuario)
         else:
-            resultado = self._ctrl.bloquear_operador(usuario)
-            titulo = "Cuenta bloqueada"
+            resultado = self._ctrl.bloquear_cuenta(usuario)
         if resultado.ok:
-            QMessageBox.information(self, titulo, resultado.mensaje)
+            QMessageBox.information(self, "Estado actualizado", resultado.mensaje)
         else:
             QMessageBox.warning(self, "Error", resultado.mensaje)
         self.cargar()
-
-    def _exportar(self):
-        ruta, _ = QFileDialog.getSaveFileName(
-            self, "Exportar operadores", "operadores.csv", "CSV (*.csv)"
-        )
-        if not ruta:
-            return
-        try:
-            with open(ruta, "w", encoding="utf-8") as f:
-                f.write("ID,Nombre,DNI,Email,Telefono,Estado,Fecha\n")
-                for u in self._cache:
-                    estado = "Bloqueado" if u.cuenta_bloqueada else u.estado
-                    f.write(f"{u.usuario_id},{u.nombre_completo},{u.dni_nie},{u.email},"
-                            f"{u.telefono or ''},{estado},{u.fecha_registro or ''}\n")
-            QMessageBox.information(self, "Exportado", f"Guardado en:\n{ruta}")
-        except Exception as e:
-            QMessageBox.critical(self, "Error al exportar", str(e))
 
     # ── Widgets de celda ──────────────────────────────────────────────────────
 
@@ -185,16 +136,6 @@ class VentanaOperadores_admin(VentanaBase, Form):
         return self._wrap(lbl)
 
     def _acciones(self, usuario):
-        btn_editar = QPushButton("  Editar  ")
-        btn_editar.setCursor(Qt.PointingHandCursor)
-        btn_editar.setStyleSheet(
-            "QPushButton { background-color:#eef4f4; color:#5e8d8d;"
-            " border:1px solid #c5dcdc; border-radius:8px;"
-            " font-size:10px; font-weight:bold; padding:2px 0px; }"
-            "QPushButton:hover { background-color:#d4e8e8; }"
-        )
-        btn_editar.clicked.connect(lambda _, u=usuario: self._editar_operador(u))
-
         if usuario.cuenta_bloqueada:
             etiqueta = "  Desbloquear  "
             estilo = (
@@ -212,116 +153,15 @@ class VentanaOperadores_admin(VentanaBase, Form):
                 "QPushButton:hover { background-color:#f9d4d1; }"
             )
 
-        btn_bloquear = QPushButton(etiqueta)
-        btn_bloquear.setCursor(Qt.PointingHandCursor)
-        btn_bloquear.setStyleSheet(estilo)
-        btn_bloquear.clicked.connect(lambda _, u=usuario: self._toggle_bloqueo(u))
+        btn = QPushButton(etiqueta)
+        btn.setCursor(Qt.PointingHandCursor)
+        btn.setStyleSheet(estilo)
+        btn.clicked.connect(lambda _, u=usuario: self._toggle_bloqueo(u))
 
         contenedor = QWidget()
         lay = QHBoxLayout(contenedor)
         lay.setContentsMargins(6, 2, 6, 2)
         lay.setAlignment(Qt.AlignCenter)
-        lay.setSpacing(6)
-        lay.addWidget(btn_editar)
-        lay.addWidget(btn_bloquear)
+        lay.setSpacing(0)
+        lay.addWidget(btn)
         return contenedor
-
-
-# ── Diálogo de Nuevo / Editar Operador ────────────────────────────────────────
-
-class _DialogoOperador(QDialog):
-
-    def __init__(self, parent=None, usuario=None):
-        super().__init__(parent)
-        self._usuario = usuario
-        self.setWindowTitle("Nuevo Operador" if not usuario else "Editar Operador")
-        self.setMinimumWidth(440)
-        self._build_ui(usuario)
-
-    def _build_ui(self, usuario):
-        lay = QVBoxLayout(self)
-        lay.setSpacing(14)
-        lay.setContentsMargins(28, 24, 28, 24)
-
-        titulo = QLabel("Nuevo Operador" if not usuario else "Editar Operador")
-        titulo.setObjectName("dlgTitle")
-        lay.addWidget(titulo)
-
-        form = QFormLayout()
-        form.setSpacing(10)
-        form.setLabelAlignment(Qt.AlignRight)
-
-        self.in_dni      = QLineEdit(placeholderText="Ej: 12345678A")
-        self.in_nombre   = QLineEdit(placeholderText="Nombre completo")
-        self.in_email    = QLineEdit(placeholderText="correo@softrip.es")
-        self.in_telefono = QLineEdit(placeholderText="Opcional")
-        self.in_password = QLineEdit()
-        self.in_password.setEchoMode(QLineEdit.Password)
-        self.in_password.setPlaceholderText(
-            "Dejar vacío para no cambiar" if usuario else "Mínimo 6 caracteres"
-        )
-        self.cb_estado = QComboBox()
-        self.cb_estado.addItems(["Activo", "Inactivo", "Suspendido"])
-
-        if usuario:
-            self.in_dni.setText(usuario.dni_nie or "")
-            self.in_nombre.setText(usuario.nombre_completo or "")
-            self.in_email.setText(usuario.email or "")
-            self.in_telefono.setText(usuario.telefono or "")
-            idx = self.cb_estado.findText(usuario.estado)
-            if idx >= 0:
-                self.cb_estado.setCurrentIndex(idx)
-            self.in_dni.setEnabled(False)
-            self.in_nombre.setEnabled(False)
-            self.in_email.setEnabled(False)
-
-        form.addRow("DNI / NIE *",       self.in_dni)
-        form.addRow("Nombre completo *",  self.in_nombre)
-        form.addRow("Email *",            self.in_email)
-        form.addRow("Teléfono",           self.in_telefono)
-        form.addRow("Contraseña *",       self.in_password)
-        form.addRow("Estado",             self.cb_estado)
-        lay.addLayout(form)
-
-        btns = QDialogButtonBox(QDialogButtonBox.Save | QDialogButtonBox.Cancel)
-        btns.button(QDialogButtonBox.Save).setText("Guardar")
-        btns.button(QDialogButtonBox.Cancel).setText("Cancelar")
-        btns.accepted.connect(self._validar_y_aceptar)
-        btns.rejected.connect(self.reject)
-        lay.addWidget(btns)
-
-    def _validar_y_aceptar(self):
-        d = self.datos()
-        if not self._usuario:
-            if not d["dni_nie"]:
-                QMessageBox.warning(self, "Campo obligatorio", "El DNI/NIE es obligatorio.")
-                return
-            if not d["nombre_completo"]:
-                QMessageBox.warning(self, "Campo obligatorio", "El nombre completo es obligatorio.")
-                return
-            if not d["email"]:
-                QMessageBox.warning(self, "Campo obligatorio", "El email es obligatorio.")
-                return
-            if not d["password"]:
-                QMessageBox.warning(self, "Campo obligatorio", "La contraseña es obligatoria.")
-                return
-            if len(d["password"]) < 6:
-                QMessageBox.warning(self, "Contraseña corta",
-                                    "La contraseña debe tener al menos 6 caracteres.")
-                return
-        else:
-            if d["password"] and len(d["password"]) < 6:
-                QMessageBox.warning(self, "Contraseña corta",
-                                    "La nueva contraseña debe tener al menos 6 caracteres.")
-                return
-        self.accept()
-
-    def datos(self):
-        return {
-            "dni_nie":         self.in_dni.text().strip(),
-            "nombre_completo": self.in_nombre.text().strip(),
-            "email":           self.in_email.text().strip(),
-            "telefono":        self.in_telefono.text().strip(),
-            "password":        self.in_password.text().strip(),
-            "estado":          self.cb_estado.currentText(),
-        }
