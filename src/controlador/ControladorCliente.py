@@ -54,8 +54,9 @@ class ControladorCliente:
         self.abrir_principal()
 
     def cerrar_sesion(self):
+        if self._ctrl_principal:
+            self._ctrl_principal.cerrarSesion()
         self._cerrar_todo()
-        self._ctrl_principal.ventanaIniciarSesion()
 
     def _ocultar_todas_menos(self, excepcion):
         for v in [self.ventana_principal, self.ventana_ajustes,
@@ -152,8 +153,8 @@ class ControladorCliente:
         return {
             **pedido,
             "fecha_inicio_fmt": fmt(pedido.get("fecha_inicio", "")),
-            "fecha_fin_fmt":    fmt(pedido.get("fecha_fin", "")),
-            "monto_total":      float(pedido.get("monto_total", 0)),
+            "fecha_fin_fmt": fmt(pedido.get("fecha_fin", "")),
+            "monto_total": float(pedido.get("monto_total", 0)),
         }
 
     # ── Perfil ───────────────────────────────────────────────────────────────
