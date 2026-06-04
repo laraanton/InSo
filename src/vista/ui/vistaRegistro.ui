@@ -27,10 +27,10 @@
         <widget class="QWidget" name="widget_2" native="true">
          <property name="geometry">
           <rect>
-           <x>9</x>
-           <y>150</y>
+           <x>10</x>
+           <y>130</y>
            <width>531</width>
-           <height>641</height>
+           <height>671</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -40,8 +40,6 @@
 	border: 1px solid rgba(200, 220, 245, 0.6);
 }</string>
          </property>
-
-         <!-- Título -->
          <widget class="QLabel" name="lbl_titulo">
           <property name="geometry">
            <rect>
@@ -61,113 +59,156 @@
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
-
-         <!-- DNI -->
          <widget class="QLineEdit" name="in_dni">
           <property name="geometry">
-           <rect><x>70</x><y>100</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>100</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="placeholderText"><string>DNI / NIE</string></property>
+          <property name="placeholderText">
+           <string>DNI / NIE</string>
+          </property>
          </widget>
-
-         <!-- Nombre -->
          <widget class="QLineEdit" name="in_nombre">
           <property name="geometry">
-           <rect><x>70</x><y>160</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>160</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="placeholderText"><string>Nombre completo</string></property>
+          <property name="placeholderText">
+           <string>Nombre completo</string>
+          </property>
          </widget>
-
-         <!-- Email -->
          <widget class="QLineEdit" name="in_email">
           <property name="geometry">
-           <rect><x>70</x><y>220</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>220</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="placeholderText"><string>Email</string></property>
+          <property name="placeholderText">
+           <string>Email</string>
+          </property>
          </widget>
-
-         <!-- Teléfono -->
          <widget class="QLineEdit" name="in_telefono">
           <property name="geometry">
-           <rect><x>70</x><y>280</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>280</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="placeholderText"><string>Teléfono (opcional)</string></property>
+          <property name="placeholderText">
+           <string>Teléfono (opcional)</string>
+          </property>
          </widget>
-
-         <!-- Contraseña -->
          <widget class="QLineEdit" name="in_contrasena">
           <property name="geometry">
-           <rect><x>70</x><y>340</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>340</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-          <property name="placeholderText"><string>Contraseña</string></property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Contraseña</string>
+          </property>
          </widget>
-
-         <!-- Confirmar contraseña -->
          <widget class="QLineEdit" name="in_confirmar">
           <property name="geometry">
-           <rect><x>70</x><y>400</y><width>371</width><height>41</height></rect>
+           <rect>
+            <x>70</x>
+            <y>400</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
 QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
           </property>
-          <property name="echoMode"><enum>QLineEdit::Password</enum></property>
-          <property name="placeholderText"><string>Confirmar contraseña</string></property>
+          <property name="echoMode">
+           <enum>QLineEdit::Password</enum>
+          </property>
+          <property name="placeholderText">
+           <string>Confirmar contraseña</string>
+          </property>
          </widget>
-
-         <!-- Botón: Registrarse -->
          <widget class="QPushButton" name="botonRegistrar">
           <property name="geometry">
-           <rect><x>70</x><y>590</y><width>371</width><height>28</height></rect>
+           <rect>
+            <x>70</x>
+            <y>590</y>
+            <width>371</width>
+            <height>28</height>
+           </rect>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton { background-color: rgb(29, 147, 197); color: white; font-size: 14px; font-weight: 500; letter-spacing: 1px; border: none; border-radius: 8px; padding: 6px; }
 QPushButton:hover { background-color: rgb(24, 95, 165); }
 QPushButton:pressed { background-color: rgb(12, 68, 124); }</string>
           </property>
-          <property name="text"><string>Registrarse</string></property>
+          <property name="text">
+           <string>Registrarse</string>
+          </property>
          </widget>
-
-         <!-- Botón: Volver al login (NUEVO) -->
          <widget class="QPushButton" name="botonVolver">
           <property name="geometry">
-           <rect><x>70</x><y>628</y><width>371</width><height>28</height></rect>
+           <rect>
+            <x>70</x>
+            <y>628</y>
+            <width>371</width>
+            <height>28</height>
+           </rect>
+          </property>
+          <property name="cursor">
+           <cursorShape>PointingHandCursor</cursorShape>
           </property>
           <property name="styleSheet">
            <string notr="true">QPushButton { background-color: transparent; color: rgb(29, 147, 197); font-size: 13px; font-weight: 400; border: none; border-radius: 8px; padding: 6px; }
 QPushButton:hover { color: rgb(24, 95, 165); text-decoration: underline; }
 QPushButton:pressed { color: rgb(12, 68, 124); }</string>
           </property>
-          <property name="text"><string>← Volver al inicio de sesión</string></property>
-          <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
+          <property name="text">
+           <string>← Volver al inicio de sesión</string>
+          </property>
          </widget>
-
         </widget>
        </widget>
       </item>
-
-      <!-- Espaciador derecho -->
       <item>
        <widget class="QWidget" name="widget_3" native="true"/>
       </item>
