@@ -21,81 +21,75 @@ class BusinessCliente:
     # ── Paquetes ─────────────────────────────────────────────────────────────
 
     def obtener_todos_paquetes(self) -> list[dict]:
+         # Convierte los VO a dicts para que la vista no dependa del modelo
         return [p.to_dict() for p in self._paq.obtener_todos()]
-
+ 
     def obtener_paquete_por_id(self, id_paquete: int) -> dict | None:
         vo = self._paq.obtener_por_id(id_paquete)
+        # Devuelve None si el paquete no existe
         return vo.to_dict() if vo else None
     
     def buscar_paquetes(self, texto: str, preferencia: str,
                     preferencia_acc: str) -> list[dict]:
-        """
-        Filtra paquetes cuyo destino o nombre contienen el texto (sin distinción
-        de mayúsculas) y los ordena por relevancia respecto al perfil del usuario.
-        """
         texto_lower = texto.lower().strip()
-
-        todos = self.obtener_todos_paquetes()   # ya devuelve list[dict]
-
-        # ── Filtro ───────────────────────────────────────────────────────────
+        todos = self.obtener_todos_paquetes()
+ 
+        # Filtra por nombre o destino del paquete
         coincidentes = [
             p for p in todos
             if texto_lower in p["destino"].lower()
             or texto_lower in p["nombre"].lower()
         ]
-
-        # ── Ordenamiento por relevancia ──────────────────────────────────────
+ 
         def prioridad(p: dict) -> int:
             perfil_paquete = (p.get("perfil") or "").lower()
             pref_usuario   = (preferencia or "").lower()
             acc_usuario    = (preferencia_acc or "").lower()
-
-            # 0 = mayor prioridad
+ 
+            # 0 = mayor prioridad: el perfil del paquete coincide con la preferencia del usuario
             if perfil_paquete and pref_usuario and perfil_paquete == pref_usuario:
-                return 0   # coincide con preferencia del usuario
+                return 0
+            # 1 = prioridad media: paquete accesible y el usuario lo necesita
             if p.get("accesibilidad") and acc_usuario not in ("", "ninguna"):
-                return 1   # accesible y el usuario lo necesita
-            return 2       # resto
-
+                return 1
+            return 2
+ 
         coincidentes.sort(key=prioridad)
         return coincidentes
-
-    # ── Pedidos ──────────────────────────────────────────────────────────────
-
+ 
     def obtener_viajes_cliente(self, usuario_id: int) -> list[dict]:
         return self._ped.obtener_por_cliente(usuario_id)
-
+ 
     def obtener_pedido(self, pedido_id: int) -> dict | None:
         return self._ped.obtener_por_paquete(pedido_id)
-
+ 
     def comprar_paquete(self, usuario_id: int, paquete: dict,
                         fecha_inicio, fecha_fin,
                         personas: int, metodo_pago: str) -> tuple[bool, str]:
-        # ── Validaciones de negocio ──────────────────────────────────────────
         if fecha_fin < fecha_inicio:
             return False, "La fecha de fin debe ser posterior a la de inicio."
         if personas < 1:
             return False, "Debe haber al menos 1 persona."
         if not metodo_pago:
             return False, "Selecciona un método de pago."
-
+ 
         try:
             precio_unitario = float(paquete.get("precio", 0))
         except (ValueError, TypeError):
             return False, "El paquete no tiene un precio válido."
-
+ 
         monto_total = precio_unitario * personas
-
-        # ── Estrategia de pago ───────────────────────────────────────────────
+ 
+        # Patrón Strategy: selecciona el objeto de pago según el método elegido
         estrategia = obtener_estrategia(metodo_pago)
         if not estrategia:
             return False, f"Método de pago '{metodo_pago}' no reconocido."
-
+ 
+        # La estrategia puede tener sus propias restricciones
         ok, msg_validacion = estrategia.validar(monto_total)
         if not ok:
             return False, msg_validacion
-
-        # ── Persistencia ─────────────────────────────────────────────────────
+ 
         vo = PedidoVO(
             cliente_id=usuario_id,
             paquete_id=paquete.get("id") or paquete.get("paquete_id"),
@@ -104,66 +98,64 @@ class BusinessCliente:
             fecha_inicio=fecha_inicio,
             fecha_fin=fecha_fin,
         )
-
+ 
         pedido_id = self._ped.insertar_pedido(vo)
         if pedido_id is None:
             return False, "No se pudo registrar el pedido. Inténtalo de nuevo."
-
-        # ── Procesamiento del pago ───────────────────────────────────────────
+ 
         ok, msg_pago = estrategia.procesar(monto_total)
         if not ok:
             return False, msg_pago
-
+ 
         return True, (
             f"¡Reserva confirmada! Tu número de pedido es #{pedido_id}.\n\n"
             f"{msg_pago}"
         )
-
+ 
     def obtener_metodos_pago(self) -> list[str]:
+        # Usado para poblar el desplegable de métodos de pago en la vista
         return nombres_disponibles()
-
-    # ── Perfil ───────────────────────────────────────────────────────────────
-
+ 
     def guardar_perfil(self, usuario_id: int,
                        telefono: str, preferencia: str,
                        preferencia_acc: str) -> tuple[bool, str]:
         ok_tel  = self._cta.actualizarTelefono(usuario_id, telefono)
         ok_pref = self._cta.actualizarPreferencia(usuario_id, preferencia)
         ok_acc  = self._cta.actualizarPreferenciaAccesibilidad(usuario_id, preferencia_acc)
-
+ 
         if ok_tel and ok_pref and ok_acc:
             return True, "Perfil actualizado correctamente."
         return False, "No se pudo actualizar algún dato del perfil."
-
+ 
     def cambiar_contrasena(self, usuario_id: int, email: str,
                            pass_actual: str, pass_nueva: str) -> tuple[bool, str]:
+        # Reutiliza el flujo de login para verificar que la contraseña actual es correcta
         login_vo = LoginVO(email, pass_actual)
         if not self._usr.consultaLogin(login_vo):
             return False, "La contraseña actual es incorrecta."
-
+ 
         if self._usr.actualizarContrasena(usuario_id, pass_nueva):
             return True, "Contraseña actualizada correctamente."
         return False, "No se pudo actualizar la contraseña."
-
+ 
     def refrescar_usuario(self, usuario_id: int):
+        # Se llama tras guardar cambios en el perfil para mantener la sesión sincronizada con la BD
         return self._usr.obtenerUsuarioPorId(usuario_id)
     
-    # ── Feedback ───────────────────────────────────────────────────────────────
-
     def guardar_feedback(self, pedido_id: int, cliente_id: int,
                      val_general: int, val_trato: int,
                      val_transporte: int, val_alojamiento: int,
                      comentarios: str) -> tuple[bool, str]:
-        # Validaciones de negocio
         for val in [val_general, val_trato, val_transporte, val_alojamiento]:
             if not (1 <= val <= 5):
                 return False, "Todas las valoraciones deben estar entre 1 y 5."
-
+ 
+        # Un pedido solo puede tener una reseña
         if self._fb.existe_feedback(pedido_id):
             return False, "Ya has dejado una reseña para este viaje."
-
+ 
         vo = FeedbackVO(
-            feedback_id=None,
+            feedback_id=None,  # La BD asigna el ID automáticamente
             pedido_id=pedido_id,
             cliente_id=cliente_id,
             val_general=val_general,
@@ -176,6 +168,7 @@ class BusinessCliente:
         if ok:
             return True, "¡Gracias por tu reseña!"
         return False, "No se pudo guardar la reseña. Inténtalo de nuevo."
-
+ 
     def tiene_feedback(self, pedido_id: int) -> bool:
+        # Usado en la vista para mostrar u ocultar el botón de "Dejar reseña"
         return self._fb.existe_feedback(pedido_id)
