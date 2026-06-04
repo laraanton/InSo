@@ -22,14 +22,14 @@ from src.modelo.dao.ReservaDAO     import ReservaDAO
 from src.modelo.dao.FeedbackDAO    import FeedbackDAO
 from src.modelo.dao.ReclamacionDAO import ReclamacionDAO
 
-from src.modelo.vo.PaqueteVO     import PaqueteVO
-from src.modelo.vo.ReservaVO     import ReservaVO
-from src.modelo.vo.FeedbackVO    import FeedbackVO
-from src.modelo.vo.ReclamacionVO import ReclamacionVO
-from src.modelo.vo.OperacionResultadoVO   import OperacionResultadoVO
+from src.modelo.vo.PaqueteVO            import PaqueteVO
+from src.modelo.vo.ReservaVO            import ReservaVO
+from src.modelo.vo.FeedbackVO           import FeedbackVO
+from src.modelo.vo.ReclamacionVO        import ReclamacionVO
+from src.modelo.vo.OperacionResultadoVO import OperacionResultadoVO
 
 
-# ── Estados permitidos 
+# ── Estados permitidos ────────────────────────────────────────────────────────
 
 _ESTADOS_RESERVA = {
     "Pendiente confirmacion", "Confirmado", "Pagado",
@@ -51,7 +51,7 @@ class OperadorBO:
         self._feed = FeedbackDAO()
         self._rec  = ReclamacionDAO()
 
-    # ── Validación de paquete 
+    # ── Validación de paquete ─────────────────────────────────────────────
 
     @staticmethod
     def _validar_paquete(paquete: PaqueteVO) -> OperacionResultadoVO:
@@ -69,7 +69,7 @@ class OperadorBO:
             return OperacionResultadoVO(False, "El precio debe ser un número positivo (ej: 1200.00).")
         return OperacionResultadoVO(True, "")
 
-    # ── PAQUETES 
+    # ── PAQUETES ──────────────────────────────────────────────────────────
 
     def obtener_todos_paquetes(self) -> list[PaqueteVO]:
         return self._paq.obtener_todos()
@@ -120,7 +120,7 @@ class OperadorBO:
         )
         return OperacionResultadoVO(True, f"Paquete '{paquete.nombre}' eliminado correctamente.")
 
-    # ── RESERVAS 
+    # ── RESERVAS ──────────────────────────────────────────────────────────
 
     def obtener_reservas(self) -> list[ReservaVO]:
         return self._res.obtener_todas()
@@ -141,27 +141,9 @@ class OperadorBO:
             return OperacionResultadoVO(False, f"Pedido {id_pedido} no encontrado o error en BD.")
         return OperacionResultadoVO(True, f"Pedido {id_pedido} → '{nuevo_estado}'.")
 
-    def registrar_reserva(self, datos: dict) -> OperacionResultadoVO:
-        """
-        Crea una reserva nueva. Recibe un dict con:
-            cliente_id, paquete_id, monto_total, metodo_pago,
-            fecha_inicio, fecha_fin
-        (el DAO.insertar sigue esperando dict para este caso concreto de
-        creación manual, donde aún no existe un ReservaVO completo)
-        """
-        if not datos.get("cliente_id"):
-            return OperacionResultadoVO(False, "El campo 'cliente_id' es obligatorio.")
-        if not datos.get("paquete_id"):
-            return OperacionResultadoVO(False, "El campo 'paquete_id' es obligatorio.")
-        datos["usuario_responsable"] = self._usuario_id
-        identificador = self._res.insertar(datos)
-        if identificador is None:
-            return OperacionResultadoVO(False, "Error al crear la reserva en la base de datos.")
-        return OperacionResultadoVO(True, f"Reserva {identificador} creada correctamente.")
-
     def exportar_reservas_csv(self, ruta: str) -> OperacionResultadoVO:
         try:
-            reservas = self._res.exportar_todas()   # list[dict] vía ReservaVO.to_export_dict()
+            reservas = self._res.exportar_todas()
             cabecera = ["ID Pedido", "Cliente", "Paquete", "Fecha", "Precio", "Estado", "Método Pago"]
             campos   = ["id", "cliente", "paquete", "fecha", "precio", "estado", "metodo_pago"]
             with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
@@ -171,7 +153,7 @@ class OperadorBO:
         except Exception as e:
             return OperacionResultadoVO(False, f"Error al exportar: {e}")
 
-    # ── FEEDBACK 
+    # ── FEEDBACK ──────────────────────────────────────────────────────────
 
     def obtener_feedbacks(self) -> list[FeedbackVO]:
         return self._feed.obtener_todos()
@@ -182,7 +164,7 @@ class OperadorBO:
     def obtener_paquetes_con_feedback(self) -> list[str]:
         return self._feed.obtener_paquetes_con_feedback()
 
-    # ── RECLAMACIONES 
+    # ── RECLAMACIONES ─────────────────────────────────────────────────────
 
     def obtener_reclamaciones(self) -> list[ReclamacionVO]:
         return self._rec.obtener_todas()
