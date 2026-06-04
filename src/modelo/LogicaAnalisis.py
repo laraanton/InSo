@@ -23,8 +23,6 @@ class AnalisisBO:
     def __init__(self):
         self._dao = AnalisisDAO()
 
-    # ── API pública ───────────────────────────────────────────────────────────
-
     def get_analisis(self, periodo: str) -> AnalisisVO:
         """
         Convierte el texto del combo (p.ej. "Últimos 30 días") en una fecha
@@ -51,25 +49,14 @@ class AnalisisBO:
             perfil_viajero = self._dao.distribucion_perfiles(),  # sin filtro de fecha
         )
 
-    def exportar_analisis(self, periodo: str) -> OperacionResultadoVO:
-        """Genera un CSV con el resumen del período en ~/Documents."""
+    def exportar_analisis(self, periodo: str, ruta: str) -> OperacionResultadoVO:
         try:
             fecha_desde = self._resolver_fecha_desde(periodo)
             filas = self._dao.exportar_resumen(fecha_desde)
 
             if not filas:
-                return OperacionResultadoVO(
-                    False, "No hay datos para exportar en el período seleccionado."
-                )
+                return OperacionResultadoVO(False, "No hay datos para exportar en el período seleccionado.")
 
-            slug = (
-                periodo.lower()
-                .replace(" ", "_")
-                .replace("á", "a").replace("é", "e")
-                .replace("í", "i").replace("ó", "o").replace("ú", "u")
-            )
-            nombre_archivo = f"analisis_{slug}_{date.today().isoformat()}.csv"
-            ruta = os.path.join(os.path.expanduser("~"), "Documents", nombre_archivo)
             os.makedirs(os.path.dirname(ruta), exist_ok=True)
 
             cabeceras = [
@@ -82,6 +69,7 @@ class AnalisisBO:
                 "val_trato", "val_transporte", "val_alojamiento", "val_general",
                 "categoria_reclamacion",
             ]
+
             with open(ruta, "w", newline="", encoding="utf-8-sig") as f:
                 f.write(",".join(cabeceras) + "\n")
                 csv.DictWriter(f, fieldnames=campos, extrasaction="ignore").writerows(filas)
@@ -91,8 +79,7 @@ class AnalisisBO:
         except Exception as exc:
             return OperacionResultadoVO(False, f"Error al exportar: {exc}")
 
-    # ── Helpers privados ──────────────────────────────────────────────────────
-
+    # Calcula la fecha inicial del filtro
     @staticmethod
     def _resolver_fecha_desde(periodo: str) -> date | None:
         hoy = date.today()
@@ -103,13 +90,15 @@ class AnalisisBO:
             "Este año":        date(hoy.year, 1, 1),
         }
         return mapping.get(periodo)  # None → "Todo", sin filtro
-
+    
+    # Formatea ingresos
     @staticmethod
     def _fmt_ingresos(valor) -> str:
         if valor is None:
             return "— €"
         return f"{float(valor):,.0f} €".replace(",", ".")
 
+    # Formatea valoración media
     @staticmethod
     def _fmt_satisfaccion(valor) -> str:
         if valor is None:
