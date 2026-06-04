@@ -41,3 +41,9 @@ class MiVentana(QMainWindow, Form):
         #si el controlador devuelve user se llama a abrirVentanaPrincipal(admin, operdor o cliente)
         QMessageBox.information(self, "Bienvenido", mensaje)
         self.controlador.abrirVentanaPrincipal(user)
+        
+    def resetear(self):
+        self.in_usuario.clear()
+        self.in_contrasena.clear()
+        self.in_usuario.setFocus()
+
