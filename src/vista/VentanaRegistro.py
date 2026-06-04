@@ -42,7 +42,7 @@ class VentanaRegistro(QMainWindow, Form):
             return
 
         QMessageBox.information(self, "Registro exitoso", mensaje)
-        self.controlador.abrirIniciarSesion()
+        self.controlador.ventanaIniciarSesion()
 
     def on_volver(self):                                          
-        self.controlador.abrirIniciarSesion()
+        self.controlador.ventanaIniciarSesion()
