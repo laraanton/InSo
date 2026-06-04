@@ -2,6 +2,10 @@
 LogicaOperador.py  –  Lógica de negocio del Operador
 =====================================================
 Orquesta los DAOs y aplica reglas de negocio.
+El Controlador NUNCA llama a los DAOs directamente.
+
+Los DAOs ya devuelven VOs; este BO los recibe y los pasa
+directamente sin re-construirlos ni convertir dicts.
 
 Reglas de negocio aquí:
     - Validación de campos obligatorios del paquete
@@ -12,12 +16,12 @@ Reglas de negocio aquí:
 
 from __future__ import annotations
 import csv
-
+# Acceso directo a la BD
 from src.modelo.dao.PaqueteDAO     import PaqueteDAO
 from src.modelo.dao.ReservaDAO     import ReservaDAO
 from src.modelo.dao.FeedbackDAO    import FeedbackDAO
 from src.modelo.dao.ReclamacionDAO import ReclamacionDAO
-
+# Transferencia de datos entre capas
 from src.modelo.vo.PaqueteVO            import PaqueteVO
 from src.modelo.vo.ReservaVO            import ReservaVO
 from src.modelo.vo.FeedbackVO           import FeedbackVO
@@ -41,7 +45,9 @@ _ESTADOS_RECLAMACION = {
 class OperadorBO:
 
     def __init__(self, usuario_id=None):
+        # ID del operador
         self._usuario_id = usuario_id
+        # Instancia cada DAO
         self._paq  = PaqueteDAO()
         self._res  = ReservaDAO()
         self._feed = FeedbackDAO()
@@ -51,6 +57,7 @@ class OperadorBO:
 
     @staticmethod
     def _validar_paquete(paquete: PaqueteVO) -> OperacionResultadoVO:
+        # Comprueba que los campos obligatorios existen y son correctos
         if not (paquete.nombre or "").strip():
             return OperacionResultadoVO(False, "El campo 'Nombre del paquete' es obligatorio.")
         if not (paquete.destino or "").strip():
@@ -63,16 +70,20 @@ class OperadorBO:
                 raise ValueError
         except ValueError:
             return OperacionResultadoVO(False, "El precio debe ser un número positivo (ej: 1200.00).")
+        # Todas las validaciones pasadas: resultado ok sin mensaje de error
         return OperacionResultadoVO(True, "")
 
     # ── PAQUETES ──────────────────────────────────────────────────────────
 
+    # Devuelve todos los paquetes activos en ls BD
     def obtener_todos_paquetes(self) -> list[PaqueteVO]:
         return self._paq.obtener_todos()
 
+    # Devuelve el paquete con ese ID o None si no existe
     def obtener_paquete_por_id(self, id_paquete: int) -> PaqueteVO | None:
         return self._paq.obtener_por_id(id_paquete)
 
+    # Valida el VO, inserta el paquete y obtiene el nuevo ID asignado
     def crear_paquete(self, paquete: PaqueteVO) -> OperacionResultadoVO:
         resultado = self._validar_paquete(paquete)
         if not resultado.ok:
@@ -106,6 +117,7 @@ class OperadorBO:
 
     # ── RESERVAS ──────────────────────────────────────────────────────────
 
+    # Devuelve toda reserva sin filtro
     def obtener_reservas(self) -> list[ReservaVO]:
         return self._res.obtener_todas()
 
