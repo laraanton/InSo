@@ -43,17 +43,28 @@ class VentanaOperadores_admin(VentanaBase, Form):
     # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
-        anchos = [50, 180, 110, 170, 110, 90, 100, 160]
         header = self.tablaOperadores.horizontalHeader()
-        for i, w in enumerate(anchos):
-            if w is None:
-                header.setSectionResizeMode(i, QHeaderView.Stretch)
-            else:
+
+        anchos_fijos = {
+            0: 40,
+            1: 160,
+            2: 100,
+            4: 100,
+            5: 85,
+            6: 95,
+        }
+
+        for i in range(self.tablaOperadores.columnCount()):
+            if i in anchos_fijos:
                 header.setSectionResizeMode(i, QHeaderView.Fixed)
-                self.tablaOperadores.setColumnWidth(i, w)
+                self.tablaOperadores.setColumnWidth(i, anchos_fijos[i])
+            else:
+                header.setSectionResizeMode(i, QHeaderView.Stretch)
+
         self.tablaOperadores.verticalHeader().setDefaultSectionSize(38)
         self.tablaOperadores.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tablaOperadores.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tablaOperadores.horizontalHeader().setStretchLastSection(False)
 
     def _conectar_senales(self):
         self.btnNuevoOperador.clicked.connect(self._nuevo_operador)
@@ -174,24 +185,43 @@ class VentanaOperadores_admin(VentanaBase, Form):
         return self._wrap(lbl)
 
     def _acciones(self, usuario):
-        contenedor = QWidget()
-        lay = QHBoxLayout(contenedor)
-        lay.setContentsMargins(4, 2, 4, 2)
-        lay.setSpacing(6)
-
-        btn_editar = QPushButton("Editar")
-        btn_editar.setObjectName("btnEdit")
+        btn_editar = QPushButton("  Editar  ")
         btn_editar.setCursor(Qt.PointingHandCursor)
-        btn_editar.setMinimumWidth(56)
+        btn_editar.setStyleSheet(
+            "QPushButton { background-color:#eef4f4; color:#5e8d8d;"
+            " border:1px solid #c5dcdc; border-radius:8px;"
+            " font-size:10px; font-weight:bold; padding:2px 0px; }"
+            "QPushButton:hover { background-color:#d4e8e8; }"
+        )
         btn_editar.clicked.connect(lambda _, u=usuario: self._editar_operador(u))
 
-        etiqueta     = "Desbloquear" if usuario.cuenta_bloqueada else "Bloquear"
+        if usuario.cuenta_bloqueada:
+            etiqueta = "  Desbloquear  "
+            estilo = (
+                "QPushButton { background-color:#eafaf1; color:#166534;"
+                " border:1px solid #b7e4c7; border-radius:8px;"
+                " font-size:10px; font-weight:bold; padding:2px 0px; }"
+                "QPushButton:hover { background-color:#d4f0e0; }"
+            )
+        else:
+            etiqueta = "  Bloquear  "
+            estilo = (
+                "QPushButton { background-color:#fee2e2; color:#991b1b;"
+                " border:1px solid #f5c6c3; border-radius:8px;"
+                " font-size:10px; font-weight:bold; padding:2px 0px; }"
+                "QPushButton:hover { background-color:#f9d4d1; }"
+            )
+
         btn_bloquear = QPushButton(etiqueta)
-        btn_bloquear.setObjectName("btnSuccess" if usuario.cuenta_bloqueada else "btnDanger")
         btn_bloquear.setCursor(Qt.PointingHandCursor)
-        btn_bloquear.setMinimumWidth(72)
+        btn_bloquear.setStyleSheet(estilo)
         btn_bloquear.clicked.connect(lambda _, u=usuario: self._toggle_bloqueo(u))
 
+        contenedor = QWidget()
+        lay = QHBoxLayout(contenedor)
+        lay.setContentsMargins(6, 2, 6, 2)
+        lay.setAlignment(Qt.AlignCenter)
+        lay.setSpacing(6)
         lay.addWidget(btn_editar)
         lay.addWidget(btn_bloquear)
         return contenedor
@@ -241,6 +271,9 @@ class _DialogoOperador(QDialog):
             idx = self.cb_estado.findText(usuario.estado)
             if idx >= 0:
                 self.cb_estado.setCurrentIndex(idx)
+            self.in_dni.setEnabled(False)
+            self.in_nombre.setEnabled(False)
+            self.in_email.setEnabled(False)
 
         form.addRow("DNI / NIE *",       self.in_dni)
         form.addRow("Nombre completo *",  self.in_nombre)
