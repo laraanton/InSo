@@ -31,7 +31,11 @@ class ControladorPrincipal:
         tipo = user.tipo_usuario
         if tipo == "Administrador":
             self._ventana_actual = VentanaAdmin(user)
-            self._ventana_actual.controlador = ControladorAdmin(user, self)
+            self._ventana_actual.controlador = ControladorAdmin(
+                usuario_actual=user,
+                ventana=self._ventana_actual,
+                controlador_principal=self
+            )
         elif tipo == "Operador":
             self._ventana_actual = VentanaOperador(user)
             ctrl = ControladorOperador(
