@@ -11,7 +11,8 @@ class VentanaRegistro(QMainWindow, Form):
 
         self.botonRegistrar.clicked.connect(self.on_registrar)
         self.botonVolver.clicked.connect(self.on_volver)
-
+        self.in_preferencia.wheelEvent = lambda event: None 
+        self.in_accesibilidad.wheelEvent = lambda event: None
         self.in_dni.returnPressed.connect(lambda: self.in_nombre.setFocus())
         self.in_nombre.returnPressed.connect(lambda: self.in_email.setFocus())
         self.in_email.returnPressed.connect(lambda: self.in_telefono.setFocus())
@@ -27,6 +28,8 @@ class VentanaRegistro(QMainWindow, Form):
         telefono   = self.in_telefono.text().strip()
         contrasena = self.in_contrasena.text().strip()
         confirmar  = self.in_confirmar.text().strip()
+        preferencia = self.in_preferencia.currentText()
+        accesibilidad = self.in_accesibilidad.currentText()
 
         #validación básica
         if contrasena != confirmar:
@@ -35,7 +38,7 @@ class VentanaRegistro(QMainWindow, Form):
 
         #llamada al controlador para que registre al usuario
         exito, mensaje = self.controlador.registrarUsuario(
-            dni_nie, nombre, email, telefono, contrasena, preferencia="General", accesibilidad="Ninguna"
+            dni_nie, nombre, email, telefono, contrasena, preferencia, accesibilidad
         )
         if not exito:
             QMessageBox.warning(self, "Error de registro", mensaje)
