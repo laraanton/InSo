@@ -1,9 +1,8 @@
 """
 VentanaUsuarios_admin.py  –  Vista de Todos los Usuarios
 ========================================================
-Responsabilidad: mostrar la lista de todos los usuarios y
-delegar las acciones de bloqueo en el Controlador.
-No contiene lógica de negocio.
+    - __init__ recibe user= (no controlador)
+    - controlador llega por setter, que llama a cargar()
 """
 
 from PyQt5.QtWidgets import (
@@ -20,20 +19,28 @@ Form, _ = uic.loadUiType("./src/vista/ui/vistausuariosadmin.ui")
 
 class VentanaUsuarios_admin(VentanaBase, Form):
 
-    def __init__(self, controlador, parent=None):
+    def __init__(self, user=None, parent=None):
         super().__init__(parent)
         self.setupUi(self)
-        self._ctrl  = controlador
+        self._user  = user
+        self._ctrl  = None
         self._cache = []
 
         self._configurar_tabla()
+
+    @property
+    def controlador(self):
+        return self._ctrl
+
+    @controlador.setter
+    def controlador(self, value):
+        self._ctrl = value
         self._conectar_senales()
+        self.cargar()
 
     # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
-        # [ID, Nombre, DNI, Email, Tipo, Estado, Registro, Acción]
-        # None = Stretch (la columna ocupa el espacio restante)
         anchos = [50, 170, 110, 190, 100, 90, 110, None]
         header = self.tablaUsuarios.horizontalHeader()
         for i, w in enumerate(anchos):
@@ -54,7 +61,6 @@ class VentanaUsuarios_admin(VentanaBase, Form):
     # ── Carga de datos ────────────────────────────────────────────────────────
 
     def cargar(self):
-        """Llamado por el Controlador cada vez que se navega a esta página."""
         self._cache = self._ctrl.obtener_todos_usuarios()
         self._poblar(self._cache)
 
@@ -99,7 +105,6 @@ class VentanaUsuarios_admin(VentanaBase, Form):
             resultado = self._ctrl.desbloquear_cuenta(usuario)
         else:
             resultado = self._ctrl.bloquear_cuenta(usuario)
-
         if resultado.ok:
             QMessageBox.information(self, "Estado actualizado", resultado.mensaje)
         else:
