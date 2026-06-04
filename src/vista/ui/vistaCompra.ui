@@ -77,18 +77,6 @@ QHeaderView::section {
     color: #999999;
     letter-spacing: 0.5px;
 }
-QPushButton#btnNuevaReserva {
-    background-color: #5e8d8d;
-    border: none;
-    border-radius: 8px;
-    padding: 8px 20px;
-    font-size: 11px;
-    font-weight: bold;
-    color: white;
-}
-QPushButton#btnNuevaReserva:hover {
-    background-color: #4a7474;
-}
 QPushButton#btnExportar {
     background-color: transparent;
     border: 1px solid #5e8d8d;
@@ -115,16 +103,15 @@ QScrollBar::handle:vertical {
     border-radius: 3px;
     min-height: 20px;
 }
-QLabel#lblSeccionTitulo { font-size: 20px; }  /* se queda igual */
-QLabel#lblSeccionSub { font-size: 16px; }      /* era 11px */
-QLabel { font-size: 16px; }                    /* era 11px */
-QLineEdit { font-size: 16px; }                 /* era 11px */
-QComboBox { font-size: 16px; }                 /* era 11px */
-QTableWidget { font-size: 16px; }              /* era 11px */
-QHeaderView::section { font-size: 15px; }      /* era 10px */
-QPushButton#btnNuevaReserva { font-size: 16px; } /* era 11px */
-QPushButton#btnExportar { font-size: 16px; }   /* era 11px */
-QLabel#lblEstado { font-size: 16px; }          /* era 11px */
+QLabel#lblSeccionTitulo { font-size: 20px; }
+QLabel#lblSeccionSub { font-size: 16px; }
+QLabel { font-size: 16px; }
+QLineEdit { font-size: 16px; }
+QComboBox { font-size: 16px; }
+QTableWidget { font-size: 16px; }
+QHeaderView::section { font-size: 15px; }
+QPushButton#btnExportar { font-size: 16px; }
+QLabel#lblEstado { font-size: 16px; }
 QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
    </string>
   </property>
@@ -164,12 +151,6 @@ QScrollBar::add-line:vertical, QScrollBar::sub-line:vertical { height: 0px; }
      <item>
       <widget class="QPushButton" name="btnExportar">
        <property name="text"><string>Exportar CSV</string></property>
-       <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QPushButton" name="btnNuevaReserva">
-       <property name="text"><string>+ Nueva Reserva</string></property>
        <property name="cursor"><cursorShape>PointingHandCursor</cursorShape></property>
       </widget>
      </item>
