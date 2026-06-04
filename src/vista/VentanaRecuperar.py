@@ -39,7 +39,7 @@ class VentanaRecuperar(QMainWindow, Form):
             return
 
         QMessageBox.information(self, "Éxito", mensaje)
-        self.controlador.abrirIniciarSesion()
+        self.controlador.ventanaIniciarSesion()
 
     def on_volver(self):
-        self.controlador.abrirIniciarSesion()
+        self.controlador.ventanaIniciarSesion()
