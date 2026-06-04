@@ -62,7 +62,6 @@ class ControladorCliente:
                   self.ventana_viajes, self.ventana_detalle,
                   self.ventana_compra, self.ventana_resultados]:
             if v and v is not excepcion:
-                print(v)
                 v.hide()
 
     def _cerrar_todo(self):
