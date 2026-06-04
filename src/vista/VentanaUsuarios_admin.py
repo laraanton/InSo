@@ -1,13 +1,14 @@
 """
 VentanaUsuarios_admin.py  –  Vista de Todos los Usuarios
 ========================================================
+Sigue el mismo patrón que las subvistas del Operador:
     - __init__ recibe user= (no controlador)
     - controlador llega por setter, que llama a cargar()
 """
 
 from PyQt5.QtWidgets import (
     QWidget, QHBoxLayout, QPushButton, QLabel,
-    QMessageBox, QAbstractItemView
+    QMessageBox, QAbstractItemView, QHeaderView
 )
 from PyQt5.QtCore import Qt
 from PyQt5 import uic
@@ -41,17 +42,24 @@ class VentanaUsuarios_admin(VentanaBase, Form):
     # ── Configuración inicial ─────────────────────────────────────────────────
 
     def _configurar_tabla(self):
-        anchos = [50, 170, 110, 190, 100, 90, 110, None]
         header = self.tablaUsuarios.horizontalHeader()
-        for i, w in enumerate(anchos):
-            if w is None:
-                header.setSectionResizeMode(i, header.Stretch)
+        anchos_fijos = {
+            0: 40,
+            2: 100,
+            4: 90,
+            5: 85,
+            6: 100,
+        }
+        for i in range(self.tablaUsuarios.columnCount()):
+            if i in anchos_fijos:
+                header.setSectionResizeMode(i, QHeaderView.Fixed)
+                self.tablaUsuarios.setColumnWidth(i, anchos_fijos[i])
             else:
-                header.setSectionResizeMode(i, header.Fixed)
-                self.tablaUsuarios.setColumnWidth(i, w)
+                header.setSectionResizeMode(i, QHeaderView.Stretch)
         self.tablaUsuarios.verticalHeader().setDefaultSectionSize(38)
         self.tablaUsuarios.setSelectionMode(QAbstractItemView.SingleSelection)
         self.tablaUsuarios.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tablaUsuarios.horizontalHeader().setStretchLastSection(False)
 
     def _conectar_senales(self):
         self.searchUsuarios.textChanged.connect(self._filtrar)
@@ -128,15 +136,32 @@ class VentanaUsuarios_admin(VentanaBase, Form):
         return self._wrap(lbl)
 
     def _acciones(self, usuario):
+        if usuario.cuenta_bloqueada:
+            etiqueta = "  Desbloquear  "
+            estilo = (
+                "QPushButton { background-color:#eafaf1; color:#166534;"
+                " border:1px solid #b7e4c7; border-radius:8px;"
+                " font-size:10px; font-weight:bold; padding:2px 0px; }"
+                "QPushButton:hover { background-color:#d4f0e0; }"
+            )
+        else:
+            etiqueta = "  Bloquear  "
+            estilo = (
+                "QPushButton { background-color:#fee2e2; color:#991b1b;"
+                " border:1px solid #f5c6c3; border-radius:8px;"
+                " font-size:10px; font-weight:bold; padding:2px 0px; }"
+                "QPushButton:hover { background-color:#f9d4d1; }"
+            )
+
+        btn = QPushButton(etiqueta)
+        btn.setCursor(Qt.PointingHandCursor)
+        btn.setStyleSheet(estilo)
+        btn.clicked.connect(lambda _, u=usuario: self._toggle_bloqueo(u))
+
         contenedor = QWidget()
         lay = QHBoxLayout(contenedor)
-        lay.setContentsMargins(4, 2, 4, 2)
-        lay.setSpacing(6)
-        etiqueta = "Desbloquear" if usuario.cuenta_bloqueada else "Bloquear"
-        btn = QPushButton(etiqueta)
-        btn.setObjectName("btnSuccess" if usuario.cuenta_bloqueada else "btnDanger")
-        btn.setCursor(Qt.PointingHandCursor)
-        btn.clicked.connect(lambda _, u=usuario: self._toggle_bloqueo(u))
+        lay.setContentsMargins(6, 2, 6, 2)
+        lay.setAlignment(Qt.AlignCenter)
+        lay.setSpacing(0)
         lay.addWidget(btn)
-        lay.addStretch()
         return contenedor
