@@ -158,7 +158,6 @@ class VentanaEditar(QWidget):
         self.lblAviso.setVisible(False)
         hoy = QDate.currentDate()
         self.inputFechaInicio.setDate(hoy)
-        self.inputFechaInicio.setDate(hoy)
         self._actualizar_fecha_fin()
         self._set_modo_lectura(True)
 
