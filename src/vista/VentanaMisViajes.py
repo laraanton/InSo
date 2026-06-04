@@ -1,16 +1,17 @@
+import os
+from PyQt5.QtWidgets import QMainWindow, QMessageBox, QWidget, QSizePolicy
 from PyQt5 import uic
-from PyQt5.QtCore import QDate
-from PyQt5.QtWidgets import QMainWindow, QMessageBox
 
-Form, Window = uic.loadUiType("./src/vista/ui/vistaDetallePaquete.ui")
+Form, Window = uic.loadUiType("./src/vista/ui/vistaMisViajes.ui")
+
+_UI_DIR = os.path.join(os.path.dirname(__file__), "ui")
 
 
-class VentanaDetallePaquete(QMainWindow, Form):
-    def __init__(self, user, paquete: dict):
+class VentanaMisViajes(QMainWindow, Form):
+    def __init__(self, user):
         super().__init__()
         self.setupUi(self)
         self.user = user
-        self.paquete = paquete
         self._controlador = None
 
     @property
@@ -20,94 +21,80 @@ class VentanaDetallePaquete(QMainWindow, Form):
     @controlador.setter
     def controlador(self, value):
         self._controlador = value
-        self._rellenar_datos()
-        self._conectar_señales()
+        self._cargar_datos()
+        self._connect_signals()
+        self._cargar_viajes()
 
-    def _rellenar_datos(self):
-        p = self.paquete
-        destino   = p.get("destino", "Destino")
-        duracion  = p.get("duracion", 0)
-        perfil    = p.get("perfil", "General")
-        accesible = "Sí" if p.get("accesibilidad") else "No"
+    def _cargar_datos(self):
+        self.userNameLabel.setText(self.user.nombre_completo.split()[0])
+        self.avatarLabel.setText(self.user.nombre_completo[0].upper())
 
-        self.setWindowTitle(f"Detalle · {destino}")
-        self.lbl_nombre_paquete.setText(f"{destino} · {duracion} noches")
-        self.lbl_meta.setText(f"Perfil: {perfil} · Accesible: {accesible}")
-        self.chip_servicios.setText(p.get("servicios", "Servicios incluidos"))
-        self.chip_accesibilidad.setText("Accesible" if p.get("accesibilidad") else "No accesible")
-        self.chip_perfil.setText(perfil)
-        self.lbl_descripcion.setText(p.get("descripcion", "Sin descripción"))
+    def _connect_signals(self):
+        self.logoBtn.clicked.connect(self._controlador.volver_a_principal)
+        self.btnNavAjustes.clicked.connect(self._controlador.ir_a_ajustes)
+        self.btnLogout.clicked.connect(self._cerrar_sesion)
 
-        self.stat_duracion_val.setText(str(duracion))
+    # ── Carga de viajes ───────────────────────────────────────────────────────
 
-        hoy = QDate.currentDate()
-        self.dt_inicio.setDate(hoy)
-        self.dt_fin.setDate(hoy.addDays(int(duracion)))
+    def _cargar_viajes(self):
+        while self.listaViajes.count():
+            item = self.listaViajes.takeAt(0)
+            if item.widget():
+                item.widget().deleteLater()
 
-        self._actualizar_total()
+        viajes = self._controlador.obtener_viajes_cliente()
 
-    def _conectar_señales(self):
-        self.dt_inicio.dateChanged.connect(self._actualizar_fecha_fin)
-        self.dt_fin.dateChanged.connect(self._actualizar_total)
-        self.spin_personas.valueChanged.connect(self._actualizar_total)
-        self.btn_confirmar.clicked.connect(self._confirmar)
-        self.btn_volver.clicked.connect(self._controlador.volver_a_principal)
+        if not viajes:
+            self.placeholderIcon.show()
+            self.placeholderLabel.show()
+            self.placeholderSub.show()
+            self.scrollViajes.hide()
+            return
 
-    def _actualizar_fecha_fin(self):
-        duracion = int(self.paquete.get("duracion", 0))
-        nueva_fin = self.dt_inicio.date().addDays(duracion)
-        self.dt_fin.blockSignals(True)
-        self.dt_fin.setDate(nueva_fin)
-        self.dt_fin.blockSignals(False)
-        self._actualizar_total()
+        self.placeholderIcon.hide()
+        self.placeholderLabel.hide()
+        self.placeholderSub.hide()
+        self.scrollViajes.show()
 
-    def _actualizar_total(self):
-        personas = self.spin_personas.value()
-        total    = self._controlador.calcular_total(self.paquete, personas)
+        for viaje in viajes:
+            card = self._crear_tarjeta(viaje)
+            self.listaViajes.addWidget(card)
+
+        self.scrollContent.adjustSize()
+        self.scrollViajes.updateGeometry()
+
+    def _crear_tarjeta(self, viaje: dict) -> QWidget:
+        contenedor = QWidget()
+        uic.loadUi(os.path.join(_UI_DIR, "cardPaqueteViaje.ui"), contenedor)
+
+        duracion = viaje["duracion"]
+        sufijo = f"{duracion} noche" if str(duracion) == "1" else f"{duracion} noches"
+        contenedor.card_titulo.setText(f"{viaje.get('destino', '')} · {sufijo}")
+
+        descripcion =  viaje["servicios"] if viaje["servicios"] else viaje["descripcion"][:60]
+        contenedor.card_desc.setText(descripcion)
 
         try:
-            precio = float(self.paquete.get("precio", 0))
+            precio_fmt = f"Desde {float(viaje['monto_total']):.0f} €"
         except (ValueError, TypeError):
-            precio = 0.0
+            precio_fmt = f"Desde {viaje['monto_total']} €"
+        contenedor.card_precio.setText(precio_fmt)
 
-        self.lbl_total_valor.setText(f"{total:,.2f} €")
-        self.lbl_total_sub.setText(f"{precio:,.2f} € × {personas} persona(s)")
-        self.stat_total_val.setText(f"{total:,.2f} €")
-        self.stat_precio_val.setText(f"{precio:,.2f} €")
+        pid = viaje["pedido_id"]
+        contenedor.card_btn.clicked.connect(lambda _checked, p=pid: self._controlador.ver_pedido(p))
 
-    def _confirmar(self):
-        fecha_ini = self.dt_inicio.date().toPyDate()
-        fecha_fin = self.dt_fin.date().toPyDate()
-        personas  = self.spin_personas.value()
-        metodo    = self.combo_pago.currentText()
+        contenedor.setSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        contenedor.setFixedHeight(155)
+        return contenedor
 
-        # El controlador valida, la vista solo muestra el error
-        ok, msg = self._controlador.validar_compra(
-            self.paquete, fecha_ini, fecha_fin, personas, metodo
-        )
-        if not ok:
-            QMessageBox.warning(self, "Error", msg)
-            return
+    # ── Sesión ────────────────────────────────────────────────────────────────
 
-        total = self._controlador.calcular_total(self.paquete, personas)
+    def _cerrar_sesion(self):
         resp = QMessageBox.question(
-            self, "Confirmar reserva",
-            f"<b>{self.paquete.get('destino')}</b><br><br>"
-            f"Fechas: {fecha_ini.strftime('%d/%m/%Y')} → {fecha_fin.strftime('%d/%m/%Y')}<br>"
-            f"Personas: {personas}<br>"
-            f"Método de pago: {metodo}<br><br>"
-            f"<b>Total: {total:,.2f} €</b><br><br>"
-            f"¿Confirmas la reserva?",
-            QMessageBox.Yes | QMessageBox.No, QMessageBox.No,
+            self, "Cerrar sesión",
+            "¿Deseas cerrar la sesión actual?",
+            QMessageBox.Yes | QMessageBox.No,
+            QMessageBox.No,
         )
-        if resp != QMessageBox.Yes:
-            return
-
-        exito, mensaje = self._controlador.comprar_paquete(
-            self.paquete, fecha_ini, fecha_fin, personas, metodo
-        )
-        if exito:
-            QMessageBox.information(self, "Reserva confirmada", mensaje)
-            self._controlador.ir_a_mis_viajes()
-        else:
-            QMessageBox.warning(self, "Error en la reserva", mensaje)
+        if resp == QMessageBox.Yes:
+            self._controlador.cerrar_sesion()
