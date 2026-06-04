@@ -34,20 +34,20 @@ class ControladorCliente:
     def ir_a_ajustes(self):
         self.ventana_ajustes = VentanaAjustesCuenta(self.user)
         self.ventana_ajustes.controlador = self
-        self.ventana_ajustes.show()
         self._ocultar_todas_menos(self.ventana_ajustes)
+        self.ventana_ajustes.show()
 
     def ir_a_resultados(self, paquetes, termino, fecha, n_personas):
         self.ventana_resultados = VentanaResultados(self.user, paquetes, termino, fecha, n_personas)
         self.ventana_resultados.controlador = self
-        self.ventana_resultados.show()
         self._ocultar_todas_menos(self.ventana_resultados)
+        self.ventana_resultados.show()
 
     def ir_a_mis_viajes(self):
         self.ventana_viajes = VentanaMisViajes(self.user)
         self.ventana_viajes.controlador = self
-        self.ventana_viajes.show()
         self._ocultar_todas_menos(self.ventana_viajes)
+        self.ventana_viajes.show()
 
     def volver_a_principal(self):
         self._ocultar_todas_menos(None)
@@ -55,14 +55,14 @@ class ControladorCliente:
 
     def cerrar_sesion(self):
         self._cerrar_todo()
-        if self._ctrl_principal:
-            self._ctrl_principal.cerrarSesion()
+        self._ctrl_principal.ventanaIniciarSesion()
 
     def _ocultar_todas_menos(self, excepcion):
         for v in [self.ventana_principal, self.ventana_ajustes,
                   self.ventana_viajes, self.ventana_detalle,
                   self.ventana_compra, self.ventana_resultados]:
             if v and v is not excepcion:
+                print(v)
                 v.hide()
 
     def _cerrar_todo(self):
