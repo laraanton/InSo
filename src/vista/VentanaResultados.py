@@ -2,7 +2,6 @@ import os
 from PyQt5 import uic
 from PyQt5.QtWidgets import QMainWindow, QWidget, QSizePolicy
 from PyQt5.QtCore import QDate
-from src.controlador.ControladorCliente import ControladorCliente
 
 Form, Window = uic.loadUiType("./src/vista/ui/vistaResultados.ui")
 
@@ -16,9 +15,15 @@ class VentanaResultados(QMainWindow, Form):
         self.termino  = termino
         self.fecha = fecha
         self.personas = n_personas
-        self.controlador = ControladorCliente(user)
-        self.controlador.ventana_detalle = self
+        self._controlador = None
 
+    @property
+    def controlador(self):
+        return self._controlador
+
+    @controlador.setter
+    def controlador(self, value):
+        self._controlador = value
         self._inicializar_buscador()
         self._connect_signals()
         self._poblar_resultados()
@@ -38,7 +43,7 @@ class VentanaResultados(QMainWindow, Form):
         self.logoBtn.clicked.connect(self._volver)
         self.btnVolver.clicked.connect(self._volver)
         self.btnBuscar.clicked.connect(self._nueva_busqueda)
-        self.btnCuenta.clicked.connect(self.controlador.ir_a_ajustes)
+        self.btnCuenta.clicked.connect(self._controlador.ir_a_ajustes)
 
     # ── Resultados ────────────────────────────────────────────────────────────
 
@@ -124,14 +129,13 @@ class VentanaResultados(QMainWindow, Form):
         if fecha_vuelta < fecha_ida:
             return
 
-        nuevos = self.controlador.buscar_paquetes(destino)
+        nuevos = self._controlador.buscar_paquetes(destino)
         self.paquetes = nuevos
         self.termino  = destino
         self._poblar_resultados()
 
     def _ver_paquete(self, paquete_id: int):
-        self.controlador.ventana_principal = self
-        self.controlador.ver_paquete_buscado(paquete_id, self.fecha, self.personas)
+        self._controlador.ver_paquete_buscado(paquete_id, self.fecha, self.personas)
 
     def _volver(self):
-        self.controlador.volver_a_principal()
+        self._controlador.volver_a_principal()
