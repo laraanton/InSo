@@ -14,7 +14,7 @@ class ControladorPrincipal:
         self._modelo = modelo
         self._ventana_actual = None
 
-    def ventanaInciarSesion(self):
+    def ventanaIniciarSesion(self):
         self._ventanaLogin.show()
 
     def abrirRegistro(self):
@@ -40,8 +40,12 @@ class ControladorPrincipal:
         elif tipo == "Cliente":
             self._ventana_actual = VentanaCliente(user)
             self._ventana_actual.controlador = ControladorCliente(user, self)
+            cliente = True
 
-        if self._ventana_actual:
+        if self._ventana_actual and cliente:
+            self._ventana_actual.controlador.abrir_principal()
+
+        elif self._ventana_actual:
             self._ventana_actual.show()
 
     def cerrarSesion(self):
