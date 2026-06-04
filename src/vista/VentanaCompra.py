@@ -75,7 +75,6 @@ class VentanaCompra(QWidget):
         t.setColumnWidth(COL_ESTADO, 130)
 
     def _conectar_senales(self):
-        self.btnNuevaReserva.clicked.connect(self._nueva_reserva)
         self.btnExportar.clicked.connect(self._exportar_csv)
         self.inputBuscar.textChanged.connect(self._filtrar) # filtra en tiempo real al escribir
         self.comboEstado.currentIndexChanged.connect(self._filtrar) # filtra al cambiar el combo
@@ -172,21 +171,6 @@ class VentanaCompra(QWidget):
                 item.setBackground(QColor(bg))
                 item.setForeground(QColor(fg))
     
-    def _nueva_reserva(self):
-        # abre el diálogo modal; si el usuario cancela, no hace nada
-        dialogo = _DialogoNuevaReserva(self)
-        if dialogo.exec_() != QDialog.Accepted:
-            return
-
-        datos = dialogo.datos()
-        if not datos:
-            return
-
-        resultado = self._ctrl.registrar_reserva(datos)
-        self._set_estado(resultado.mensaje, error=not resultado.ok)
-        if resultado.ok:
-            self.refrescar()
-
     # función exportar csv con los datos de reservas
     def _exportar_csv(self):
         # diálogo para elegir dónde guardar el CSV
@@ -206,47 +190,6 @@ class VentanaCompra(QWidget):
         color = "#e05252" if error else "#5e8d8d"
         self.lblEstado.setStyleSheet(f"color: {color}; font-weight: bold;")
 
-
-# ── Diálogo auxiliar para nueva reserva ───────────────────────────────────────
-
-class _DialogoNuevaReserva(QDialog):
-
-    def __init__(self, parent=None):
-        super().__init__(parent)
-        self.setWindowTitle("Nueva reserva")
-        self.setMinimumWidth(320)
-
-        lay = QFormLayout(self)
-
-        # campos del formulario
-        self._cliente_id = QLineEdit()
-        self._paquete_id = QLineEdit()
-        self._monto = QLineEdit()
-        self._metodo_pago = QLineEdit("PayPal")
-        self._fecha_ini = QLineEdit()   # YYYY-MM-DD  (puede quedar vacío)
-        self._fecha_fin = QLineEdit()
-
-        # textos de ayuda por si el campo está vacío
-        self._cliente_id.setPlaceholderText("Entero, p.ej. 12")
-        self._paquete_id.setPlaceholderText("Entero, p.ej. 3")
-        self._monto.setPlaceholderText("Decimal, p.ej. 1200.00")
-        self._fecha_ini.setPlaceholderText("YYYY-MM-DD  (opcional)")
-        self._fecha_fin.setPlaceholderText("YYYY-MM-DD  (opcional)")
-
-        lay.addRow("ID Cliente *", self._cliente_id)
-        lay.addRow("ID Paquete *", self._paquete_id)
-        lay.addRow("Monto total", self._monto)
-        lay.addRow("Método pago", self._metodo_pago)
-        lay.addRow("Fecha inicio", self._fecha_ini)
-        lay.addRow("Fecha fin", self._fecha_fin)
-
-        botones = QDialogButtonBox(
-            QDialogButtonBox.Ok | QDialogButtonBox.Cancel,
-            parent=self,
-        )
-        botones.accepted.connect(self._validar_y_aceptar) # OK -> valida antes de cerrar
-        botones.rejected.connect(self.reject) # Candcelar -> cierra sin hacer nada
-        lay.addRow(botones)
 
     def _validar_y_aceptar(self):
         # valida que los campos obligatorios sean números enteros antes de aceptar
