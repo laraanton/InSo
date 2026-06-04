@@ -1,12 +1,13 @@
 import os
 import numpy as np
 from PyQt5 import uic
-from PyQt5.QtWidgets import QWidget, QVBoxLayout
+from PyQt5.QtWidgets import QWidget, QVBoxLayout, QFileDialog
 
 import matplotlib
 matplotlib.use("Qt5Agg")
 from matplotlib.backends.backend_qt5agg import FigureCanvasQTAgg as FigureCanvas
 from matplotlib.figure import Figure
+from datetime import date
 
 from src.modelo.vo.AnalisisVO import AnalisisVO
 
@@ -19,6 +20,8 @@ class VentanaAnalisis(QWidget):
     def __init__(self, user=None):
         super().__init__()
         uic.loadUi(UI_FILE, self)
+
+        
 
         self.user = user
         self._controlador = None
@@ -107,6 +110,7 @@ class VentanaAnalisis(QWidget):
         else:
             ax.text(0.5, 0.5, "Sin datos", ha="center")
         ax.tick_params(axis='both', labelsize=4)
+
         return fig
 
     def _fig_ingresos(self, d):
@@ -163,6 +167,7 @@ class VentanaAnalisis(QWidget):
             ax.bar([x["categoria"] for x in data],
                    [x["cantidad"] for x in data])
         ax.tick_params(axis='both', labelsize=6)
+
         return fig
 
     def _fig_perfil(self, d):
@@ -174,6 +179,7 @@ class VentanaAnalisis(QWidget):
             ax.barh([x["perfil"] for x in data],
                     [x["media_presupuesto"] for x in data])
         ax.tick_params(axis='both', labelsize=6)
+
         return fig
 
     def _set_estado(self, msg, error=False):
@@ -181,7 +187,19 @@ class VentanaAnalisis(QWidget):
         self.lblEstado.setStyleSheet(
             f"color: {'#e05252' if error else '#5e8d8d'};"
         )
+
  
     def _exportar(self):
-        r = self._controlador.exportar_analisis(self.cbPeriodo.currentText())
+
+        ruta, _ = QFileDialog.getSaveFileName(
+            self,
+            "Exportar análisis",
+            f"analisis_{date.today().isoformat()}.csv",
+            "CSV (*.csv)"
+        )
+
+        if not ruta:  # el usuario canceló
+            return
+
+        r = self._controlador.exportar_analisis(self.cbPeriodo.currentText(), ruta)
         self._set_estado(r.mensaje, not r.ok)
