@@ -26,11 +26,12 @@
        <widget class="QWidget" name="widget" native="true">
         <widget class="QWidget" name="widget_2" native="true">
          <property name="geometry">
+         <!-- Medidas para recuadro con formulario-->
           <rect>
-           <x>10</x>
+           <x>9</x>
            <y>130</y>
            <width>531</width>
-           <height>671</height>
+           <height>680</height>
           </rect>
          </property>
          <property name="styleSheet">
@@ -40,6 +41,7 @@
 	border: 1px solid rgba(200, 220, 245, 0.6);
 }</string>
          </property>
+
          <widget class="QLabel" name="lbl_titulo">
           <property name="geometry">
            <rect>
@@ -59,6 +61,7 @@
            <set>Qt::AlignCenter</set>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_dni">
           <property name="geometry">
            <rect>
@@ -69,13 +72,25 @@
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="placeholderText">
            <string>DNI / NIE</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_nombre">
           <property name="geometry">
            <rect>
@@ -86,13 +101,25 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="placeholderText">
            <string>Nombre completo</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_email">
           <property name="geometry">
            <rect>
@@ -103,13 +130,25 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="placeholderText">
            <string>Email</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_telefono">
           <property name="geometry">
            <rect>
@@ -120,13 +159,25 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="placeholderText">
            <string>Teléfono (opcional)</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_contrasena">
           <property name="geometry">
            <rect>
@@ -137,8 +188,19 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
@@ -147,6 +209,7 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            <string>Contraseña</string>
           </property>
          </widget>
+
          <widget class="QLineEdit" name="in_confirmar">
           <property name="geometry">
            <rect>
@@ -157,8 +220,19 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QLineEdit { font-size: 15px; color: #2c4a6e; background-color: rgba(230, 241, 251, 0.7); border: none; border-bottom: 2px solid rgba(55, 138, 221, 0.5); border-radius: 8px; padding: 6px 12px; }
-QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2px solid rgb(55, 138, 221); }</string>
+           <string notr="true">QLineEdit {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QLineEdit:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}</string>
           </property>
           <property name="echoMode">
            <enum>QLineEdit::Password</enum>
@@ -167,45 +241,191 @@ QLineEdit:focus { background-color: rgba(230, 241, 251, 0.95); border-bottom: 2p
            <string>Confirmar contraseña</string>
           </property>
          </widget>
+
+         <!-- Preferencia -->
+         <widget class="QComboBox" name="in_preferencia">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>460</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QComboBox {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QComboBox:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}
+QComboBox::drop-down {
+	border: none;
+	padding-right: 10px;
+}
+QComboBox QAbstractItemView {
+	background-color: #ffffff;
+	color: #2c4a6e;
+	selection-background-color: rgba(55, 138, 221, 0.15);
+	border: 1px solid rgba(55, 138, 221, 0.3);
+	border-radius: 8px;
+	padding: 4px;
+}</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>General</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Familiar</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Jubilado</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Movilidad reducida</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Escolar</string>
+           </property>
+          </item>
+         </widget>
+
+<!-- Accesibilidad -->
+         <widget class="QComboBox" name="in_accesibilidad">
+          <property name="geometry">
+           <rect>
+            <x>70</x>
+            <y>520</y>
+            <width>371</width>
+            <height>41</height>
+           </rect>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QComboBox {
+	font-size: 15px;
+	color: #2c4a6e;
+	background-color: rgba(230, 241, 251, 0.7);
+	border: none;
+	border-bottom: 2px solid rgba(55, 138, 221, 0.5);
+	border-radius: 8px;
+	padding: 6px 12px;
+}
+QComboBox:focus {
+	background-color: rgba(230, 241, 251, 0.95);
+	border-bottom: 2px solid rgb(55, 138, 221);
+}
+QComboBox::drop-down {
+	border: none;
+	padding-right: 10px;
+}
+QComboBox QAbstractItemView {
+	background-color: #ffffff;
+	color: #2c4a6e;
+	selection-background-color: rgba(55, 138, 221, 0.15);
+	border: 1px solid rgba(55, 138, 221, 0.3);
+	border-radius: 8px;
+	padding: 4px;
+}</string>
+          </property>
+          <item>
+           <property name="text">
+            <string>Ninguna</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Dificultad lectura</string>
+           </property>
+          </item>
+          <item>
+           <property name="text">
+            <string>Movilidad Reducida</string>
+           </property>
+          </item>
+         </widget>
+         <!-- Botón -->
          <widget class="QPushButton" name="botonRegistrar">
           <property name="geometry">
            <rect>
             <x>70</x>
-            <y>590</y>
+            <y>595</y>
             <width>371</width>
             <height>28</height>
            </rect>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton { background-color: rgb(29, 147, 197); color: white; font-size: 14px; font-weight: 500; letter-spacing: 1px; border: none; border-radius: 8px; padding: 6px; }
-QPushButton:hover { background-color: rgb(24, 95, 165); }
-QPushButton:pressed { background-color: rgb(12, 68, 124); }</string>
+           <string notr="true">QPushButton {
+	background-color: rgb(29, 147, 197);
+	color: white;
+	font-size: 14px;
+	font-weight: 500;
+	letter-spacing: 1px;
+	border: none;
+	border-radius: 8px;
+	padding: 6px;
+}
+QPushButton:hover {
+	background-color: rgb(24, 95, 165);
+}
+QPushButton:pressed {
+	background-color: rgb(12, 68, 124);
+}</string>
           </property>
           <property name="text">
            <string>Registrarse</string>
           </property>
          </widget>
-         <widget class="QPushButton" name="botonVolver">
-          <property name="geometry">
-           <rect>
-            <x>70</x>
-            <y>628</y>
-            <width>371</width>
-            <height>28</height>
-           </rect>
-          </property>
-          <property name="cursor">
-           <cursorShape>PointingHandCursor</cursorShape>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton { background-color: transparent; color: rgb(29, 147, 197); font-size: 13px; font-weight: 400; border: none; border-radius: 8px; padding: 6px; }
-QPushButton:hover { color: rgb(24, 95, 165); text-decoration: underline; }
-QPushButton:pressed { color: rgb(12, 68, 124); }</string>
-          </property>
-          <property name="text">
-           <string>← Volver al inicio de sesión</string>
-          </property>
-         </widget>
+        <!-- Botón Volver al Login -->
+        <widget class="QPushButton" name="botonVolver">
+        <property name="geometry">
+        <rect>
+        <x>70</x>
+        <y>635</y>
+        <width>371</width>
+        <height>28</height>
+        </rect>
+        </property>
+        <property name="styleSheet">
+        <string notr="true">QPushButton {
+            background-color: transparent;
+            color: rgb(29, 147, 197);
+            font-size: 13px;
+            font-weight: 400;
+            border: none;
+            border-radius: 8px;
+            padding: 6px;
+        }
+        QPushButton:hover {
+            color: rgb(24, 95, 165);
+            text-decoration: underline;
+        }
+        QPushButton:pressed {
+            color: rgb(12, 68, 124);
+        }</string>
+        </property>
+        <property name="text">
+        <string>← Volver al inicio de sesión</string>
+        </property>
+        <property name="cursor">
+        <cursorShape>PointingHandCursor</cursorShape>
+        </property>
+        </widget>
         </widget>
        </widget>
       </item>
