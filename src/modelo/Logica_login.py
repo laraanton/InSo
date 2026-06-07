@@ -19,8 +19,9 @@ class BussinessObject():
                 self._intentos[email] += 1
             else:
                 self._intentos[email] = 1
-                if self._intentos[email] >= 5:
-                    return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
+                
+            if self._intentos[email] >= 5:
+                return None, "Has superado tu límite de intentos. ¡Vuelve más tarde!"
             return None, "Credenciales incorrectas"
 
         self._intentos[email] = 0
